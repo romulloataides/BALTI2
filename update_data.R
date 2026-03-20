@@ -18,17 +18,21 @@ nsa_boundaries <- st_read(nsa_url, quiet = TRUE) %>%
   select(Neighborhood = Name, geometry) %>%
   mutate(Neighborhood = trimws(Neighborhood))
 
-# 3. EXTRACT & TRANSFORM: Live 311 Environmental Hazards
-print("Fetching and processing 311 data...")
-# Pull last 90 days to capture current acute hazards
-three11_url <- "https://data.baltimorecity.gov/resource/ni4d-8w7k.json?$where=createddate >= '2025-12-01T00:00:00'"
+# 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
+print("Fetching historical 311 data (this may take a few minutes)...")
+
+# Pull exactly 2016 through 2023 to match your JavaScript slider years
+three11_url <- "https://data.baltimorecity.gov/resource/ni4d-8w7k.json?$where=createddate >= '2016-01-01T00:00:00' AND createddate <= '2023-12-31T23:59:59'"
 raw_311 <- read.socrata(three11_url)
 
-nsa_311_summary <- raw_311 %>%
+nsa_311_clean <- raw_311 %>%
   filter(srstatus != "Closed (Duplicate)", !is.na(latitude), !is.na(longitude)) %>%
-  mutate(latitude = as.numeric(latitude), longitude = as.numeric(longitude)) %>%
+  mutate(
+    latitude = as.numeric(latitude),
+    longitude = as.numeric(longitude),
+    Year = as.numeric(substr(createddate, 1, 4)) # Extract the exact year
+  ) %>%
   st_as_sf(coords = c("longitude", "latitude"), crs = 4326) %>%
-  # Spatial join: map points to neighborhoods
   st_join(nsa_boundaries, join = st_intersects) %>%
   st_drop_geometry() %>%
   filter(!is.na(Neighborhood)) %>%
@@ -40,12 +44,41 @@ nsa_311_summary <- raw_311 %>%
       TRUE ~ "other"
     )
   ) %>%
-  filter(Category != "other") %>%
+  filter(Category != "other")
+
+# Aggregate by Neighborhood, Category, and Year
+nsa_311_yearly <- nsa_311_clean %>%
+  group_by(Neighborhood, Category, Year) %>%
+  summarize(Total = n(), .groups = 'drop')
+
+# Calculate the Composite Total Hazards (hz) per year
+total_hazards <- nsa_311_yearly %>%
+  group_by(Neighborhood, Year) %>%
+  summarize(Total = sum(Total), .groups = 'drop') %>%
+  mutate(Category = "hz")
+
+# Combine specific categories with the composite totals
+all_311_yearly <- bind_rows(nsa_311_yearly, total_hazards)
+
+# ALIGNMENT MATRIX: We must ensure every neighborhood has a value for EVERY year (even if 0)
+# This prevents arrays from being too short and breaking the JavaScript slider
+complete_grid <- expand_grid(
+  Neighborhood = unique(nsa_boundaries$Neighborhood),
+  Category = c("rt", "dp", "ws", "hz"),
+  Year = 2016:2023
+)
+
+nsa_311_arrays <- complete_grid %>%
+  left_join(all_311_yearly, by = c("Neighborhood", "Category", "Year")) %>%
+  mutate(Total = replace_na(Total, 0)) %>%
+  arrange(Neighborhood, Category, Year) %>%
+  
+  # NEST THE DATA: Collapse the years into an array (list) for each category
   group_by(Neighborhood, Category) %>%
-  summarize(Total = n(), .groups = 'drop') %>%
-  pivot_wider(names_from = Category, values_from = Total, values_fill = list(Total = 0)) %>%
-  # Create a composite environmental hazard score
-  mutate(hz = rt + dp + ws)
+  summarize(yearly_array = list(Total), .groups = 'drop') %>%
+  
+  # PIVOT: Turn categories into columns
+  pivot_wider(names_from = Category, values_from = yearly_array)
 
 # 4. EXTRACT & TRANSFORM: ACS Demographic Baselines
 print("Fetching and processing Census data...")
