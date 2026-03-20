@@ -68,10 +68,7 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
   meta_response <- GET(service_url, query = list(f = "json"), timeout(60))
   stop_for_status(meta_response)
 
-  meta <- fromJSON(
-    content(meta_response, "text", encoding = "UTF-8"),
-    simplifyVector = FALSE
-  )
+  meta <- fromJSON(content(meta_response, "text", encoding = "UTF-8"))
 
   if (!is.null(meta$error)) {
     stop(
@@ -112,10 +109,7 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
     )
     stop_for_status(response)
 
-    payload <- fromJSON(
-      content(response, "text", encoding = "UTF-8"),
-      simplifyVector = FALSE
-    )
+    payload <- fromJSON(content(response, "text", encoding = "UTF-8"))
 
     if (!is.null(payload$error)) {
       stop(
@@ -133,11 +127,14 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
       break
     }
 
-    attrs <- purrr::map(features, function(feature) {
-      if (is.null(feature$attributes)) list() else feature$attributes
-    })
-
-    batch <- dplyr::bind_rows(lapply(attrs, tibble::as_tibble))
+    if (is.data.frame(features) && "attributes" %in% names(features)) {
+      batch <- tibble::as_tibble(features$attributes)
+    } else if (is.list(features)) {
+      attrs <- purrr::map(features, "attributes")
+      batch <- dplyr::bind_rows(attrs)
+    } else {
+      stop(paste("Unexpected ArcGIS feature structure for", service_url))
+    }
 
     if (nrow(batch) == 0) {
       break
@@ -331,5 +328,3 @@ json_ready_data <- split(final_dashboard_data, final_dashboard_data$Neighborhood
 write_json(json_ready_data, "data.json", auto_unbox = TRUE, pretty = TRUE)
 
 print("Pipeline Complete! Longitudinal data.json updated.")
-
-
