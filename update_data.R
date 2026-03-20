@@ -4,7 +4,7 @@ library(jsonlite)
 library(tidycensus)
 library(httr)
 
-print("Starting Baltimore Health Data Pipeline...")
+print("Starting Baltimore Health Data Pipeline (CSA Architecture)...")
 
 normalize_name <- function(x) {
   x %>%
@@ -19,7 +19,8 @@ empty_311_tbl <- tibble(
   SRType = character(),
   SRStatus = character(),
   CreatedDate = numeric(),
-  Neighborhood = character()
+  Longitude = numeric(),
+  Latitude = numeric()
 )
 
 coerce_311_schema <- function(df) {
@@ -29,33 +30,24 @@ coerce_311_schema <- function(df) {
 
   df <- as_tibble(df)
 
-  if (!"SRType" %in% names(df)) {
-    df$SRType <- NA_character_
-  }
-  if (!"SRStatus" %in% names(df)) {
-    df$SRStatus <- NA_character_
-  }
-  if (!"CreatedDate" %in% names(df)) {
-    df$CreatedDate <- NA_real_
-  }
-  if (!"Neighborhood" %in% names(df)) {
-    df$Neighborhood <- NA_character_
-  }
+  if (!"SRType" %in% names(df)) df$SRType <- NA_character_
+  if (!"SRStatus" %in% names(df)) df$SRStatus <- NA_character_
+  if (!"CreatedDate" %in% names(df)) df$CreatedDate <- NA_real_
+  if (!"Longitude" %in% names(df)) df$Longitude <- NA_real_
+  if (!"Latitude" %in% names(df)) df$Latitude <- NA_real_
 
   df %>%
     transmute(
       SRType = as.character(SRType),
       SRStatus = as.character(SRStatus),
       CreatedDate = as.numeric(CreatedDate),
-      Neighborhood = as.character(Neighborhood)
+      Longitude = as.numeric(Longitude),
+      Latitude = as.numeric(Latitude)
     )
 }
 
 parse_arcgis_batch <- function(txt) {
-  parsed_fast <- tryCatch(
-    fromJSON(txt),
-    error = function(e) NULL
-  )
+  parsed_fast <- tryCatch(fromJSON(txt), error = function(e) NULL)
 
   if (
     !is.null(parsed_fast) &&
@@ -63,33 +55,32 @@ parse_arcgis_batch <- function(txt) {
     is.data.frame(parsed_fast$features) &&
     "attributes" %in% names(parsed_fast$features)
   ) {
-    return(coerce_311_schema(parsed_fast$features$attributes))
+    attrs <- parsed_fast$features$attributes
+    geoms <- parsed_fast$features$geometry
+    
+    # Extract the GPS coordinates from the spatial JSON
+    if (!is.null(geoms) && "x" %in% names(geoms) && "y" %in% names(geoms)) {
+      attrs$Longitude <- geoms$x
+      attrs$Latitude <- geoms$y
+    }
+    return(coerce_311_schema(attrs))
   }
 
-  parsed_safe <- tryCatch(
-    fromJSON(txt, simplifyVector = FALSE),
-    error = function(e) NULL
-  )
+  parsed_safe <- tryCatch(fromJSON(txt, simplifyVector = FALSE), error = function(e) NULL)
 
-  if (
-    !is.null(parsed_safe) &&
-    !is.null(parsed_safe$features) &&
-    length(parsed_safe$features) > 0
-  ) {
+  if (!is.null(parsed_safe) && !is.null(parsed_safe$features) && length(parsed_safe$features) > 0) {
     rows <- purrr::map_dfr(parsed_safe$features, function(feature) {
-      attr <- feature$attributes
-      if (is.null(attr)) {
-        attr <- list()
-      }
+      attr <- feature$attributes %||% list()
+      geom <- feature$geometry %||% list()
 
       tibble(
         SRType = if (is.null(attr$SRType)) NA_character_ else as.character(attr$SRType),
         SRStatus = if (is.null(attr$SRStatus)) NA_character_ else as.character(attr$SRStatus),
         CreatedDate = if (is.null(attr$CreatedDate)) NA_real_ else as.numeric(attr$CreatedDate),
-        Neighborhood = if (is.null(attr$Neighborhood)) NA_character_ else as.character(attr$Neighborhood)
+        Longitude = if (is.null(geom$x)) NA_real_ else as.numeric(geom$x),
+        Latitude = if (is.null(geom$y)) NA_real_ else as.numeric(geom$y)
       )
     })
-
     return(coerce_311_schema(rows))
   }
 
@@ -98,68 +89,32 @@ parse_arcgis_batch <- function(txt) {
 
 # 1. SETUP: Authenticate Census API
 census_key <- trimws(Sys.getenv("CENSUS_API_KEY"))
-if (identical(census_key, "")) {
-  stop("CENSUS_API_KEY is not set.")
-}
+if (identical(census_key, "")) stop("CENSUS_API_KEY is not set.")
 Sys.setenv(CENSUS_API_KEY = census_key)
 
-# 2. EXTRACT: Fetch Spatial Boundaries
-print("Fetching neighborhood boundaries...")
-
-nsa_url <- paste0(
-  "https://egis.baltimorecity.gov/egis/rest/services/",
-  "Housing/dmxBoundaries/MapServer/1/query?",
-  "where=1%3D1&outFields=Name&returnGeometry=true&f=geojson"
-)
-
-response <- GET(
-  nsa_url,
-  add_headers(
-    `User-Agent` = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-    Accept = "application/geo+json, application/json;q=0.9, */*;q=0.8"
-  ),
-  timeout(60)
-)
-
-stop_for_status(response)
-
-content_type <- headers(response)[["content-type"]]
-boundary_text <- content(response, "text", encoding = "UTF-8")
-
-if (is.null(content_type)) {
-  content_type <- "unknown"
+# 2. EXTRACT: Fetch Spatial Boundaries (CSAs)
+print("Loading Local CSA Boundaries...")
+if(!file.exists("csa_boundaries.geojson")) {
+  stop("Missing csa_boundaries.geojson! Please upload the BNIA shapefile to your repo.")
 }
 
-if (
-  !str_detect(str_to_lower(content_type), "json") ||
-  !str_detect(boundary_text, '"type"\\s*:\\s*"FeatureCollection"')
-) {
-  stop(
-    paste0(
-      "Boundary endpoint did not return valid GeoJSON. Content-Type: ",
-      content_type,
-      ". Response starts with: ",
-      substr(boundary_text, 1, 200)
-    )
-  )
-}
+csa_boundaries <- st_read("csa_boundaries.geojson", quiet = TRUE) %>%
+  st_transform(crs = 4326)
 
-writeLines(boundary_text, "nsa_boundaries.geojson", useBytes = TRUE)
+# Auto-detect BNIA's CSA name column (usually CSA2010, CSA2020, or Name)
+csa_col <- names(csa_boundaries)[str_detect(str_to_lower(names(csa_boundaries)), "csa2010|csa2020|csa_name|name")][1]
+if(is.na(csa_col)) stop("Could not detect the CSA name column in the geojson.")
 
-nsa_boundaries <- st_read("nsa_boundaries.geojson", quiet = TRUE) %>%
-  st_transform(crs = 4326) %>%
-  select(Neighborhood = Name, geometry) %>%
+csa_boundaries <- csa_boundaries %>%
+  rename(CSA = !!sym(csa_col)) %>%
+  select(CSA, geometry) %>%
   mutate(
-    Neighborhood = trimws(Neighborhood),
-    Neighborhood_key = normalize_name(Neighborhood)
+    CSA = trimws(CSA),
+    CSA_key = normalize_name(CSA)
   )
-
-boundary_lookup <- nsa_boundaries %>%
-  st_drop_geometry() %>%
-  distinct(Neighborhood, Neighborhood_key)
 
 # 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
-print("Fetching historical 311 data...")
+print("Fetching historical 311 data with GPS coordinates...")
 
 fetch_arcgis_layer <- function(service_url, out_fields) {
   meta_response <- GET(service_url, query = list(f = "json"), timeout(60))
@@ -168,23 +123,8 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
   meta_text <- content(meta_response, "text", encoding = "UTF-8")
   meta <- tryCatch(fromJSON(meta_text), error = function(e) NULL)
 
-  if (!is.null(meta) && !is.null(meta$error)) {
-    stop(
-      paste(
-        "ArcGIS metadata request failed for",
-        service_url,
-        ":",
-        meta$error$message
-      )
-    )
-  }
-
   page_size <- if (!is.null(meta$maxRecordCount)) meta$maxRecordCount else 2000L
-  if (is.null(page_size) || page_size <= 0) {
-    page_size <- 2000L
-  }
   page_size <- min(as.integer(page_size), 2000L)
-
   offset <- 0L
   batches <- list()
 
@@ -194,7 +134,8 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
       query = list(
         where = "1=1",
         outFields = paste(out_fields, collapse = ","),
-        returnGeometry = "false",
+        returnGeometry = "true", # FORCE SERVER TO SEND GPS POINTS
+        outSR = "4326",
         orderByFields = "RowID ASC",
         resultOffset = offset,
         resultRecordCount = page_size,
@@ -203,41 +144,16 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
       timeout(120)
     )
     stop_for_status(response)
-
     txt <- content(response, "text", encoding = "UTF-8")
-
-    parsed_error <- tryCatch(fromJSON(txt), error = function(e) NULL)
-    if (!is.null(parsed_error) && !is.null(parsed_error$error)) {
-      stop(
-        paste(
-          "ArcGIS query failed for",
-          service_url,
-          ":",
-          parsed_error$error$message
-        )
-      )
-    }
-
     batch <- parse_arcgis_batch(txt)
 
-    if (nrow(batch) == 0) {
-      break
-    }
-
+    if (nrow(batch) == 0) break
     batches[[length(batches) + 1L]] <- batch
-
-    has_more <- str_detect(txt, '"exceededTransferLimit"\\s*:\\s*true')
-    if (!has_more) {
-      break
-    }
-
+    if (!str_detect(txt, '"exceededTransferLimit"\\s*:\\s*true')) break
     offset <- offset + nrow(batch)
   }
 
-  if (length(batches) == 0) {
-    return(empty_311_tbl)
-  }
-
+  if (length(batches) == 0) return(empty_311_tbl)
   dplyr::bind_rows(batches)
 }
 
@@ -259,34 +175,23 @@ for (year_label in names(three11_sources)) {
   print(paste("  Downloading 311 records for", year_label, "..."))
   three11_batches[[year_label]] <- fetch_arcgis_layer(
     three11_sources[[year_label]],
-    out_fields = c("SRType", "SRStatus", "CreatedDate", "Neighborhood")
+    out_fields = c("SRType", "SRStatus", "CreatedDate") # Removed Neighborhood string
   )
 }
 
-raw_311 <- dplyr::bind_rows(three11_batches) %>%
-  coerce_311_schema()
+raw_311 <- dplyr::bind_rows(three11_batches) %>% coerce_311_schema()
 
-if (nrow(raw_311) == 0) {
-  warning("No parseable 311 rows were downloaded. 311 outputs will default to zeros.")
-}
-
-nsa_311_clean <- raw_311 %>%
-  filter(!is.na(CreatedDate), !is.na(Neighborhood), Neighborhood != "") %>%
-  mutate(
-    Neighborhood_raw = str_squish(Neighborhood),
-    Year = lubridate::year(lubridate::as_datetime(CreatedDate / 1000, tz = "UTC")),
-    Neighborhood_key = normalize_name(Neighborhood_raw)
-  ) %>%
-  left_join(boundary_lookup, by = "Neighborhood_key") %>%
-  filter(
-    !is.na(Neighborhood.y),
-    Year >= 2016,
-    Year <= 2023,
-    SRStatus != "Closed (Duplicate)"
-  ) %>%
+# The Spatial Intersection: Map exact GPS points to BNIA CSA Polygons
+csa_311_clean <- raw_311 %>%
+  filter(!is.na(CreatedDate), !is.na(Longitude), !is.na(Latitude)) %>%
+  mutate(Year = lubridate::year(lubridate::as_datetime(CreatedDate / 1000, tz = "UTC"))) %>%
+  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+  st_join(csa_boundaries, join = st_intersects) %>%
+  st_drop_geometry() %>%
+  filter(!is.na(CSA), Year >= 2016, Year <= 2023, SRStatus != "Closed (Duplicate)") %>%
   transmute(
-    Neighborhood = Neighborhood.y,
-    Neighborhood_key = Neighborhood_key,
+    CSA = CSA,
+    CSA_key = CSA_key,
     Category = case_when(
       str_detect(str_to_lower(SRType), "rat|rodent") ~ "rt",
       str_detect(str_to_lower(SRType), "trash|dumping") ~ "dp",
@@ -297,38 +202,34 @@ nsa_311_clean <- raw_311 %>%
   ) %>%
   filter(Category != "other")
 
-nsa_311_yearly <- nsa_311_clean %>%
-  group_by(Neighborhood, Neighborhood_key, Category, Year) %>%
+csa_311_yearly <- csa_311_clean %>%
+  group_by(CSA, CSA_key, Category, Year) %>%
   summarize(Total = n(), .groups = "drop")
 
-total_hazards <- nsa_311_yearly %>%
-  group_by(Neighborhood, Neighborhood_key, Year) %>%
+total_hazards <- csa_311_yearly %>%
+  group_by(CSA, CSA_key, Year) %>%
   summarize(Total = sum(Total), .groups = "drop") %>%
   mutate(Category = "hz")
 
-all_311_yearly <- bind_rows(nsa_311_yearly, total_hazards)
+all_311_yearly <- bind_rows(csa_311_yearly, total_hazards)
 
 complete_grid <- tidyr::crossing(
-  boundary_lookup,
+  csa_boundaries %>% st_drop_geometry() %>% select(CSA, CSA_key),
   Category = c("rt", "dp", "ws", "hz"),
   Year = 2016:2023
 )
 
-nsa_311_arrays <- complete_grid %>%
-  left_join(all_311_yearly, by = c("Neighborhood", "Neighborhood_key", "Category", "Year")) %>%
+csa_311_arrays <- complete_grid %>%
+  left_join(all_311_yearly, by = c("CSA", "CSA_key", "Category", "Year")) %>%
   mutate(Total = replace_na(Total, 0)) %>%
-  arrange(Neighborhood, Category, Year) %>%
-  group_by(Neighborhood, Neighborhood_key, Category) %>%
+  arrange(CSA, Category, Year) %>%
+  group_by(CSA, CSA_key, Category) %>%
   summarize(yearly_array = list(as.numeric(Total)), .groups = "drop") %>%
   pivot_wider(names_from = Category, values_from = yearly_array)
 
 # 4. EXTRACT & TRANSFORM: ACS Demographic Baselines
 print("Fetching and processing Census data...")
-
-acs_vars <- c(
-  Poverty = "B17001_002",
-  Total_Pop = "B17001_001"
-)
+acs_vars <- c(Poverty = "B17001_002", Total_Pop = "B17001_001")
 
 baltimore_acs <- get_acs(
   geography = "tract",
@@ -346,13 +247,13 @@ baltimore_acs <- get_acs(
   ) %>%
   select(GEOID, pv, geometry)
 
-nsa_acs_summary <- st_intersection(
-  nsa_boundaries %>% select(Neighborhood, Neighborhood_key),
+csa_acs_summary <- st_intersection(
+  csa_boundaries %>% select(CSA, CSA_key),
   baltimore_acs
 ) %>%
   mutate(intersect_area = st_area(geometry)) %>%
   st_drop_geometry() %>%
-  group_by(Neighborhood, Neighborhood_key) %>%
+  group_by(CSA, CSA_key) %>%
   summarize(
     pv = round(weighted.mean(pv, as.numeric(intersect_area), na.rm = TRUE), 1),
     .groups = "drop"
@@ -363,40 +264,20 @@ base_data_path <- "data.json"
 
 if (file.exists(base_data_path)) {
   current_data_raw <- read_json(base_data_path, simplifyVector = FALSE)
-
-  if (
-    !is.list(current_data_raw) ||
-    is.null(names(current_data_raw)) ||
-    any(names(current_data_raw) == "")
-  ) {
-    stop(
-      paste(
-        "data.json must be a named object keyed by Neighborhood.",
-        "Example: {\"Canton\": {\"hi\": 84, \"le\": 80, ...}}"
-      )
-    )
-  }
-
   current_data <- tibble(
-    Neighborhood = names(current_data_raw),
+    CSA = names(current_data_raw),
     data = unname(current_data_raw)
   ) %>%
     unnest_wider(data) %>%
-    mutate(Neighborhood_key = normalize_name(Neighborhood))
+    mutate(CSA_key = normalize_name(CSA))
 } else {
   stop("Missing initial data.json to use as a base.")
 }
 
 final_dashboard_data <- current_data %>%
   select(-any_of(c("pv", "rt", "dp", "ws", "hz"))) %>%
-  left_join(
-    nsa_acs_summary %>% select(Neighborhood_key, pv),
-    by = "Neighborhood_key"
-  ) %>%
-  left_join(
-    nsa_311_arrays %>% select(Neighborhood_key, rt, dp, ws, hz),
-    by = "Neighborhood_key"
-  ) %>%
+  left_join(csa_acs_summary %>% select(CSA_key, pv), by = "CSA_key") %>%
+  left_join(csa_311_arrays %>% select(CSA_key, rt, dp, ws, hz), by = "CSA_key") %>%
   mutate(pv = replace_na(pv, 0))
 
 array_cols <- intersect(c("rt", "dp", "ws", "hz"), names(final_dashboard_data))
@@ -410,13 +291,10 @@ if (length(array_cols) > 0) {
 
 # 6. LOAD: Write to JSON
 print("Formatting and writing output...")
+json_source <- final_dashboard_data %>% select(-CSA_key)
 
-json_source <- final_dashboard_data %>%
-  select(-Neighborhood_key)
-
-json_ready_data <- split(json_source, json_source$Neighborhood) %>%
-  map(~ .x %>% select(-Neighborhood) %>% as.list() %>% map(~ .x[[1]]))
+json_ready_data <- split(json_source, json_source$CSA) %>%
+  map(~ .x %>% select(-CSA) %>% as.list() %>% map(~ .x[[1]]))
 
 write_json(json_ready_data, "data.json", auto_unbox = TRUE, pretty = TRUE)
-
-print("Pipeline Complete! Longitudinal data.json updated.")
+print("Pipeline Complete! Longitudinal CSA data.json updated.")
