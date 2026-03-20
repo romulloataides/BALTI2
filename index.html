@@ -524,6 +524,9 @@ function renderTwo(){
 
   document.getElementById('t-det').innerHTML=`<div style="display:flex;gap:8px;font-size:9px;margin-bottom:5px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_A};display:inline-block;border-radius:1px"></span>${p1.split('/')[0]}</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_B};display:inline-block;border-radius:1px"></span>${p2.split('/')[0]}</span></div>`+
     [['le','Life exp',85,' yrs'],['as','Asthma ED',100,''],['la','Lead',75,'%'],['pv','Poverty',55,'%'],['un','Unemploy.',25,'%'],['va','Vacant',28,'%'],['hz','Total Hazards',250,' calls'],['rt','Rat Erad.',100,' calls'],['dp','Illegal Dump',100,' calls'],['ws','Water/Sewer',100,' calls']].map(([k,l,mx,u])=>{
+      const a=yv(p1,k,yi)||0,b=yv(p2,k,yi)||0,w1=Math.min(94,Math.round((a/mx)*94)),w2=Math.min(94,Math.round((b/mx)*94)),g=Math.abs(Math.round((a-b)*10)/10);
+      return`<div style="padding:3px 0;border-bottom:0.5px solid var(--br)"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:9px;color:var(--t2)">${l}</span><span style="font-size:9px;color:var(--t3)">gap:${g}${u}</span></div><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A}">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B}">${b}${u}</span></div></div>`;
+    }).join('')+'<div class="src-n" style="margin-top:4px">BNIA · BCHD · ACS · EJScreen</div>';
 
   renderReportsFor2(p1,p2,'t-rp2');
   document.getElementById('t-sb2').innerHTML=makeSubmitForm(p1,p2);
