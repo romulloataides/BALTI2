@@ -97,11 +97,11 @@ parse_arcgis_batch <- function(txt) {
 }
 
 # 1. SETUP: Authenticate Census API
-census_key <- Sys.getenv("CENSUS_API_KEY")
+census_key <- trimws(Sys.getenv("CENSUS_API_KEY"))
 if (identical(census_key, "")) {
   stop("CENSUS_API_KEY is not set.")
 }
-census_api_key(census_key)
+Sys.setenv(CENSUS_API_KEY = census_key)
 
 # 2. EXTRACT: Fetch Spatial Boundaries
 print("Fetching neighborhood boundaries...")
