@@ -64,35 +64,144 @@ nsa_boundaries <- st_read("nsa_boundaries.geojson", quiet = TRUE) %>%
 # 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
 print("Fetching historical 311 data...")
 
-three11_url <- paste0(
-  "https://data.baltimorecity.gov/resource/ni4d-8w7k.csv?",
-  "$where=createddate>='2016-01-01T00:00:00'%20AND%20",
-  "createddate<='2023-12-31T23:59:59'&$limit=1000000"
+fetch_arcgis_layer <- function(service_url, out_fields) {
+  meta_response <- GET(service_url, query = list(f = "json"), timeout(60))
+  stop_for_status(meta_response)
+
+  meta <- fromJSON(
+    content(meta_response, "text", encoding = "UTF-8"),
+    simplifyVector = FALSE
+  )
+
+  if (!is.null(meta$error)) {
+    stop(
+      paste(
+        "ArcGIS metadata request failed for",
+        service_url,
+        ":",
+        meta$error$message
+      )
+    )
+  }
+
+  page_size <- meta$standardMaxRecordCountNoGeometry
+  if (is.null(page_size) || page_size <= 0) {
+    page_size <- meta$maxRecordCount
+  }
+  if (is.null(page_size) || page_size <= 0) {
+    page_size <- 2000L
+  }
+  page_size <- min(as.integer(page_size), 32000L)
+
+  offset <- 0L
+  batches <- list()
+
+  repeat {
+    response <- GET(
+      service_url,
+      query = list(
+        where = "1=1",
+        outFields = paste(out_fields, collapse = ","),
+        returnGeometry = "false",
+        orderByFields = "RowID ASC",
+        resultOffset = offset,
+        resultRecordCount = page_size,
+        f = "json"
+      ),
+      timeout(120)
+    )
+    stop_for_status(response)
+
+    payload <- fromJSON(
+      content(response, "text", encoding = "UTF-8"),
+      simplifyVector = FALSE
+    )
+
+    if (!is.null(payload$error)) {
+      stop(
+        paste(
+          "ArcGIS query failed for",
+          service_url,
+          ":",
+          payload$error$message
+        )
+      )
+    }
+
+    features <- payload$features
+    if (is.null(features) || length(features) == 0) {
+      break
+    }
+
+    batch <- purrr::map_dfr(features, function(feature) {
+      tibble::as_tibble(feature$attributes)
+    })
+
+    batches[[length(batches) + 1L]] <- batch
+
+    if (!isTRUE(payload$exceededTransferLimit)) {
+      break
+    }
+
+    offset <- offset + nrow(batch)
+  }
+
+  bind_rows(batches)
+}
+
+three11_sources <- c(
+  "2016" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_Yearly/FeatureServer/6",
+  "2017" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_Yearly/FeatureServer/5",
+  "2018" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_Yearly/FeatureServer/4",
+  "2019" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_Yearly/FeatureServer/3",
+  "2020" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_Yearly/FeatureServer/2",
+  "2021" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_Yearly/FeatureServer/1",
+  "2022" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_Yearly/FeatureServer/0",
+  "2023" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_2023/FeatureServer/0"
 )
 
-raw_311 <- read_csv(three11_url, show_col_types = FALSE)
+raw_311 <- purrr::imap_dfr(three11_sources, function(service_url, year_label) {
+  print(paste("  Downloading 311 records for", year_label, "..."))
+  fetch_arcgis_layer(
+    service_url,
+    out_fields = c("SRType", "SRStatus", "CreatedDate", "Neighborhood")
+  )
+})
+
+neighborhood_lookup <- tibble(
+  Neighborhood = unique(nsa_boundaries$Neighborhood),
+  neighborhood_key = str_to_lower(str_squish(Neighborhood))
+)
 
 nsa_311_clean <- raw_311 %>%
-  filter(srstatus != "Closed (Duplicate)", !is.na(latitude), !is.na(longitude)) %>%
-  mutate(
-    latitude = as.numeric(latitude),
-    longitude = as.numeric(longitude),
-    Year = as.numeric(substr(createddate, 1, 4))
+  transmute(
+    SRType = SRType,
+    SRStatus = SRStatus,
+    CreatedDate = as.numeric(CreatedDate),
+    Neighborhood_raw = str_squish(Neighborhood)
   ) %>%
-  filter(!is.na(latitude), !is.na(longitude), !is.na(Year)) %>%
-  st_as_sf(coords = c("longitude", "latitude"), crs = 4326, remove = FALSE) %>%
-  st_join(nsa_boundaries, join = st_intersects) %>%
-  st_drop_geometry() %>%
-  filter(!is.na(Neighborhood)) %>%
+  filter(!is.na(CreatedDate), !is.na(Neighborhood_raw), Neighborhood_raw != "") %>%
+  mutate(
+    Year = lubridate::year(lubridate::as_datetime(CreatedDate / 1000, tz = "UTC")),
+    neighborhood_key = str_to_lower(Neighborhood_raw)
+  ) %>%
+  left_join(neighborhood_lookup, by = "neighborhood_key") %>%
+  filter(
+    !is.na(Neighborhood),
+    Year >= 2016,
+    Year <= 2023,
+    SRStatus != "Closed (Duplicate)"
+  ) %>%
   mutate(
     Category = case_when(
-      str_detect(str_to_lower(srtype), "rat|rodent") ~ "rt",
-      str_detect(str_to_lower(srtype), "trash|dumping") ~ "dp",
-      str_detect(str_to_lower(srtype), "water|sewer") ~ "ws",
+      str_detect(str_to_lower(SRType), "rat|rodent") ~ "rt",
+      str_detect(str_to_lower(SRType), "trash|dumping") ~ "dp",
+      str_detect(str_to_lower(SRType), "water|sewer") ~ "ws",
       TRUE ~ "other"
     )
   ) %>%
-  filter(Category != "other")
+  filter(Category != "other") %>%
+  select(Neighborhood, Category, Year)
 
 nsa_311_yearly <- nsa_311_clean %>%
   group_by(Neighborhood, Category, Year) %>%
@@ -204,3 +313,4 @@ json_ready_data <- split(final_dashboard_data, final_dashboard_data$Neighborhood
 write_json(json_ready_data, "data.json", auto_unbox = TRUE, pretty = TRUE)
 
 print("Pipeline Complete! Longitudinal data.json updated.")
+
