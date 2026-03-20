@@ -262,7 +262,18 @@ const YEARS=[2016,2017,2018,2019,2020,2021,2022,2023];
 let BASE={};
 
 const RATES={hi:.4,le:.08,as:-.6,la:-.5,va:-.2,pv:-.3,un:-.25,hs:.15,fd:.3,gs:.1,hw:-.2,cr:-.5,in:.8,tp:.2,dp:.4};
-function yv(nsa,k,yi){const b=BASE[nsa];if(!b||b[k]===undefined)return null;const r=RATES[k]||0;const noise=Math.sin(yi*17+b[k])*.25;return Math.round((b[k]+r*(yi-7)+noise)*10)/10;}
+function yv(nsa,k,yi){
+  const b=BASE[nsa];
+  if(!b||b[k]===undefined)return null;
+  
+  // NEW LINE: If the data is an array of real historical years, use the exact number!
+  if(Array.isArray(b[k])) return b[k][yi]; 
+  
+  // Otherwise, fallback to the simulator
+  const r=RATES[k]||0;
+  const noise=Math.sin(yi*17+b[k])*.25;
+  return Math.round((b[k]+r*(yi-7)+noise)*10)/10;
+}
 function allY(nsa,k){return YEARS.map((_,i)=>yv(nsa,k,i));}
 const MCFG={hi:{label:'Health index',min:25,max:87,inv:false,unit:''},le:{label:'Life exp.',min:59,max:82,inv:false,unit:' yrs'},as:{label:'Asthma ED /1k',min:14,max:97,inv:true,unit:''},la:{label:'Lead exp.',min:7,max:72,inv:true,unit:'%'},va:{label:'Vacant',min:1,max:28,inv:true,unit:'%'},pv:{label:'Poverty',min:3,max:52,inv:true,unit:'%'},un:{label:'Unemploy.',min:2,max:25,inv:true,unit:'%'},hs:{label:'HS grad',min:58,max:99,inv:false,unit:'%'},hz:{label:'311 Hazards',min:0,max:250,inv:true,unit:' calls'}};
 const PAL_G=['#A32D2D','#D85A30','#EF9F27','#3A7CC4','#1D9E75'];
