@@ -11,7 +11,12 @@ census_api_key(Sys.getenv("CENSUS_API_KEY"))
 # 2. EXTRACT: Fetch Spatial Boundaries (NSAs)
 print("Fetching NSA Boundaries...")
 nsa_url <- "https://opendata.baltimorecity.gov/egis/rest/services/Hosted/Neighborhood_Statistical_Areas/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
-nsa_boundaries <- st_read(nsa_url, quiet = TRUE) %>%
+
+# Workaround: Download the file locally first to bypass GDAL's finicky web driver
+download.file(nsa_url, destfile = "nsa_boundaries.geojson", method = "auto", quiet = TRUE)
+
+# Read the local file
+nsa_boundaries <- st_read("nsa_boundaries.geojson", quiet = TRUE) %>%
   st_transform(crs = 4326) %>%
   select(Neighborhood = Name, geometry) %>%
   mutate(Neighborhood = trimws(Neighborhood))
