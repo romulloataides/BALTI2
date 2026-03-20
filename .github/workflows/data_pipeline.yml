@@ -38,7 +38,8 @@ jobs:
           CENSUS_API_KEY: ${{ secrets.CENSUS_API_KEY }}
 
       - name: Commit and Push Changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Automated SDoH data update"
-          file_pattern: "data.json"
+        - uses: stefanzweifel/git-auto-commit-action@v5
+  with:
+    commit_message: Automated SDoH data update
+    file_pattern: data.json
+    push_options: '--force'
