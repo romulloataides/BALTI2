@@ -15,6 +15,87 @@ normalize_name <- function(x) {
     str_to_lower()
 }
 
+empty_311_tbl <- tibble(
+  SRType = character(),
+  SRStatus = character(),
+  CreatedDate = numeric(),
+  Neighborhood = character()
+)
+
+coerce_311_schema <- function(df) {
+  if (is.null(df) || nrow(df) == 0) {
+    return(empty_311_tbl)
+  }
+
+  df <- as_tibble(df)
+
+  if (!"SRType" %in% names(df)) {
+    df$SRType <- NA_character_
+  }
+  if (!"SRStatus" %in% names(df)) {
+    df$SRStatus <- NA_character_
+  }
+  if (!"CreatedDate" %in% names(df)) {
+    df$CreatedDate <- NA_real_
+  }
+  if (!"Neighborhood" %in% names(df)) {
+    df$Neighborhood <- NA_character_
+  }
+
+  df %>%
+    transmute(
+      SRType = as.character(SRType),
+      SRStatus = as.character(SRStatus),
+      CreatedDate = as.numeric(CreatedDate),
+      Neighborhood = as.character(Neighborhood)
+    )
+}
+
+parse_arcgis_batch <- function(txt) {
+  parsed_fast <- tryCatch(
+    fromJSON(txt),
+    error = function(e) NULL
+  )
+
+  if (
+    !is.null(parsed_fast) &&
+    !is.null(parsed_fast$features) &&
+    is.data.frame(parsed_fast$features) &&
+    "attributes" %in% names(parsed_fast$features)
+  ) {
+    return(coerce_311_schema(parsed_fast$features$attributes))
+  }
+
+  parsed_safe <- tryCatch(
+    fromJSON(txt, simplifyVector = FALSE),
+    error = function(e) NULL
+  )
+
+  if (
+    !is.null(parsed_safe) &&
+    !is.null(parsed_safe$features) &&
+    length(parsed_safe$features) > 0
+  ) {
+    rows <- purrr::map_dfr(parsed_safe$features, function(feature) {
+      attr <- feature$attributes
+      if (is.null(attr)) {
+        attr <- list()
+      }
+
+      tibble(
+        SRType = if (is.null(attr$SRType)) NA_character_ else as.character(attr$SRType),
+        SRStatus = if (is.null(attr$SRStatus)) NA_character_ else as.character(attr$SRStatus),
+        CreatedDate = if (is.null(attr$CreatedDate)) NA_real_ else as.numeric(attr$CreatedDate),
+        Neighborhood = if (is.null(attr$Neighborhood)) NA_character_ else as.character(attr$Neighborhood)
+      )
+    })
+
+    return(coerce_311_schema(rows))
+  }
+
+  empty_311_tbl
+}
+
 # 1. SETUP: Authenticate Census API
 census_key <- Sys.getenv("CENSUS_API_KEY")
 if (identical(census_key, "")) {
@@ -84,12 +165,10 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
   meta_response <- GET(service_url, query = list(f = "json"), timeout(60))
   stop_for_status(meta_response)
 
-  meta <- fromJSON(
-    content(meta_response, "text", encoding = "UTF-8"),
-    simplifyVector = FALSE
-  )
+  meta_text <- content(meta_response, "text", encoding = "UTF-8")
+  meta <- tryCatch(fromJSON(meta_text), error = function(e) NULL)
 
-  if (!is.null(meta$error)) {
+  if (!is.null(meta) && !is.null(meta$error)) {
     stop(
       paste(
         "ArcGIS metadata request failed for",
@@ -100,7 +179,7 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
     )
   }
 
-  page_size <- meta$maxRecordCount
+  page_size <- if (!is.null(meta$maxRecordCount)) meta$maxRecordCount else 2000L
   if (is.null(page_size) || page_size <= 0) {
     page_size <- 2000L
   }
@@ -125,40 +204,21 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
     )
     stop_for_status(response)
 
-    payload <- fromJSON(
-      content(response, "text", encoding = "UTF-8"),
-      simplifyVector = FALSE
-    )
+    txt <- content(response, "text", encoding = "UTF-8")
 
-    if (!is.null(payload$error)) {
+    parsed_error <- tryCatch(fromJSON(txt), error = function(e) NULL)
+    if (!is.null(parsed_error) && !is.null(parsed_error$error)) {
       stop(
         paste(
           "ArcGIS query failed for",
           service_url,
           ":",
-          payload$error$message
+          parsed_error$error$message
         )
       )
     }
 
-    features <- payload$features
-    if (is.null(features) || length(features) == 0) {
-      break
-    }
-
-    batch <- purrr::map_dfr(features, function(feature) {
-      attr <- feature$attributes
-      if (is.null(attr)) {
-        attr <- list()
-      }
-
-      tibble(
-        SRType = if (is.null(attr$SRType)) NA_character_ else as.character(attr$SRType),
-        SRStatus = if (is.null(attr$SRStatus)) NA_character_ else as.character(attr$SRStatus),
-        CreatedDate = if (is.null(attr$CreatedDate)) NA_real_ else as.numeric(attr$CreatedDate),
-        Neighborhood = if (is.null(attr$Neighborhood)) NA_character_ else as.character(attr$Neighborhood)
-      )
-    })
+    batch <- parse_arcgis_batch(txt)
 
     if (nrow(batch) == 0) {
       break
@@ -166,11 +226,16 @@ fetch_arcgis_layer <- function(service_url, out_fields) {
 
     batches[[length(batches) + 1L]] <- batch
 
-    if (!isTRUE(payload$exceededTransferLimit)) {
+    has_more <- str_detect(txt, '"exceededTransferLimit"\\s*:\\s*true')
+    if (!has_more) {
       break
     }
 
     offset <- offset + nrow(batch)
+  }
+
+  if (length(batches) == 0) {
+    return(empty_311_tbl)
   }
 
   dplyr::bind_rows(batches)
@@ -187,55 +252,50 @@ three11_sources <- c(
   "2023" = "https://services1.arcgis.com/UWYHeuuJISiGmgXx/ArcGIS/rest/services/311_Customer_Service_Requests_2023/FeatureServer/0"
 )
 
-raw_311 <- purrr::imap_dfr(three11_sources, function(service_url, year_label) {
+three11_batches <- vector("list", length(three11_sources))
+names(three11_batches) <- names(three11_sources)
+
+for (year_label in names(three11_sources)) {
   print(paste("  Downloading 311 records for", year_label, "..."))
-  fetch_arcgis_layer(
-    service_url,
+  three11_batches[[year_label]] <- fetch_arcgis_layer(
+    three11_sources[[year_label]],
     out_fields = c("SRType", "SRStatus", "CreatedDate", "Neighborhood")
-  )
-})
-
-required_cols <- c("SRType", "SRStatus", "CreatedDate", "Neighborhood")
-missing_cols <- setdiff(required_cols, names(raw_311))
-
-if (length(missing_cols) > 0) {
-  stop(
-    paste(
-      "311 data is missing required columns:",
-      paste(missing_cols, collapse = ", ")
-    )
   )
 }
 
+raw_311 <- dplyr::bind_rows(three11_batches) %>%
+  coerce_311_schema()
+
+if (nrow(raw_311) == 0) {
+  warning("No parseable 311 rows were downloaded. 311 outputs will default to zeros.")
+}
+
 nsa_311_clean <- raw_311 %>%
-  transmute(
-    SRType = SRType,
-    SRStatus = SRStatus,
-    CreatedDate = as.numeric(CreatedDate),
-    Neighborhood_raw = str_squish(Neighborhood)
-  ) %>%
-  filter(!is.na(CreatedDate), !is.na(Neighborhood_raw), Neighborhood_raw != "") %>%
+  filter(!is.na(CreatedDate), !is.na(Neighborhood), Neighborhood != "") %>%
   mutate(
+    Neighborhood_raw = str_squish(Neighborhood),
     Year = lubridate::year(lubridate::as_datetime(CreatedDate / 1000, tz = "UTC")),
     Neighborhood_key = normalize_name(Neighborhood_raw)
   ) %>%
   left_join(boundary_lookup, by = "Neighborhood_key") %>%
   filter(
-    !is.na(Neighborhood),
+    !is.na(Neighborhood.y),
     Year >= 2016,
     Year <= 2023,
     SRStatus != "Closed (Duplicate)"
   ) %>%
-  mutate(
+  transmute(
+    Neighborhood = Neighborhood.y,
+    Neighborhood_key = Neighborhood_key,
     Category = case_when(
       str_detect(str_to_lower(SRType), "rat|rodent") ~ "rt",
       str_detect(str_to_lower(SRType), "trash|dumping") ~ "dp",
       str_detect(str_to_lower(SRType), "water|sewer") ~ "ws",
       TRUE ~ "other"
-    )
+    ),
+    Year = Year
   ) %>%
-  filter(Category != "other") %>%
-  select(Neighborhood, Neighborhood_key, Category, Year)
+  filter(Category != "other")
 
 nsa_311_yearly <- nsa_311_clean %>%
   group_by(Neighborhood, Neighborhood_key, Category, Year) %>%
