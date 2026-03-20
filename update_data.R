@@ -13,9 +13,11 @@ print("Fetching NSA Boundaries...")
 nsa_url <- "https://opendata.baltimorecity.gov/egis/rest/services/Hosted/Neighborhood_Statistical_Areas/FeatureServer/0/query?outFields=*&where=1%3D1&f=geojson"
 
 # Workaround: Download the file locally first to bypass GDAL's finicky web driver
-download.file(nsa_url, destfile = "nsa_boundaries.geojson", method = "auto", quiet = TRUE)
+# We add a User-Agent disguise so the city's server doesn't block the automated request
+options(HTTPUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+download.file(nsa_url, destfile = "nsa_boundaries.geojson", mode = "wb", quiet = TRUE)
 
-# Read the local file
+# Read the local file instead of the URL
 nsa_boundaries <- st_read("nsa_boundaries.geojson", quiet = TRUE) %>%
   st_transform(crs = 4326) %>%
   select(Neighborhood = Name, geometry) %>%
@@ -23,7 +25,6 @@ nsa_boundaries <- st_read("nsa_boundaries.geojson", quiet = TRUE) %>%
 
 # 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
 print("Fetching historical 311 data...")
-# We use CSV format and add limit=1000000 to bypass the default 1000 row cap
 three11_url <- "https://data.baltimorecity.gov/resource/ni4d-8w7k.csv?$where=createddate>='2016-01-01T00:00:00'%20AND%20createddate<='2023-12-31T23:59:59'&$limit=1000000"
 raw_311 <- read_csv(three11_url)
 
@@ -121,6 +122,9 @@ json_ready_data <- final_dashboard_data %>%
   column_to_rownames(var = "Neighborhood") %>%
   as.list() %>%
   purrr::transpose()
+
+write_json(json_ready_data, "data.json", auto_unbox = TRUE, pretty = TRUE)
+print("Pipeline Complete! Longitudinal data.json updated.")
 
 write_json(json_ready_data, "data.json", auto_unbox = TRUE, pretty = TRUE)
 print("Pipeline Complete! Longitudinal data.json updated.")updated.")
