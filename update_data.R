@@ -707,14 +707,18 @@ year_benchmark_record <- function(tbl, year) {
   record[map_lgl(record, ~ length(.x) == 1 && !is.na(.x))]
 }
 
+empty_benchmark_import <- function() {
+  list(
+    state = tibble(Year = integer()),
+    federal = tibble(Year = integer()),
+    metrics = character(),
+    sources = character()
+  )
+}
+
 load_acs_benchmark_series <- function(years = 2016:2023, has_census_key = FALSE) {
   if (!has_census_key) {
-    return(list(
-      state = tibble(Year = integer()),
-      federal = tibble(Year = integer()),
-      metrics = character(),
-      sources = character()
-    ))
+    return(empty_benchmark_import())
   }
 
   lesshs_ids <- sprintf("B15003_%03d", 2:16)
@@ -906,6 +910,123 @@ load_cdc_asthma_benchmark_series <- function(years = 2016:2023) {
     federal = rows %>% transmute(Year, as = as_federal) %>% filter(!is.na(as)),
     metrics = "as",
     sources = map_chr(requested_specs, ~ paste0("https://data.cdc.gov/resource/", .x$dataset_id, ".csv"))
+  )
+}
+
+load_cdc_life_expectancy_benchmark_series <- function(years = 2016:2023) {
+  csv_url <- "https://www.cdc.gov/nchs/data-visualization/state-life-expectancy/data/USLT-2018-2022.csv"
+
+  raw <- tryCatch(
+    {
+      response <- GET(csv_url, timeout(120))
+      stop_for_status(response)
+      txt <- content(response, "text", encoding = "UTF-8")
+      readr::read_csv(I(txt), show_col_types = FALSE, progress = FALSE)
+    },
+    error = function(e) {
+      warning(paste("CDC life expectancy benchmark refresh failed:", conditionMessage(e)))
+      tibble()
+    }
+  )
+
+  if (!nrow(raw)) {
+    return(empty_benchmark_import())
+  }
+
+  cleaned <- raw %>%
+    transmute(
+      Year = parse_year_value(col_or_default(raw, "Year", NA_integer_)),
+      State = str_squish(as.character(col_or_default(raw, "State", NA_character_))),
+      Sex = str_squish(as.character(col_or_default(raw, "Sex", NA_character_))),
+      le = coerce_numeric_value(col_or_default(raw, "LEB", NA_real_))
+    ) %>%
+    filter(
+      Year %in% years,
+      str_to_lower(Sex) == "total",
+      !is.na(le)
+    )
+
+  list(
+    state = cleaned %>%
+      filter(State == "Maryland") %>%
+      transmute(Year, le),
+    federal = cleaned %>%
+      filter(State == "United States") %>%
+      transmute(Year, le),
+    metrics = "le",
+    sources = c(
+      state = csv_url,
+      federal = csv_url
+    )
+  )
+}
+
+load_cdc_lead_benchmark_series <- function(years = 2016:2023) {
+  workbook_url <- "https://www.cdc.gov/lead-prevention/media/files/2025/08/2017-2022-cbls-national-data-508-1.xlsx"
+
+  if (!requireNamespace("readxl", quietly = TRUE)) {
+    warning("readxl is required for CDC lead benchmark imports. Install readxl to enable Maryland `la` benchmarks.")
+    return(empty_benchmark_import())
+  }
+
+  tmp_path <- tempfile(fileext = ".xlsx")
+  on.exit(unlink(tmp_path), add = TRUE)
+
+  raw <- tryCatch(
+    {
+      response <- GET(workbook_url, write_disk(tmp_path, overwrite = TRUE), timeout(120))
+      stop_for_status(response)
+      readxl::read_excel(tmp_path, skip = 2)
+    },
+    error = function(e) {
+      warning(paste("CDC lead benchmark refresh failed:", conditionMessage(e)))
+      tibble()
+    }
+  )
+
+  if (!nrow(raw)) {
+    return(empty_benchmark_import())
+  }
+
+  normalized_cols <- tibble(
+    source_col = names(raw),
+    normalized = normalize_name(names(raw))
+  )
+
+  year_col <- normalized_cols$source_col[normalized_cols$normalized == "year"][1]
+  state_col <- normalized_cols$source_col[normalized_cols$normalized == "state"][1]
+  pct5_col <- normalized_cols$source_col[
+    normalized_cols$normalized == normalize_name("Percent of Children with Confirmed BLLs ≥5 µg/dL")
+  ][1]
+
+  if (any(is.na(c(year_col, state_col, pct5_col)))) {
+    warning("CDC lead benchmark workbook schema changed unexpectedly; skipping Maryland `la` benchmark refresh.")
+    return(empty_benchmark_import())
+  }
+
+  maryland_tbl <- raw %>%
+    transmute(
+      Year = parse_year_value(.data[[year_col]]),
+      State = str_squish(as.character(.data[[state_col]])),
+      pct5 = as.character(.data[[pct5_col]])
+    ) %>%
+    filter(
+      State == "Maryland",
+      Year %in% years
+    ) %>%
+    transmute(
+      Year,
+      la = coerce_numeric_value(pct5)
+    ) %>%
+    filter(!is.na(la))
+
+  list(
+    state = maryland_tbl,
+    federal = tibble(Year = integer()),
+    metrics = "la",
+    sources = c(
+      state = workbook_url
+    )
   )
 }
 
@@ -1220,17 +1341,23 @@ print("Fetching state and federal benchmark series...")
 acs_benchmark_import <- load_acs_benchmark_series(years = years, has_census_key = has_census_key)
 fred_benchmark_import <- load_fred_unemployment_benchmarks(years = years)
 cdc_benchmark_import <- load_cdc_asthma_benchmark_series(years = years)
+cdc_life_expectancy_benchmark_import <- load_cdc_life_expectancy_benchmark_series(years = years)
+cdc_lead_benchmark_import <- load_cdc_lead_benchmark_series(years = years)
 
 state_benchmark_series <- merge_benchmark_tables(list(
   acs_benchmark_import$state,
   fred_benchmark_import$state,
-  cdc_benchmark_import$state
+  cdc_benchmark_import$state,
+  cdc_life_expectancy_benchmark_import$state,
+  cdc_lead_benchmark_import$state
 ))
 
 federal_benchmark_series <- merge_benchmark_tables(list(
   acs_benchmark_import$federal,
   fred_benchmark_import$federal,
-  cdc_benchmark_import$federal
+  cdc_benchmark_import$federal,
+  cdc_life_expectancy_benchmark_import$federal,
+  cdc_lead_benchmark_import$federal
 ))
 
 legacy_rates <- c(
@@ -1240,6 +1367,39 @@ legacy_rates <- c(
 )
 benchmark_metrics <- c("hi", "le", "as", "la", "va", "pv", "un", "hs", "fd", "gs", "cr")
 inverse_benchmark_metrics <- c("as", "la", "va", "pv", "un", "cr")
+benchmark_metric_bounds <- list(
+  hi = c(0, 100),
+  le = c(0, Inf),
+  as = c(0, 100),
+  la = c(0, 100),
+  va = c(0, 100),
+  pv = c(0, 100),
+  un = c(0, 100),
+  hs = c(0, 100),
+  fd = c(0, 100),
+  gs = c(0, 100),
+  cr = c(0, 100)
+)
+
+clamp_benchmark_value <- function(metric, value) {
+  if (is.null(value) || is.na(value)) {
+    return(value)
+  }
+
+  bounds <- benchmark_metric_bounds[[metric]]
+  if (is.null(bounds) || length(bounds) != 2) {
+    return(round(as.numeric(value), 1))
+  }
+
+  lower <- bounds[[1]]
+  upper <- bounds[[2]]
+  clamped <- max(as.numeric(value), lower)
+  if (is.finite(upper)) {
+    clamped <- min(clamped, upper)
+  }
+
+  round(clamped, 1)
+}
 
 metric_series <- function(x, metric, years = 2016:2023) {
   idx <- seq_along(years) - 1
@@ -1354,7 +1514,7 @@ build_fallback_level_record <- function(city_record, level = c("state", "federal
       0.8 * step
     }
 
-    out[[metric]] <- round(as.numeric(value) + delta, 1)
+    out[[metric]] <- clamp_benchmark_value(metric, as.numeric(value) + delta)
   }
 
   out
@@ -1562,10 +1722,12 @@ for (row_idx in seq_len(nrow(final_dashboard_data))) {
 }
 
 benchmarks_output <- list(city = list(), state = list(), federal = list())
-real_benchmark_metrics <- sort(unique(c(
-  setdiff(names(state_benchmark_series), "Year"),
-  setdiff(names(federal_benchmark_series), "Year")
-)))
+state_real_benchmark_metrics <- sort(setdiff(names(state_benchmark_series), "Year"))
+federal_real_benchmark_metrics <- sort(setdiff(names(federal_benchmark_series), "Year"))
+shared_real_benchmark_metrics <- intersect(state_real_benchmark_metrics, federal_real_benchmark_metrics)
+state_only_real_benchmark_metrics <- setdiff(state_real_benchmark_metrics, federal_real_benchmark_metrics)
+federal_only_real_benchmark_metrics <- setdiff(federal_real_benchmark_metrics, state_real_benchmark_metrics)
+real_benchmark_metrics <- sort(union(state_real_benchmark_metrics, federal_real_benchmark_metrics))
 
 for (idx in seq_along(years)) {
   year_key <- as.character(years[[idx]])
@@ -1667,10 +1829,34 @@ json_ready_data <- list(
       )
     },
     benchmark_note = if (length(real_benchmark_metrics) > 0) {
-      paste0(
-        "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks use real official series for: ",
-        paste(real_benchmark_metrics, collapse = ", "),
-        ". Remaining benchmark metrics still fall back to the provisional scaffold. Benchmark `hi` is derived from available real benchmark components when enough official inputs are present."
+      paste(
+        c(
+          "City benchmarks are derived from Baltimore CSA values.",
+          if (length(shared_real_benchmark_metrics) > 0) {
+            paste0(
+              "State and federal benchmarks use real official series for: ",
+              paste(shared_real_benchmark_metrics, collapse = ", "),
+              "."
+            )
+          },
+          if (length(state_only_real_benchmark_metrics) > 0) {
+            paste0(
+              "State-only official benchmark coverage is available for: ",
+              paste(state_only_real_benchmark_metrics, collapse = ", "),
+              "."
+            )
+          },
+          if (length(federal_only_real_benchmark_metrics) > 0) {
+            paste0(
+              "Federal-only official benchmark coverage is available for: ",
+              paste(federal_only_real_benchmark_metrics, collapse = ", "),
+              "."
+            )
+          },
+          "Remaining benchmark cells still fall back to the provisional scaffold.",
+          "Benchmark `hi` is derived from available real benchmark components when enough official inputs are present."
+        ),
+        collapse = " "
       )
     } else {
       "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected."
@@ -1682,12 +1868,15 @@ json_ready_data <- list(
       state_benchmarks = compact(list(
         acs = if (length(acs_benchmark_import$sources)) acs_benchmark_import$sources[["state"]] else NULL,
         fred = if (length(fred_benchmark_import$sources)) fred_benchmark_import$sources[["state"]] else NULL,
-        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES / 500 Cities aggregate queries (2018-2023)" else NULL
+        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES / 500 Cities aggregate queries (2018-2023)" else NULL,
+        cdc_life_expectancy = if (length(cdc_life_expectancy_benchmark_import$sources)) cdc_life_expectancy_benchmark_import$sources[["state"]] else NULL,
+        cdc_lead = if (length(cdc_lead_benchmark_import$sources)) cdc_lead_benchmark_import$sources[["state"]] else NULL
       )),
       federal_benchmarks = compact(list(
         acs = if (length(acs_benchmark_import$sources)) acs_benchmark_import$sources[["federal"]] else NULL,
         fred = if (length(fred_benchmark_import$sources)) fred_benchmark_import$sources[["federal"]] else NULL,
-        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES aggregate queries (2018-2023)" else NULL
+        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES aggregate queries (2018-2023)" else NULL,
+        cdc_life_expectancy = if (length(cdc_life_expectancy_benchmark_import$sources)) cdc_life_expectancy_benchmark_import$sources[["federal"]] else NULL
       )),
       hazards = if (has_311_data) "Open Baltimore 311 ArcGIS services" else NULL,
       poverty = if (nrow(csa_acs_summary) > 0) "ACS 2022 tract estimates weighted to CSA" else NULL
@@ -1695,6 +1884,8 @@ json_ready_data <- list(
     derived_metrics = if (derive_hi_from_components) as.list("hi") else NULL,
     proxy_metrics = if ("as" %in% cdc_metric_cols) as.list("as") else NULL,
     real_benchmark_metrics = if (length(real_benchmark_metrics)) as.list(real_benchmark_metrics) else NULL,
+    state_benchmark_metrics = if (length(state_real_benchmark_metrics)) as.list(state_real_benchmark_metrics) else NULL,
+    federal_benchmark_metrics = if (length(federal_real_benchmark_metrics)) as.list(federal_real_benchmark_metrics) else NULL,
     imported_metrics = sort(unique(c(
       service_metric_cols,
       cdc_metric_cols,

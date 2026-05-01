@@ -98,11 +98,14 @@ Current real benchmark coverage:
 
 - `un` from FRED / BLS (`MDUR` for Maryland and `UNRATE` for the United States)
 - `as` from CDC `PLACES` tract releases for `2018` through `2023`, aggregated with population weighting
+- `le` from the official CDC `U.S. Life Expectancy by State and Sex, 2018-2022` CSV for both Maryland and the United States
+- `la` from the official CDC Childhood Blood Lead Surveillance workbook for Maryland only, using the consistent `>=5 µg/dL` series for `2017` through `2022`
 
 Current benchmark gaps that still depend on the old scaffold until more sources are connected:
 
 - `pv`, `hs`, and `va` are implemented in the pipeline through ACS 5-year series, but they only activate when `CENSUS_API_KEY` is available
-- `le` and `la` do not yet have a clean statewide/national benchmark source in this repo
+- `le` still falls back for `2016`, `2017`, and `2023`, because the official CDC state-life table feed currently covers `2018` through `2022`
+- `la` still falls back for the federal benchmark and for `2016` / `2023`, because CDC's lead surveillance workbook does not provide a defensible national prevalence row and only covers `2017` through `2022`
 - benchmark `hi` is derived only when enough real benchmark components are present; otherwise it falls back
 
 ## Deployment
@@ -144,7 +147,7 @@ node scripts/migrate_data_schema.mjs data.json
 - Add `CENSUS_API_KEY` to GitHub Actions secrets so `update_data.R` can run end to end.
 - Once `CENSUS_API_KEY` is set, rerun the pipeline so ACS-backed `pv`, `hs`, and `va` state/federal benchmarks replace more of the scaffold.
 - Replace the CDC asthma proxy with a direct neighborhood-level official asthma ED source if BNIA or Maryland publishes a current one again.
-- Add direct official state/federal sources for `le` and `la` if you want the benchmark switcher to be fully non-scaffolded.
+- Add a defensible federal `la` source and newer official `le` years if you want the benchmark switcher to be fully non-scaffolded.
 - Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
 - Add a real backend for community reports if submissions need persistence.
 
