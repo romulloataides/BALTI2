@@ -8,7 +8,9 @@ alter table public.reports
 create index if not exists reports_source_scope_idx
   on public.reports (source, pilot_slug, nsa, created_at desc);
 
-create or replace view public.report_vote_counts
+drop view if exists public.report_vote_counts;
+
+create view public.report_vote_counts
 with (security_invoker = true) as
   select r.id, r.tracking_id, r.nsa, r.category, r.description,
          r.severity, r.author_role, r.status, r.created_at,

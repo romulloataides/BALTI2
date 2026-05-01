@@ -1623,7 +1623,7 @@ async function sendAdminMagicLink(){
   analysisStatus='Sending magic link…';
   renderDeskPanel();
   const redirectTo=buildURL();
-  const {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:false}});
+  const {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:true}});
   analysisBusy=false;
   if(error){
     console.error(error);

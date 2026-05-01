@@ -173,7 +173,8 @@ on conflict do nothing;
    - optional `DASHBOARD_DATA_URL`
 5. Deploy [`supabase/functions/analysis-desk/index.ts`](./supabase/functions/analysis-desk/index.ts).
 6. In Supabase Auth settings, allow your dashboard URL as a redirect target for magic-link sign-in.
-7. Flip `window.BALTI2_ENABLE_ANALYSIS_DESK = true` in [`supabase/config.js`](./supabase/config.js) after the function is live.
+7. First-time admin magic-link sign-in can now create the Supabase Auth user automatically; admin access still depends on the `public.admin_users` allowlist.
+8. [`supabase/config.js`](./supabase/config.js) already enables `window.BALTI2_ENABLE_ANALYSIS_DESK` and `window.BALTI2_ENABLE_PILOT_VOTES` in this repo.
 
 ## Phase 3, 6, and 7 prototype coverage
 

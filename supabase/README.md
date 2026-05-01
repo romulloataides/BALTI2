@@ -93,17 +93,19 @@ That function:
   - dashboard neighborhood data
   - live reports
   - 311 proxy history
-  - spending records
-  - pilot accuracy votes
+- spending records
+- pilot accuracy votes
+
+First-time admin magic-link sign-in can now create the Supabase Auth user automatically; admin access still depends on the `public.admin_users` allowlist.
 
 ## 9. Turn on the Phase 6 / 7 feature flags
 
-After the migration and Edge Function are really live:
+[`config.js`](./config.js) already enables:
 
-- set `window.BALTI2_ENABLE_ANALYSIS_DESK = true`
-- set `window.BALTI2_ENABLE_PILOT_VOTES = true`
+- `window.BALTI2_ENABLE_ANALYSIS_DESK = true`
+- `window.BALTI2_ENABLE_PILOT_VOTES = true`
 
-Until then, keeping them `false` gives you a cleaner public demo because the frontend will not probe undeployed endpoints.
+If you need a quieter public demo before the backend is live, you can temporarily switch them back to `false`.
 
 ## 10. Optional CI secrets (GitHub)
 
