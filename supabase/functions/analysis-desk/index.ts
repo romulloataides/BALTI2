@@ -44,7 +44,7 @@ const supabaseAnonKey =
   Deno.env.get("SB_PUBLISHABLE_KEY") ?? Deno.env.get("SUPABASE_ANON_KEY")!;
 const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const openAiApiKey = Deno.env.get("OPENAI_API_KEY");
-const openAiModel = Deno.env.get("OPENAI_MODEL") ?? "gpt-5.4";
+const openAiModel = Deno.env.get("OPENAI_MODEL") ?? "gpt-4o";
 const dashboardDataUrl =
   Deno.env.get("DASHBOARD_DATA_URL") ??
   "https://romulloataides.github.io/BALTI2/data.json";
