@@ -44,7 +44,9 @@ Notes:
 - `neighborhoods` stores year-specific records for each CSA.
 - `benchmarks.city` is shared across all neighborhoods and is derived from the Baltimore CSA dataset.
 - `benchmarks.state` and `benchmarks.federal` are currently provisional scaffolds until real ACS/FRED benchmark imports are wired into the pipeline.
-- The current longitudinal values are still modeled where real year arrays are not yet available. That modeling now lives in the data layer instead of the frontend render path.
+- Real year arrays now come from a mix of BNIA files, BNIA ArcGIS services, CDC tract datasets, and the existing baseline `data.json`.
+- The dashboard `hi` series is derived from official component metrics when BNIA does not provide a direct health-index series.
+- Remaining gaps are still modeled in the data layer instead of in the frontend render path.
 
 ## BNIA longitudinal input
 
@@ -77,7 +79,12 @@ Live BNIA service fallback currently supplements:
 - `un` from the `Unempr` ArcGIS service
 - `hs` as `100 - Lesshs` from the `Lesshs` ArcGIS service
 
-Those live services are helpful, but they are not fully complete for every dashboard metric or every year. The pipeline still keeps existing `data.json` values and modeled series for any missing gaps.
+Official non-BNIA supplements currently fill the remaining health gaps:
+
+- `as` from CDC `500 Cities` / `PLACES` tract releases for `2016` through `2023`, aggregated to CSA using tract centroid assignment and population weighting
+- `hi` derived from the official component metrics `le`, `as`, `la`, `va`, `pv`, `un`, and `hs` using yearly min-max normalization and equal weighting when no direct BNIA `hi` series is available
+
+These sources are helpful, but they are not perfect substitutes for a current full BNIA export. The CDC asthma series is an adult current-asthma prevalence proxy, not the original asthma emergency-department rate. The pipeline still keeps existing `data.json` values and modeled series for any remaining gaps.
 
 ## Deployment
 
@@ -116,6 +123,7 @@ node scripts/migrate_data_schema.mjs data.json
 
 - Drop the real BNIA Vital Signs longitudinal file into one of the supported locations so `update_data.R` can replace more of the modeled neighborhood series than the live service fallback can cover.
 - Add `CENSUS_API_KEY` to GitHub Actions secrets so `update_data.R` can run end to end.
+- Replace the CDC asthma proxy with a direct neighborhood-level official asthma ED source if BNIA or Maryland publishes a current one again.
 - Add real state and federal benchmarks through ACS/FRED inputs instead of the current provisional scaffolds.
 - Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
 - Add a real backend for community reports if submissions need persistence.
@@ -124,4 +132,4 @@ node scripts/migrate_data_schema.mjs data.json
 
 - Share links use the current page URL instead of a hardcoded placeholder domain.
 - The dashboard still depends on CDN assets for Leaflet and Chart.js.
-- Most yearly trends are still modeled from snapshot values unless a metric is provided as a real 2016–2023 array in `data.json`.
+- Most yearly trends are still modeled only when a real `2016`–`2023` array is unavailable after the BNIA, CDC, ACS, and 311 refresh steps run.

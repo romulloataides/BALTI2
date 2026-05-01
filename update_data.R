@@ -75,6 +75,14 @@ detect_first_col <- function(df, patterns, exclude = character()) {
   if (is.na(match)) NA_character_ else match
 }
 
+col_or_default <- function(df, col, default = NA) {
+  if (col %in% names(df)) {
+    df[[col]]
+  } else {
+    rep(default, nrow(df))
+  }
+}
+
 find_bnia_source <- function() {
   env_path <- trimws(Sys.getenv("BNIA_VITAL_SIGNS_PATH"))
   candidates <- c(
@@ -422,6 +430,265 @@ load_bnia_service_longitudinal <- function(csa_lookup, years = 2016:2023) {
   )
 }
 
+parse_geolocation_point <- function(x) {
+  txt <- str_squish(as.character(x))
+  txt[txt %in% c("", "NA", "N/A", "null")] <- NA_character_
+
+  out <- tibble(
+    Longitude = rep(NA_real_, length(txt)),
+    Latitude = rep(NA_real_, length(txt))
+  )
+
+  point_idx <- !is.na(txt) & str_detect(txt, "^POINT\\s*\\(")
+  if (any(point_idx)) {
+    coords <- str_match(txt[point_idx], "^POINT\\s*\\(([-0-9\\.]+)\\s+([-0-9\\.]+)\\)$")
+    out$Longitude[point_idx] <- suppressWarnings(as.numeric(coords[, 2]))
+    out$Latitude[point_idx] <- suppressWarnings(as.numeric(coords[, 3]))
+  }
+
+  tuple_idx <- !is.na(txt) & str_detect(txt, "^\\(")
+  if (any(tuple_idx)) {
+    coords <- str_match(txt[tuple_idx], "^\\(([-0-9\\.]+),\\s*([-0-9\\.]+)\\)$")
+    out$Latitude[tuple_idx] <- suppressWarnings(as.numeric(coords[, 2]))
+    out$Longitude[tuple_idx] <- suppressWarnings(as.numeric(coords[, 3]))
+  }
+
+  out
+}
+
+fetch_cdc_csv <- function(dataset_id, query = list()) {
+  endpoint <- paste0("https://data.cdc.gov/resource/", dataset_id, ".csv")
+  response <- GET(endpoint, query = query, timeout(120))
+  stop_for_status(response)
+
+  txt <- content(response, "text", encoding = "UTF-8")
+  readr::read_csv(I(txt), show_col_types = FALSE, progress = FALSE)
+}
+
+normalize_component_scores <- function(values, inverse = FALSE) {
+  scores <- rep(NA_real_, length(values))
+  usable <- !is.na(values)
+
+  if (!any(usable)) {
+    return(scores)
+  }
+
+  observed <- values[usable]
+  if (dplyr::n_distinct(observed) <= 1) {
+    scores[usable] <- 50
+    return(scores)
+  }
+
+  scaled <- (observed - min(observed, na.rm = TRUE)) /
+    (max(observed, na.rm = TRUE) - min(observed, na.rm = TRUE)) * 100
+
+  if (inverse) {
+    scaled <- 100 - scaled
+  }
+
+  scores[usable] <- round(scaled, 1)
+  scores
+}
+
+derive_health_index_series <- function(df, years = 2016:2023) {
+  component_metrics <- c("le", "as", "la", "va", "pv", "un", "hs")
+  inverse_metrics <- c("as", "la", "va", "pv", "un")
+
+  available_components <- intersect(component_metrics, names(df))
+  if (!length(available_components)) {
+    return(rep(list(rep(NA_real_, length(years))), nrow(df)))
+  }
+
+  out <- replicate(nrow(df), rep(NA_real_, length(years)), simplify = FALSE)
+
+  for (idx in seq_along(years)) {
+    component_values <- map_dfc(available_components, function(metric) {
+      tibble(!!metric := map_dbl(df[[metric]], function(series) {
+        value <- series[[idx]]
+        if (is.null(value) || is.na(value)) return(NA_real_)
+        as.numeric(value)
+      }))
+    })
+
+    scaled_values <- map_dfc(available_components, function(metric) {
+      tibble(!!metric := normalize_component_scores(
+        component_values[[metric]],
+        inverse = metric %in% inverse_metrics
+      ))
+    })
+
+    year_scores <- apply(as.matrix(scaled_values), 1, function(row_values) {
+      usable <- row_values[!is.na(row_values)]
+      if (length(usable) < 4) return(NA_real_)
+      round(mean(usable), 1)
+    })
+
+    for (row_idx in seq_len(nrow(df))) {
+      out[[row_idx]][idx] <- year_scores[[row_idx]]
+    }
+  }
+
+  out
+}
+
+load_cdc_asthma_longitudinal <- function(csa_boundaries, years = 2016:2023) {
+  release_specs <- list(
+    `2016` = list(dataset_id = "k25u-mg9b", schema = "legacy_500cities", year = 2016),
+    `2017` = list(dataset_id = "k86t-wghb", schema = "legacy_500cities", year = 2017),
+    `2018` = list(dataset_id = "4ai3-zynv", schema = "places", year = 2018),
+    `2019` = list(dataset_id = "373s-ayzu", schema = "places", year = 2019),
+    `2020` = list(dataset_id = "nw2y-v4gm", schema = "places", year = 2020),
+    `2021` = list(dataset_id = "em5e-5hvn", schema = "places", year = 2021),
+    `2022` = list(dataset_id = "ai6z-tcin", schema = "places", year = 2022),
+    `2023` = list(dataset_id = "cwsq-ngmh", schema = "places", year = 2023)
+  )
+
+  csa_lookup <- csa_boundaries %>%
+    st_drop_geometry() %>%
+    distinct(CSA, CSA_key)
+
+  print("Loading CDC tract-based asthma prevalence proxy...")
+
+  requested_specs <- release_specs[intersect(as.character(years), names(release_specs))]
+
+  asthma_points <- imap_dfr(requested_specs, function(spec, year_key) {
+    raw <- tryCatch(
+      {
+        if (identical(spec$schema, "legacy_500cities")) {
+          fetch_cdc_csv(
+            spec$dataset_id,
+            query = c(
+              list(
+                stateabbr = "MD",
+                placefips = "2404000",
+                `$limit` = 5000
+              ),
+              setNames(
+                list("tractfips,population2010,casthma_crudeprev,geolocation"),
+                "$select"
+              )
+            )
+          )
+        } else {
+          fetch_cdc_csv(
+            spec$dataset_id,
+            query = list(
+              stateabbr = "MD",
+              countyfips = "24510",
+              measureid = "CASTHMA",
+              datavaluetypeid = "CrdPrv",
+              `$limit` = 5000
+            )
+          )
+        }
+      },
+      error = function(e) {
+        warning(
+          paste(
+            "CDC asthma import failed for",
+            spec$year,
+            "from dataset",
+            spec$dataset_id,
+            ":",
+            conditionMessage(e)
+          )
+        )
+        tibble()
+      }
+    )
+
+    if (!nrow(raw)) {
+      return(tibble(
+        Year = integer(),
+        tract_id = character(),
+        weight = numeric(),
+        value = numeric(),
+        Longitude = numeric(),
+        Latitude = numeric()
+      ))
+    }
+
+    enriched_raw <- bind_cols(raw, parse_geolocation_point(col_or_default(raw, "geolocation", NA_character_)))
+
+    if (identical(spec$schema, "legacy_500cities")) {
+      tibble(
+        Year = rep(spec$year, nrow(enriched_raw)),
+        tract_id = as.character(col_or_default(enriched_raw, "tractfips", NA_character_)),
+        weight = coerce_numeric_value(col_or_default(enriched_raw, "population2010", NA_real_)),
+        value = coerce_numeric_value(col_or_default(enriched_raw, "casthma_crudeprev", NA_real_)),
+        Longitude = suppressWarnings(as.numeric(col_or_default(enriched_raw, "Longitude", NA_real_))),
+        Latitude = suppressWarnings(as.numeric(col_or_default(enriched_raw, "Latitude", NA_real_)))
+      )
+    } else {
+      tibble(
+        Year = parse_year_value(col_or_default(enriched_raw, "year", spec$year)),
+        tract_id = as.character(col_or_default(enriched_raw, "locationid", NA_character_)),
+        weight = coalesce(
+          coerce_numeric_value(col_or_default(enriched_raw, "totalpop18plus", NA_real_)),
+          coerce_numeric_value(col_or_default(enriched_raw, "totalpopulation", NA_real_))
+        ),
+        value = coerce_numeric_value(col_or_default(enriched_raw, "data_value", NA_real_)),
+        Longitude = suppressWarnings(as.numeric(col_or_default(enriched_raw, "Longitude", NA_real_))),
+        Latitude = suppressWarnings(as.numeric(col_or_default(enriched_raw, "Latitude", NA_real_)))
+      ) %>%
+        filter(Year == spec$year)
+    }
+  })
+
+  asthma_points <- asthma_points %>%
+    filter(
+      Year %in% years,
+      !is.na(value),
+      !is.na(Longitude),
+      !is.na(Latitude)
+    ) %>%
+    mutate(weight = if_else(is.na(weight) | weight <= 0, 1, weight))
+
+  if (!nrow(asthma_points)) {
+    print("No CDC asthma proxy records were imported.")
+    return(list(
+      data = tibble(CSA = character(), CSA_key = character()),
+      metrics = character(),
+      sources = character()
+    ))
+  }
+
+  asthma_csa <- asthma_points %>%
+    st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+    st_join(csa_boundaries %>% select(CSA, CSA_key), join = st_intersects, left = FALSE) %>%
+    st_drop_geometry() %>%
+    group_by(CSA, CSA_key, Year) %>%
+    summarize(
+      as_value = round(weighted.mean(value, weight, na.rm = TRUE), 1),
+      .groups = "drop"
+    )
+
+  asthma_series <- tidyr::crossing(
+    csa_lookup,
+    Year = years
+  ) %>%
+    left_join(asthma_csa, by = c("CSA", "CSA_key", "Year")) %>%
+    arrange(CSA, Year) %>%
+    group_by(CSA, CSA_key) %>%
+    summarize(as = list(as.numeric(as_value)), .groups = "drop")
+
+  print(
+    paste(
+      "  Imported CDC asthma proxy for",
+      nrow(asthma_series),
+      "CSAs across",
+      length(unique(asthma_points$Year)),
+      "years."
+    )
+  )
+
+  list(
+    data = asthma_series,
+    metrics = "as",
+    sources = map_chr(requested_specs, ~ paste0("https://data.cdc.gov/resource/", .x$dataset_id, ".csv"))
+  )
+}
+
 has_series_data <- function(x) {
   if (is.null(x)) return(FALSE)
   values <- suppressWarnings(as.numeric(unlist(x, use.names = FALSE)))
@@ -552,6 +819,7 @@ csa_lookup <- csa_boundaries %>%
 
 bnia_import <- load_bnia_longitudinal(csa_lookup, years = years)
 bnia_service_import <- load_bnia_service_longitudinal(csa_lookup, years = years)
+cdc_asthma_import <- load_cdc_asthma_longitudinal(csa_boundaries, years = years)
 
 # 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
 print("Fetching historical 311 data with GPS coordinates...")
@@ -926,6 +1194,32 @@ if (nrow(bnia_service_import$data) > 0) {
   service_metric_cols <- character()
 }
 
+if (nrow(cdc_asthma_import$data) > 0) {
+  cdc_metric_cols <- setdiff(names(cdc_asthma_import$data), c("CSA", "CSA_key"))
+
+  final_dashboard_data <- final_dashboard_data %>%
+    left_join(
+      cdc_asthma_import$data %>%
+        rename_with(~ paste0(.x, "_cdc"), all_of(cdc_metric_cols)) %>%
+        select(CSA_key, ends_with("_cdc")),
+      by = "CSA_key"
+    )
+
+  for (metric in cdc_metric_cols) {
+    final_dashboard_data <- ensure_metric_column(final_dashboard_data, metric)
+    override_col <- paste0(metric, "_cdc")
+    final_dashboard_data[[metric]] <- map2(
+      final_dashboard_data[[override_col]],
+      final_dashboard_data[[metric]],
+      prefer_metric_input
+    )
+  }
+
+  final_dashboard_data <- final_dashboard_data %>% select(-ends_with("_cdc"))
+} else {
+  cdc_metric_cols <- character()
+}
+
 if (nrow(bnia_import$data) > 0) {
   bnia_metric_cols <- setdiff(names(bnia_import$data), c("CSA", "CSA_key"))
 
@@ -954,7 +1248,9 @@ if (nrow(bnia_import$data) > 0) {
 
 metric_cols <- setdiff(names(final_dashboard_data), c("CSA", "CSA_key"))
 
-for (metric in metric_cols) {
+derive_hi_from_components <- !"hi" %in% bnia_metric_cols
+
+for (metric in setdiff(metric_cols, if (derive_hi_from_components) "hi" else character())) {
   final_dashboard_data[[metric]] <- map(
     final_dashboard_data[[metric]],
     metric_series,
@@ -962,6 +1258,20 @@ for (metric in metric_cols) {
     years = years
   )
 }
+
+if (derive_hi_from_components) {
+  final_dashboard_data <- ensure_metric_column(final_dashboard_data, "hi")
+  final_dashboard_data$hi <- derive_health_index_series(final_dashboard_data, years = years)
+} else if ("hi" %in% names(final_dashboard_data)) {
+  final_dashboard_data$hi <- map(
+    final_dashboard_data$hi,
+    metric_series,
+    metric = "hi",
+    years = years
+  )
+}
+
+metric_cols <- union(setdiff(metric_cols, "hi"), "hi")
 
 # 6. LOAD: Write normalized JSON
 print("Formatting and writing normalized output...")
@@ -1002,36 +1312,72 @@ json_ready_data <- list(
     schema_version = 2,
     years = as.list(years),
     provisional = TRUE,
-    note = case_when(
-      length(bnia_metric_cols) > 0 && length(service_metric_cols) > 0 ~ paste0(
-        "Real BNIA longitudinal values imported from a local file for: ",
-        paste(sort(bnia_metric_cols), collapse = ", "),
-        ". BNIA ArcGIS services supplied: ",
-        paste(sort(service_metric_cols), collapse = ", "),
-        ". Missing metrics still fall back to existing data.json values and modeled series where needed."
-      ),
-      length(bnia_metric_cols) > 0 ~ paste0(
-        "Real BNIA longitudinal values imported from a local file for: ",
-        paste(sort(bnia_metric_cols), collapse = ", "),
-        ". Missing metrics still fall back to existing data.json values and modeled series where needed."
-      ),
-      length(service_metric_cols) > 0 ~ paste0(
-        "BNIA ArcGIS services supplied: ",
-        paste(sort(service_metric_cols), collapse = ", "),
-        ". Missing metrics still fall back to existing data.json values and modeled series where needed."
-      ),
-      TRUE ~ "No BNIA longitudinal file or live BNIA service metrics were imported. Neighborhood yearly records still fall back to existing data.json values and modeled series where needed."
-    ),
+    note = {
+      note_parts <- character()
+
+      if (length(bnia_metric_cols) > 0) {
+        note_parts <- c(
+          note_parts,
+          paste0(
+            "Real BNIA longitudinal values imported from a local file for: ",
+            paste(sort(bnia_metric_cols), collapse = ", "),
+            "."
+          )
+        )
+      }
+
+      if (length(service_metric_cols) > 0) {
+        note_parts <- c(
+          note_parts,
+          paste0(
+            "BNIA ArcGIS services supplied: ",
+            paste(sort(service_metric_cols), collapse = ", "),
+            "."
+          )
+        )
+      }
+
+      if ("as" %in% cdc_metric_cols) {
+        note_parts <- c(
+          note_parts,
+          "CDC 500 Cities / PLACES tract releases supplied `as` as an adult current asthma prevalence proxy, aggregated to CSAs using tract centroid assignment and population weighting."
+        )
+      }
+
+      if (derive_hi_from_components) {
+        note_parts <- c(
+          note_parts,
+          "The dashboard `hi` series is derived from official component metrics (le, as, la, va, pv, un, hs) using yearly min-max normalization and equal weighting."
+        )
+      }
+
+      if (!length(note_parts)) {
+        note_parts <- "No BNIA longitudinal file, CDC asthma proxy, or live BNIA service metrics were imported."
+      }
+
+      paste(
+        c(
+          note_parts,
+          "Missing metrics still fall back to existing data.json values and modeled series where needed."
+        ),
+        collapse = " "
+      )
+    },
     benchmark_note = "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected.",
     source_files = list(
       neighborhood = if (!is.na(bnia_import$source_path)) basename(bnia_import$source_path) else NULL,
       neighborhood_services = if (length(bnia_service_import$sources)) unname(as.list(bnia_service_import$sources)) else NULL,
+      asthma_proxy = if (length(cdc_asthma_import$sources)) unname(as.list(cdc_asthma_import$sources)) else NULL,
       hazards = if (has_311_data) "Open Baltimore 311 ArcGIS services" else NULL,
       poverty = if (nrow(csa_acs_summary) > 0) "ACS 2022 tract estimates weighted to CSA" else NULL
     ),
+    derived_metrics = if (derive_hi_from_components) as.list("hi") else NULL,
+    proxy_metrics = if ("as" %in% cdc_metric_cols) as.list("as") else NULL,
     imported_metrics = sort(unique(c(
       service_metric_cols,
+      cdc_metric_cols,
       bnia_metric_cols,
+      if (derive_hi_from_components) "hi",
       if (nrow(csa_acs_summary) > 0) "pv",
       if (has_311_data) c("rt", "dp", "ws", "hz")
     )))
