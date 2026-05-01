@@ -31,6 +31,9 @@ create table if not exists public.annotations (
   created_at  timestamptz not null default now()
 );
 
+create index if not exists annotations_lookup_idx
+  on public.annotations (nsa, metric, created_at desc);
+
 create or replace view public.report_vote_counts
 with (security_invoker = true) as
   select r.id, r.tracking_id, r.nsa, r.category, r.description,
@@ -60,4 +63,21 @@ create policy "public insert votes"           on public.votes       for insert w
 create policy "public read annotations"       on public.annotations for select using (true);
 create policy "public insert annotations"     on public.annotations for insert with check (true);
 
+grant select, insert on public.reports to anon, authenticated;
+grant select, insert on public.votes to anon, authenticated;
+grant select, insert on public.annotations to anon, authenticated;
 grant select on public.report_vote_counts to anon, authenticated;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'annotations'
+  ) then
+    alter publication supabase_realtime add table public.annotations;
+  end if;
+end
+$$;

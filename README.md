@@ -13,6 +13,7 @@ GitHub repo: `https://github.com/romulloataides/BALTI2`
 - `csa_boundaries.geojson` contains the 55 Baltimore CSA polygons used by the map.
 - `update_data.R` updates `data.json`, so pipeline runs now affect the deployed dashboard without rewriting `index.html`.
 - `scripts/migrate_data_schema.mjs` upgrades the legacy flat JSON shape into the normalized longitudinal schema used by Phase 2.
+- `supabase/migrations/001_initial_schema.sql` defines the live prototype backend for community reports, votes, and inline annotations.
 
 ## Data schema
 
@@ -123,6 +124,22 @@ Published files:
 
 Because `index.html` now fetches `data.json` and `csa_boundaries.geojson` at runtime, future data updates can ship without rebuilding the HTML shell.
 
+## Live prototype backend
+
+The prototype now supports three community-data layers through Supabase:
+
+- `reports` for community-submitted items
+- `votes` for confirm / dispute validation
+- `annotations` for inline human context attached to metrics, gap flags, and reports
+
+The annotation UI is intentionally separate from official data. It stores the context target in the `annotations.metric` field using namespaced keys such as `metric:hi`, `gap:la`, and `report:BLT-1234ABCD`.
+
+If you rerun the Supabase SQL after pulling this repo, it now also adds:
+
+- an index for `annotations (nsa, metric, created_at desc)`
+- explicit anon/authenticated grants for `reports`, `votes`, and `annotations`
+- realtime publication coverage for `annotations`
+
 ## GitHub Pages Setup Reference
 
 1. Create a public GitHub repository, for example `BALTI2`.
@@ -152,7 +169,7 @@ node scripts/migrate_data_schema.mjs data.json
 - Replace the CDC asthma proxy with a direct neighborhood-level official asthma ED source if BNIA or Maryland publishes a current one again.
 - Add a defensible federal `la` source and newer official `le` years if you want the benchmark switcher to be fully non-scaffolded.
 - Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
-- Add a real backend for community reports if submissions need persistence.
+- Add lightweight moderation / cleanup controls now that reports, votes, and annotations persist.
 
 ## Notes
 
