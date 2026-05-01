@@ -887,6 +887,7 @@ const PILOT_META={
     label:'Carrollton Ridge pilot',
     csa:'Southwest Baltimore',
     scopeLabel:'Carrollton Ridge / Franklin Square',
+    basis:'Official Baltimore neighborhood boundaries place Carrollton Ridge and Franklin Square inside the Southwest Baltimore CSA.',
     submitPath:'submit/',
     focus:['dumping','broadband']
   }
@@ -1487,7 +1488,7 @@ function renderPilotIssueCard(nsa,issue){
 function renderPilotOverview(nsa){
   const cfg=currentPilotConfig();
   if(!cfg)return'';
-  return `<div class="pilot-shell"><div class="pilot-hero"><div class="pilot-kicker">Community pilot</div><div class="pilot-title">${escapeHtml(cfg.label)}</div><div class="pilot-copy">This prototype narrows the view to ${escapeHtml(cfg.scopeLabel)} and foregrounds the two issues we can demonstrate most honestly today: illegal dumping and broadband access. Both cards stay explicit about whether they are official series or community-signal proxies. Official dashboard metrics are still anchored to the ${escapeHtml(cfg.csa)} CSA until a tighter Carrollton-specific source is connected.</div><div class="pilot-actions"><a class="pilot-submit-link" href="${escapeHtml(pilotSubmitUrl())}">Digital Navigator submit</a></div></div><div class="pilot-grid">${cfg.focus.map(issue=>renderPilotIssueCard(nsa,issue)).join('')}</div></div>`;
+  return `<div class="pilot-shell"><div class="pilot-hero"><div class="pilot-kicker">Community pilot</div><div class="pilot-title">${escapeHtml(cfg.label)}</div><div class="pilot-copy">This prototype narrows the view to ${escapeHtml(cfg.scopeLabel)} and foregrounds the two issues we can demonstrate most honestly today: illegal dumping and broadband access. Both cards stay explicit about whether they are official series or community-signal proxies. Official dashboard metrics are drawn from the ${escapeHtml(cfg.csa)} CSA because ${escapeHtml(cfg.basis)}</div><div class="pilot-actions"><a class="pilot-submit-link" href="${escapeHtml(pilotSubmitUrl())}">Digital Navigator submit</a></div></div><div class="pilot-grid">${cfg.focus.map(issue=>renderPilotIssueCard(nsa,issue)).join('')}</div></div>`;
 }
 function renderPilotSubmitIntro(){
   const cfg=currentPilotConfig();

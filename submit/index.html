@@ -179,6 +179,7 @@ const PILOT_META={
   carrollton:{
     title:'Carrollton Ridge field submit',
     scopeLabel:'Carrollton Ridge / Franklin Square',
+    basis:'Official Baltimore neighborhood boundaries place Carrollton Ridge and Franklin Square inside the Southwest Baltimore CSA.',
     nsa:'Southwest Baltimore'
   }
 };
@@ -218,7 +219,7 @@ function applyPilotCopy(){
   byId('hero-title').textContent=pilot.title;
   byId('scope-pill').textContent=`Scope: ${pilot.scopeLabel}`;
   byId('pilot-neighborhood').value=pilot.scopeLabel;
-  byId('pilot-neighborhood-note').textContent=`Official dashboard metrics are still anchored to ${dataAnchor} while this pilot uses the tighter ${pilot.scopeLabel} framing.`;
+  byId('pilot-neighborhood-note').textContent=`Official dashboard metrics use ${dataAnchor} because ${pilot.basis}`;
   byId('return-link').href=`../?pilot=${encodeURIComponent(new URLSearchParams(window.location.search).get('pilot')||'carrollton')}`;
 }
 function setFocus(focus){

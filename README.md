@@ -197,7 +197,7 @@ The current repo now covers the next three product phases with a mixed live/prot
   - The remaining manual step is deployment: until the `analysis-desk` function and secrets are live, the UI will show a clear setup error instead of silently faking answers.
 
 - **Phase 7 — Carrollton Ridge pilot**
-  - Opening the dashboard with `?pilot=carrollton` locks the prototype to `Southwest Baltimore`, which is the current CSA stand-in for `Carrollton Ridge / Franklin Square`.
+  - Opening the dashboard with `?pilot=carrollton` locks the prototype to `Southwest Baltimore`, which is now the verified CSA match for `Carrollton Ridge / Franklin Square` after intersecting official Baltimore neighborhood boundaries with the dashboard CSA geometry.
   - Pilot mode foregrounds two focal issues:
     - illegal dumping, using the current `311 hazards` and sanitation-signal proxy
     - broadband access, using reports and annotations that mention connectivity-related terms
@@ -209,7 +209,7 @@ The current repo now covers the next three product phases with a mixed live/prot
     - optional GPS capture
     - richer pilot metadata in `reports.metadata`
     - legacy-schema fallback while the new migration is being rolled out
-    - clearer pilot-vs-CSA copy, so the form shows `Carrollton Ridge / Franklin Square` while staying explicit that official dashboard metrics are still anchored to the `Southwest Baltimore` CSA
+    - clearer pilot-vs-CSA copy, so the form shows `Carrollton Ridge / Franklin Square` while explaining why the dashboard metrics come from the `Southwest Baltimore` CSA
   - [`submit/sw.js`](./submit/sw.js) still caches the flow after first load, but the page itself now exposes queue state instead of treating offline drafts as a hidden implementation detail.
   - Physical field-testing is still a human step. The repo now supports it better; it does not replace it.
 
@@ -243,7 +243,6 @@ node scripts/migrate_data_schema.mjs data.json
 - Add a defensible federal `la` source and newer official `le` years if you want the benchmark switcher to be fully non-scaffolded.
 - Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
 - Expand the current official Baltimore FY14-20 CIP spending seed with newer CIP, work-order, or procurement data so efficacy queries can move beyond the initial capital-project view.
-- Replace the Carrollton-to-`Southwest Baltimore` proxy if BNIA or another defensible CSA mapping source becomes available.
 - Finish human mobile field-testing with Digital Navigators and adjust the pilot intake copy based on what they actually need in the street.
 
 ## Notes
@@ -253,3 +252,4 @@ node scripts/migrate_data_schema.mjs data.json
 - Most yearly trends are still modeled only when a real `2016`–`2023` array is unavailable after the BNIA, CDC, ACS, and 311 refresh steps run.
 - `spending_events` is now seeded from the official Baltimore Planning FY14-20 CIP layers, spatially allocated to CSAs; project status is inferred from fiscal year because the source does not expose execution dates or completion status.
 - The Phase 6 analysis desk ignores legacy `phase7_seed_%` spending rows if they still exist in Supabase, so efficacy summaries prefer official-source expenditure records.
+- The Carrollton Ridge pilot now uses a verified CSA mapping: official Baltimore neighborhood boundaries for `Carrollton Ridge` and `Franklin Square` both intersect entirely with the `Southwest Baltimore` CSA in the dashboard geometry.
