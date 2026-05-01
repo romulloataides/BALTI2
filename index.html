@@ -99,6 +99,29 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .accuracy-chip.proxy{background:var(--warn-lt);color:var(--warn);border-color:color-mix(in oklab,var(--warn) 24%,var(--bg))}
 .accuracy-chip.scaffold{background:var(--accent-lt);color:var(--danger);border-color:color-mix(in oklab,var(--accent) 28%,var(--bg))}
 .accuracy-copy{font-size:9px;color:var(--t2);line-height:1.45}
+.gap-grid{display:grid;grid-template-columns:1fr;gap:6px}
+.gap-card{display:flex;flex-direction:column;gap:6px;padding:8px 9px;border-radius:8px;background:var(--bg2);border:0.5px solid var(--br)}
+.gap-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.gap-title{font-size:11px;font-weight:500;line-height:1.35}
+.gap-meta{font-size:9px;color:var(--t3);line-height:1.4}
+.gap-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:500}
+.gap-pill.low{background:var(--success-lt);color:var(--success)}
+.gap-pill.medium{background:var(--warn-lt);color:var(--warn)}
+.gap-pill.high{background:var(--accent-lt);color:var(--danger)}
+.gap-pill.pending{background:var(--bg3);color:var(--t3)}
+.gap-pair{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.gap-bars{display:flex;flex-direction:column;gap:4px}
+.gap-bar-row{display:flex;align-items:center;gap:6px}
+.gap-bar-label{width:74px;flex-shrink:0;font-size:9px;color:var(--t2)}
+.gap-track{flex:1;height:5px;border-radius:999px;background:var(--bg3);overflow:hidden}
+.gap-fill{height:100%;border-radius:999px}
+.gap-values{font-size:9px;color:var(--t2);min-width:34px;text-align:right}
+.gap-table{display:flex;flex-direction:column;gap:5px}
+.gap-mini{display:flex;flex-direction:column;gap:4px;padding:7px 8px;border-radius:7px;background:var(--bg);border:0.5px solid var(--br)}
+.gap-mini-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.gap-mini-title{font-size:10px;font-weight:500}
+.gap-mini-copy{font-size:9px;color:var(--t2);line-height:1.4}
+.gap-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:9px;color:var(--t2)}
 .bench-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:999px;font-size:9px;border:0.5px solid var(--br);background:var(--bg);color:var(--t2)}
 .bench-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0}
 .vs-row{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:10px}
@@ -150,6 +173,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   #side{width:100%;height:44vh;border-left:none;border-top:0.5px solid var(--br)}
   #map-wrap{min-height:56vh}
   .rf-row{grid-template-columns:1fr}
+  .gap-pair{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion: reduce){
   .skip-link,.mtab,.ltog,#play-btn,.pt,.sb-btn,.chip,.ss-btn,.map-picker,.conf-fill,.rfb,.toast,.level-btn{transition:none!important}
@@ -186,6 +210,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       </button>
       <button type="button" class="ltog" id="lt-3" onclick="togL('3')" aria-pressed="false" aria-label="Toggle 311 request layer">
         <span class="ldot" style="background:var(--warn)"></span><span>311</span>
+      </button>
+      <button type="button" class="ltog" id="lt-gap" onclick="toggleGapMode()" aria-pressed="false" aria-label="Toggle gap severity map mode">
+        <span class="ldot" style="background:var(--danger)"></span><span>Gap mode</span>
+      </button>
+      <button type="button" class="ltog" id="lt-blind" onclick="toggleBlindSpots()" aria-pressed="false" aria-label="Show only blind spot neighborhoods in gap mode">
+        <span class="ldot" style="background:var(--success)"></span><span>Blind spots</span>
       </button>
       <button type="button" class="ltog share-launch" id="lt-share" onclick="openShare()" aria-haspopup="dialog" aria-label="Open share options">
         <span class="ldot" style="background:var(--brand2)"></span><span>Share</span>
@@ -250,6 +280,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button type="button" class="pt active" onclick="swTab(this,'ov1')">Overview</button>
           <button type="button" class="pt" onclick="swTab(this,'tr1')">Trends</button>
           <button type="button" class="pt" onclick="swTab(this,'dt1')">Determinants</button>
+          <button type="button" class="pt" onclick="swTab(this,'gap1')">Gap</button>
           <button type="button" class="pt" onclick="swTab(this,'rp1')">Reports</button>
           <button type="button" class="pt" onclick="swTab(this,'vl1')">Validate</button>
           <button type="button" class="pt" onclick="swTab(this,'sb1')">Submit</button>
@@ -257,6 +288,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div class="pane" id="t-ov1"></div>
         <div class="pane" id="t-tr1" style="display:none"></div>
         <div class="pane" id="t-dt1" style="display:none"></div>
+        <div class="pane" id="t-gap1" style="display:none"></div>
         <div class="pane" id="t-rp1" style="display:none"></div>
         <div class="pane" id="t-vl1" style="display:none"></div>
         <div class="pane" id="t-sb1" style="display:none"></div>
@@ -266,6 +298,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button type="button" class="pt active" onclick="swTab(this,'cmp')">Compare</button>
           <button type="button" class="pt" onclick="swTab(this,'tra')">Trajectory</button>
           <button type="button" class="pt" onclick="swTab(this,'det')">Determinants</button>
+          <button type="button" class="pt" onclick="swTab(this,'gap2')">Gap</button>
           <button type="button" class="pt" onclick="swTab(this,'rp2')">Reports</button>
           <button type="button" class="pt" onclick="swTab(this,'vl2')">Validate</button>
           <button type="button" class="pt" onclick="swTab(this,'sb2')">Submit</button>
@@ -273,6 +306,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div class="pane" id="t-cmp"></div>
         <div class="pane" id="t-tra" style="display:none"></div>
         <div class="pane" id="t-det" style="display:none"></div>
+        <div class="pane" id="t-gap2" style="display:none"></div>
         <div class="pane" id="t-rp2" style="display:none"></div>
         <div class="pane" id="t-vl2" style="display:none"></div>
         <div class="pane" id="t-sb2" style="display:none"></div>
@@ -425,6 +459,146 @@ function legendAccuracyLine(metric){
   if(benchmarkPart)chips.push(benchmarkPart);
   return chips.map(part=>accuracyChip(part.label,part.tone)).join('');
 }
+function metricConcernScore(metric,value){
+  const config=MCFG[metric];
+  if(!config||value===null||value===undefined||Number.isNaN(Number(value)))return null;
+  const range=config.max-config.min||1;
+  const normalized=Math.max(0,Math.min(1,(Number(value)-config.min)/range));
+  return round1((config.inv?normalized:1-normalized)*100);
+}
+function latestNeighborhoodMetric(nsa,metric,yi=curYI){
+  for(let i=yi;i>=0;i--){
+    const value=yv(nsa,metric,i);
+    if(value!==null)return{value,year:YEARS[i],stale:i!==yi,index:i};
+  }
+  return{value:null,year:null,stale:false,index:null};
+}
+function gapCategoryFamily(category){
+  const cat=normalizeReportCategory(category);
+  if(cat.includes('infrastructure')||cat.includes('street')||cat.includes('traffic'))return'infrastructure';
+  if(cat.includes('environment'))return'environmental';
+  if(cat.includes('safety'))return'safety';
+  if(cat.includes('sanitation')||cat.includes('trash'))return'sanitation';
+  if(cat.includes('vacant'))return'vacant';
+  if(cat.includes('light'))return'lighting';
+  if(cat.includes('data'))return'data_challenge';
+  if(cat.includes('asset'))return'asset';
+  return'general';
+}
+function reportSeverityLevel(severity){
+  const raw=String(severity||'medium').toLowerCase();
+  if(raw.startsWith('low'))return'low';
+  if(raw.startsWith('high'))return'high';
+  return'medium';
+}
+function reportImpactScore(report){
+  const statusBase=REPORT_STATUS_BASE[report.status]??REPORT_STATUS_BASE.open;
+  const severityBoost=REPORT_SEVERITY_WEIGHT[reportSeverityLevel(report.severity)]??REPORT_SEVERITY_WEIGHT.medium;
+  const confirmBoost=Math.min(12,(report.confirms||0)*1.15);
+  const disputePenalty=Math.min(10,(report.disputes||0)*1.35);
+  const ageFade=Math.max(0.45,1-((report.days||0)/90));
+  return Math.max(0,round1((statusBase+severityBoost+confirmBoost-disputePenalty)*ageFade));
+}
+function reportPressureForMetric(nsa,metric){
+  const weights=GAP_SIGNAL_WEIGHTS[metric]?.reports;
+  if(!weights)return null;
+  const target=matchNeighborhoodKey(nsa)||nsa;
+  const total=REPORTS.filter(report=>(matchNeighborhoodKey(report.nsa)||report.nsa)===target).reduce((sum,report)=>{
+    const family=gapCategoryFamily(report.category);
+    return sum+(reportImpactScore(report)*(weights[family]??0.2));
+  },0);
+  return round1(Math.max(0,Math.min(100,total*2.6)));
+}
+function servicePressureForMetric(nsa,metric,yi=curYI){
+  const weights=GAP_SIGNAL_WEIGHTS[metric]?.service;
+  if(!weights)return null;
+  let weighted=0,totalWeight=0;
+  Object.entries(weights).forEach(([serviceMetric,weight])=>{
+    const snap=latestNeighborhoodMetric(nsa,serviceMetric,yi);
+    const concern=metricConcernScore(serviceMetric,snap.value);
+    if(concern===null)return;
+    weighted+=concern*weight;
+    totalWeight+=weight;
+  });
+  return totalWeight?round1(weighted/totalWeight):null;
+}
+function communitySignalForMetric(nsa,metric,yi=curYI){
+  const service=servicePressureForMetric(nsa,metric,yi);
+  const reports=reportPressureForMetric(nsa,metric);
+  if(service===null&&reports===null)return null;
+  if(service===null)return reports;
+  if(reports===null)return service;
+  return round1((service*0.72)+(reports*0.28));
+}
+function gapSnapshot(nsa,metric,yi=curYI){
+  const official=latestNeighborhoodMetric(nsa,metric,yi);
+  const officialConcern=metricConcernScore(metric,official.value);
+  const communitySignal=communitySignalForMetric(nsa,metric,yi);
+  if(officialConcern===null||communitySignal===null)return{metric,available:false,officialValue:official.value,officialYear:official.year,officialStale:official.stale,officialConcern,communitySignal,delta:null,severity:'pending',direction:'pending'};
+  const delta=round1(Math.abs(communitySignal-officialConcern));
+  const direction=communitySignal-officialConcern>=15?'community':officialConcern-communitySignal>=15?'official':'aligned';
+  const severity=delta>=30?'high':delta>=15?'medium':'low';
+  return{metric,available:true,officialValue:official.value,officialYear:official.year,officialStale:official.stale,officialConcern,communitySignal,delta,severity,direction};
+}
+function gapSeverityMeta(snapshot){
+  if(!snapshot?.available)return{level:'pending',label:'Waiting for coverage',color:TOKENS.t3,fill:TOKENS.br};
+  if(snapshot.severity==='high')return{level:'high',label:'Contradicting',color:TOKENS.danger,fill:TOKENS.danger};
+  if(snapshot.severity==='medium')return{level:'medium',label:'Diverging',color:TOKENS.warn,fill:TOKENS.warn};
+  return{level:'low',label:'Aligned',color:TOKENS.success,fill:TOKENS.success};
+}
+function gapDirectionShort(snapshot){
+  if(!snapshot?.available)return'Waiting for signal';
+  if(snapshot.direction==='community')return'Community signal > official burden';
+  if(snapshot.direction==='official')return'Official burden > community signal';
+  return'Signals aligned';
+}
+function gapDirectionCopy(snapshot){
+  if(!snapshot?.available)return'Gap view is waiting for either official metric coverage or enough resident-generated signal to compare.';
+  if(snapshot.direction==='community')return'Community signal is worse than the official burden score, suggesting a possible blind spot in what the official data is capturing.';
+  if(snapshot.direction==='official')return'Official burden is worse than the resident signal, suggesting a quieter but persistent issue that may not be generating as much local reporting.';
+  return'Official burden and resident-generated community signal are broadly aligned for this metric.';
+}
+function gapMetricsForPanel(metric=curM){return GAP_PANEL_METRICS.includes(metric)?GAP_PANEL_METRICS:[metric,...GAP_PANEL_METRICS];}
+function gapLegendLine(metric){
+  return`${accuracyChip(`${MCFG[metric]?.label||metric} gap`,'proxy')}${accuracyChip('Community signal proxy','derived')}`;
+}
+function gapSourceLine(){
+  return'Official neighborhood data vs community signal proxy from resident-generated 311 patterns and report activity';
+}
+function gapTooltipHtml(key,name){
+  const label=key||name||'Neighborhood';
+  const snapshot=gapSnapshot(key,curM,curYI);
+  const severity=gapSeverityMeta(snapshot);
+  if(!snapshot.available)return`${label}<br>Gap view unavailable for ${MCFG[curM].label.toLowerCase()} in this year`;
+  const staleCopy=snapshot.officialStale?`<br>Official value last available in ${snapshot.officialYear}`:'';
+  return`${label}<br>${MCFG[curM].label} gap: ${severity.label} (${snapshot.delta} pts)<br>Official burden: ${snapshot.officialConcern}/100<br>Community signal: ${snapshot.communitySignal}/100${staleCopy}`;
+}
+function gapSummaryCard(nsa,metric,title){
+  const snapshot=gapSnapshot(nsa,metric,curYI);
+  const severity=gapSeverityMeta(snapshot);
+  const sourceYear=snapshot.officialYear||YEARS[curYI];
+  const officialLabel=snapshot.officialValue===null?'Unavailable':`${snapshot.officialValue}${MCFG[metric]?.unit||''}`;
+  return`<div class="gap-card"><div class="gap-head"><div><div class="gap-title">${title}</div><div class="gap-meta">${MCFG[metric]?.label||metric}${snapshot.officialStale?` · official ${sourceYear}`:''}</div></div><span class="gap-pill ${severity.level}">${severity.label}</span></div>${snapshot.available?`<div class="gap-summary"><span>${gapDirectionShort(snapshot)}</span><strong>${snapshot.delta} pts</strong></div><div class="gap-bars"><div class="gap-bar-row"><div class="gap-bar-label">Official burden</div><div class="gap-track"><div class="gap-fill" style="width:${snapshot.officialConcern}%;background:${TOKENS.brand}"></div></div><div class="gap-values">${snapshot.officialConcern}</div></div><div class="gap-bar-row"><div class="gap-bar-label">Community signal</div><div class="gap-track"><div class="gap-fill" style="width:${snapshot.communitySignal}%;background:${TOKENS.accent}"></div></div><div class="gap-values">${snapshot.communitySignal}</div></div></div><div class="gap-mini-copy">Official value: ${officialLabel}${snapshot.officialStale?` · latest official year ${sourceYear}`:''}. ${gapDirectionCopy(snapshot)}</div>`:`<div class="gap-mini-copy">Official value: ${officialLabel}. Gap view is waiting for enough matched coverage to compare this metric honestly.</div>`}</div>`;
+}
+function renderGapMetricMini(nsa,metric){
+  const snapshot=gapSnapshot(nsa,metric,curYI);
+  const severity=gapSeverityMeta(snapshot);
+  return`<div class="gap-mini"><div class="gap-mini-top"><div class="gap-mini-title">${MCFG[metric]?.label||metric}${metricAccuracyInline(metric)}</div><span class="gap-pill ${severity.level}">${severity.label}</span></div>${snapshot.available?`<div class="gap-summary"><span>${gapDirectionShort(snapshot)}</span><strong>${snapshot.delta} pts</strong></div><div class="gap-bars"><div class="gap-bar-row"><div class="gap-bar-label">Official</div><div class="gap-track"><div class="gap-fill" style="width:${snapshot.officialConcern}%;background:${TOKENS.brand}"></div></div><div class="gap-values">${snapshot.officialConcern}</div></div><div class="gap-bar-row"><div class="gap-bar-label">Community</div><div class="gap-track"><div class="gap-fill" style="width:${snapshot.communitySignal}%;background:${TOKENS.accent}"></div></div><div class="gap-values">${snapshot.communitySignal}</div></div></div><div class="gap-mini-copy">${snapshot.officialStale?`Official value last available in ${snapshot.officialYear}. `:''}${gapDirectionCopy(snapshot)}</div>`:`<div class="gap-mini-copy">Matched coverage is not available yet for this metric in the current timeline.</div>`}</div>`;
+}
+function renderGapMetricCompare(metric,p1,p2){
+  const snapA=gapSnapshot(p1,metric,curYI);
+  const snapB=gapSnapshot(p2,metric,curYI);
+  const sevA=gapSeverityMeta(snapA);
+  const sevB=gapSeverityMeta(snapB);
+  return`<div class="gap-mini"><div class="gap-mini-top"><div class="gap-mini-title">${MCFG[metric]?.label||metric}${metricAccuracyInline(metric)}</div><div class="gap-summary"><span style="color:${COL_A};font-weight:500">${shortNeighborhood(p1)}</span><span style="color:${COL_B};font-weight:500">${shortNeighborhood(p2)}</span></div></div><div class="gap-pair"><div class="gap-card"><div class="gap-head"><div class="gap-meta">${shortNeighborhood(p1)}</div><span class="gap-pill ${sevA.level}">${sevA.label}</span></div>${snapA.available?`<div class="gap-summary"><span>${gapDirectionShort(snapA)}</span><strong>${snapA.delta} pts</strong></div><div class="gap-bars"><div class="gap-bar-row"><div class="gap-bar-label">Official</div><div class="gap-track"><div class="gap-fill" style="width:${snapA.officialConcern}%;background:${COL_A}"></div></div><div class="gap-values">${snapA.officialConcern}</div></div><div class="gap-bar-row"><div class="gap-bar-label">Community</div><div class="gap-track"><div class="gap-fill" style="width:${snapA.communitySignal}%;background:${TOKENS.warn}"></div></div><div class="gap-values">${snapA.communitySignal}</div></div></div>`:`<div class="gap-mini-copy">Coverage pending.</div>`}</div><div class="gap-card"><div class="gap-head"><div class="gap-meta">${shortNeighborhood(p2)}</div><span class="gap-pill ${sevB.level}">${sevB.label}</span></div>${snapB.available?`<div class="gap-summary"><span>${gapDirectionShort(snapB)}</span><strong>${snapB.delta} pts</strong></div><div class="gap-bars"><div class="gap-bar-row"><div class="gap-bar-label">Official</div><div class="gap-track"><div class="gap-fill" style="width:${snapB.officialConcern}%;background:${COL_B}"></div></div><div class="gap-values">${snapB.officialConcern}</div></div><div class="gap-bar-row"><div class="gap-bar-label">Community</div><div class="gap-track"><div class="gap-fill" style="width:${snapB.communitySignal}%;background:${TOKENS.warn}"></div></div><div class="gap-values">${snapB.communitySignal}</div></div></div>`:`<div class="gap-mini-copy">Coverage pending.</div>`}</div></div></div>`;
+}
+function renderGapPanelOne(nsa,tid){
+  const topMetrics=gapMetricsForPanel().map(metric=>({metric,snapshot:gapSnapshot(nsa,metric,curYI)})).filter(entry=>entry.snapshot.available).sort((a,b)=>b.snapshot.delta-a.snapshot.delta).slice(0,3);
+  document.getElementById(tid).innerHTML=`${metricAccuracyBox(curM,'Current map metric')}${gapSummaryCard(nsa,curM,`${shortNeighborhood(nsa)} · current map metric`)}<div class="gap-card"><div class="gap-title">Community signal proxy</div><div class="gap-mini-copy">This Gap view is intentionally labeled as a demo proxy until the Baltimore Area Survey feed is integrated. The community side blends resident-generated 311 patterns with validated local report activity, then compares that signal with the official neighborhood burden on a shared 0–100 concern scale.</div></div>${topMetrics.length?`<div class="shd">Biggest blind spots</div><div class="gap-grid">${topMetrics.map(({metric})=>renderGapMetricMini(nsa,metric)).join('')}</div>`:''}<div class="shd">Matched metrics</div><div class="gap-grid">${gapMetricsForPanel().map(metric=>renderGapMetricMini(nsa,metric)).join('')}</div><div class="src-n">${gapSourceLine()}</div>`;
+}
+function renderGapPanelTwo(p1,p2,tid){
+  document.getElementById(tid).innerHTML=`${metricAccuracyBox(curM,'Current map metric')}<div class="gap-card"><div class="gap-title">Blind spot comparison</div><div class="gap-mini-copy">Each neighborhood is scored separately on the same 0–100 concern scale. The official side comes from the dashboard metric, while the community side is a proxy built from resident-generated 311 patterns and local report activity until the Baltimore Area Survey feed is connected.</div></div><div class="gap-pair">${gapSummaryCard(p1,curM,shortNeighborhood(p1))}${gapSummaryCard(p2,curM,shortNeighborhood(p2))}</div><div class="shd">Matched metrics</div><div class="gap-grid">${gapMetricsForPanel().map(metric=>renderGapMetricCompare(metric,p1,p2)).join('')}</div><div class="src-n">${gapSourceLine()}</div>`;
+}
 function yearRecordFor(store,name,yi){const yearKey=String(YEARS[yi]);return store?.[name]?.[yearKey]||store?.[name]?.[YEARS[yi]]||null;}
 function yv(nsa,k,yi){const record=yearRecordFor(BASE,nsa,yi);if(!record||record[k]===undefined||record[k]===null)return null;return round1(record[k]);}
 function allY(nsa,k){return YEARS.map((_,i)=>yv(nsa,k,i));}
@@ -455,6 +629,20 @@ const LEVEL_META={
   state:{label:'State',short:'State avg',note:'Compare neighborhood values with the Maryland statewide benchmark.',benchmarkLabel:'State avg'},
   federal:{label:'Federal',short:'National avg',note:'Compare neighborhood values with the national benchmark.',benchmarkLabel:'National avg'}
 };
+const GAP_PANEL_METRICS=['hi','le','as','la','va','pv','un','hs'];
+const GAP_SIGNAL_WEIGHTS={
+  hi:{reports:{infrastructure:1.05,environmental:1.2,safety:0.9,sanitation:0.75,vacant:0.8,lighting:0.35,data_challenge:0.45,asset:-0.8,general:0.5},service:{hz:0.42,dp:0.24,rt:0.14,ws:0.2}},
+  le:{reports:{environmental:1.3,safety:1.05,infrastructure:0.75,sanitation:0.55,asset:-0.45,general:0.45},service:{hz:0.45,dp:0.16,rt:0.12,ws:0.27}},
+  as:{reports:{environmental:1.45,sanitation:1.0,infrastructure:0.35,data_challenge:0.3,asset:-0.2,general:0.3},service:{hz:0.52,dp:0.12,rt:0.08,ws:0.28}},
+  la:{reports:{environmental:1.3,data_challenge:1.0,vacant:0.72,infrastructure:0.45,sanitation:0.25,general:0.3},service:{hz:0.36,dp:0.22,rt:0.08,ws:0.34}},
+  va:{reports:{vacant:1.6,sanitation:0.82,infrastructure:0.78,asset:-0.4,general:0.35},service:{hz:0.16,dp:0.48,rt:0.12,ws:0.24}},
+  pv:{reports:{infrastructure:0.78,safety:0.72,sanitation:0.46,asset:-0.7,general:0.45},service:{hz:0.24,dp:0.22,rt:0.16,ws:0.38}},
+  un:{reports:{infrastructure:0.48,asset:-0.82,safety:0.25,data_challenge:0.26,general:0.5},service:{hz:0.18,dp:0.24,rt:0.12,ws:0.46}},
+  hs:{reports:{safety:0.86,asset:-1.0,lighting:0.48,infrastructure:0.4,general:0.3},service:{hz:0.22,dp:0.18,rt:0.16,ws:0.18}},
+  hz:{reports:{environmental:1.0,sanitation:1.0,infrastructure:0.82,safety:0.52,general:0.4},service:{hz:0.45,dp:0.25,rt:0.14,ws:0.16}}
+};
+const REPORT_STATUS_BASE={open:8,review:12,verified:16};
+const REPORT_SEVERITY_WEIGHT={low:0,medium:4,high:8};
 const FALLBACK_REPORTS=[
   {lat:39.285,lng:-76.620,nsa:'Downtown/Seton Hill',cat:'infrastructure',color:TOKENS.accent,title:'Broken sidewalk on MLK Blvd',status:'open',c:6,d:0,days:2},
   {lat:39.310,lng:-76.665,nsa:'Sandtown-Winchester/Harlem Park',cat:'infrastructure',color:TOKENS.accent,title:'Collapsed porch — N Gilmor St',status:'verified',c:14,d:1,days:5},
@@ -468,22 +656,22 @@ const FALLBACK_REPORTS=[
 ];
 const THREE11=[{lat:39.310,lng:-76.665,cnt:180},{lat:39.248,lng:-76.622,cnt:140},{lat:39.285,lng:-76.620,cnt:88},{lat:39.302,lng:-76.590,cnt:64},{lat:39.278,lng:-76.643,cnt:58}];
 let REPORTS=[],VALIDATION_CASES=[];
-let map,geo,rMks=[],cMks=[],curM='hi',curYI=7,pinA=null,pinB=null,activeSlot='a',ls={c:true,r:true,'3':false},benchMode='city';
+let map,geo,rMks=[],cMks=[],curM='hi',curYI=7,pinA=null,pinB=null,activeSlot='a',ls={c:true,r:true,'3':false},benchMode='city',gapMode=false,blindSpotsOnly=false;
 let playing=false,playT=null,trajChart=null;
 let reportSyncChannel=null,activeReportPinForm=null;
 const draftReportLocations={};
 const REDUCED_MOTION=window.matchMedia('(prefers-reduced-motion: reduce)');
-function buildURL(){const base=`${window.location.origin}${window.location.pathname}`;const params=new URLSearchParams();if(pinA) params.set('a',encodeNSA(pinA));if(pinB) params.set('b',encodeNSA(pinB));params.set('m',curM);params.set('y',YEARS[curYI]);params.set('lvl',benchMode);return `${base}?${params.toString()}`;}
+function buildURL(){const base=`${window.location.origin}${window.location.pathname}`;const params=new URLSearchParams();if(pinA) params.set('a',encodeNSA(pinA));if(pinB) params.set('b',encodeNSA(pinB));params.set('m',curM);params.set('y',YEARS[curYI]);params.set('lvl',benchMode);if(gapMode)params.set('gap','1');if(blindSpotsOnly)params.set('blind','1');return `${base}?${params.toString()}`;}
 function encodeNSA(name){return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');}
 function decodeNSA(slug){if(!slug)return null;const lower=slug.replace(/-/g,' ');for(const k of Object.keys(BASE)){if(k.toLowerCase()===lower)return k;if(k.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()===lower)return k;}return null;}
-function loadFromURL(){try{const p=new URLSearchParams(window.location.search);const a=p.get('a'),b=p.get('b'),m=p.get('m'),y=p.get('y'),lvl=p.get('lvl');if(a){const k=decodeNSA(a);if(k)pinA=k;}if(b){const k=decodeNSA(b);if(k)pinB=k;}if(m&&MCFG[m])curM=m;if(y){const yi=YEARS.indexOf(parseInt(y));if(yi>=0)curYI=yi;}if(lvl&&LEVEL_META[lvl])benchMode=lvl;if(pinA||pinB){updatePinBar();updatePinStyles();refreshSide();const btn=document.querySelector(`.mtab[data-m="${curM}"]`);if(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}document.getElementById('yr-slider').value=curYI;document.getElementById('cur-yr').textContent=YEARS[curYI];}}catch(e){}}
+function loadFromURL(){try{const p=new URLSearchParams(window.location.search);const a=p.get('a'),b=p.get('b'),m=p.get('m'),y=p.get('y'),lvl=p.get('lvl');if(a){const k=decodeNSA(a);if(k)pinA=k;}if(b){const k=decodeNSA(b);if(k)pinB=k;}if(m&&MCFG[m])curM=m;if(y){const yi=YEARS.indexOf(parseInt(y));if(yi>=0)curYI=yi;}if(lvl&&LEVEL_META[lvl])benchMode=lvl;gapMode=p.get('gap')==='1';blindSpotsOnly=p.get('blind')==='1';if(blindSpotsOnly)gapMode=true;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();if(pinA||pinB){updatePinBar();updatePinStyles();refreshSide();const btn=document.querySelector(`.mtab[data-m="${curM}"]`);if(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}document.getElementById('yr-slider').value=curYI;document.getElementById('cur-yr').textContent=YEARS[curYI];}}catch(e){}}
 function updateShareStrip(){const url=buildURL();document.getElementById('share-url-inline').textContent=url;document.getElementById('share-url-inline').title=url;if(pinA||pinB){document.getElementById('share-strip').classList.add('visible');}else{document.getElementById('share-strip').classList.remove('visible');}}
 function copyURL(){const url=buildURL();navigator.clipboard.writeText(url).then(()=>{const b=document.getElementById('copied-badge');b.style.display='block';setTimeout(()=>b.style.display='none',2000);}).catch(()=>toast('URL: '+url));}
-function openShare(){const url=buildURL();document.getElementById('share-url-box').textContent=url;const parts=[];if(pinA) parts.push(pinA.split('/')[0]);if(pinB) parts.push(pinB.split('/')[0]);const levelBits=benchMode==='neighborhood'?'Local context':LEVEL_META[benchMode].short;const desc=parts.length===2?`Comparing ${parts[0]} vs ${parts[1]} · ${MCFG[curM].label} · ${YEARS[curYI]} · ${levelBits}`:parts.length===1?`${parts[0]} · ${MCFG[curM].label} · ${YEARS[curYI]} · ${levelBits}`:`Baltimore health map · ${MCFG[curM].label} · ${YEARS[curYI]} · ${levelBits}`;document.getElementById('share-desc').textContent=desc;document.getElementById('share-modal').setAttribute('aria-hidden','false');document.getElementById('share-modal').classList.add('open');}
+function openShare(){const url=buildURL();document.getElementById('share-url-box').textContent=url;const parts=[];if(pinA) parts.push(pinA.split('/')[0]);if(pinB) parts.push(pinB.split('/')[0]);const levelBits=benchMode==='neighborhood'?'Local context':LEVEL_META[benchMode].short;const viewBits=gapMode?`Gap view${blindSpotsOnly?' · blind spots only':''}`:MCFG[curM].label;const desc=parts.length===2?`Comparing ${parts[0]} vs ${parts[1]} · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`:parts.length===1?`${parts[0]} · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`:`Baltimore health map · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`;document.getElementById('share-desc').textContent=desc;document.getElementById('share-modal').setAttribute('aria-hidden','false');document.getElementById('share-modal').classList.add('open');}
 function closeModal(evt){if(evt&&evt.currentTarget&&evt.target!==evt.currentTarget)return;document.getElementById('share-modal').setAttribute('aria-hidden','true');document.getElementById('share-modal').classList.remove('open');document.getElementById('embed-box').style.display='none';}
 function closeStrip(){document.getElementById('share-strip').classList.remove('visible');}
 function copyFromModal(){const url=document.getElementById('share-url-box').textContent;navigator.clipboard.writeText(url).then(()=>{toast('Link copied to clipboard ✓');closeModal();}).catch(()=>toast('URL: '+url));}
-function shareTwitter(){const url=buildURL();const p1=pinA?pinA.split('/')[0]:'';const p2=pinB?pinB.split('/')[0]:'';const context=benchMode==='neighborhood'?'local context':LEVEL_META[benchMode].short.toLowerCase();const text=p1&&p2?`Health gap: ${p1} vs ${p2} in Baltimore · ${MCFG[curM].label} ${YEARS[curYI]} · ${context}`:`Baltimore ${MCFG[curM].label} by neighborhood ${YEARS[curYI]} · ${context}`;window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,'_blank');}
+function shareTwitter(){const url=buildURL();const p1=pinA?pinA.split('/')[0]:'';const p2=pinB?pinB.split('/')[0]:'';const context=benchMode==='neighborhood'?'local context':LEVEL_META[benchMode].short.toLowerCase();const subject=gapMode?`Gap view ${YEARS[curYI]}`:`${MCFG[curM].label} ${YEARS[curYI]}`;const text=p1&&p2?`Health gap: ${p1} vs ${p2} in Baltimore · ${subject} · ${context}`:`Baltimore ${subject} by neighborhood · ${context}`;window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,'_blank');}
 function shareLinkedIn(){const url=buildURL();window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,'_blank');}
 function shareEmail(){const url=buildURL();const p1=pinA?pinA.split('/')[0]:'';const p2=pinB?pinB.split('/')[0]:'';const context=benchMode==='neighborhood'?'Neighborhood context':LEVEL_META[benchMode].short;const subj=p1&&p2?`Baltimore health data: ${p1} vs ${p2}`:'Baltimore neighborhood health data';const body=`${subj}
 
@@ -491,18 +679,22 @@ View this comparison on the Baltimore Health Dashboard:
 ${url}
 
 Benchmark context: ${context}
+View mode: ${gapMode?`Gap view${blindSpotsOnly?' · blind spots only':''}`:MCFG[curM].label}
 
 Data: BNIA Vital Signs · BCHD · ACS 5-yr`;window.open(`mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`);}
 function copyEmbed(doCopy){const url=buildURL();const code=`<iframe src="${url}&embed=1" width="100%" height="600" frameborder="0" style="border-radius:8px;border:1px solid ${TOKENS.br}" title="Baltimore Health Dashboard"></iframe>`;if(doCopy){navigator.clipboard.writeText(code).then(()=>{toast('Embed code copied ✓');}).catch(()=>toast('Code: '+code));return;}const box=document.getElementById('embed-box');box.style.display=box.style.display==='none'?'flex':'none';box.style.flexDirection='column';document.getElementById('embed-code').textContent=code;}
 function geoName(props){return props?.Community||props?.CSA2010||props?.name||props?.Name||props?.NAME||'';}
 function gc(val,m){const c=MCFG[m],t=Math.max(0,Math.min(1,(val-c.min)/(c.max-c.min)));const n=c.inv?1-t:t;const p=c.inv?PAL_B:PAL_G;return p[Math.floor(n*4.99)];}
-function getStyle(f){const n=geoName(f.properties);const k=findK(n);const v=k?yv(k,curM,curYI):null;return{fillColor:v!==null?gc(v,curM):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?0.76:0};}
+function getStyle(f){const n=geoName(f.properties);const k=findK(n);if(gapMode&&k){const snapshot=gapSnapshot(k,curM,curYI);const severity=gapSeverityMeta(snapshot);const hidden=blindSpotsOnly&&(snapshot.delta===null||snapshot.delta<15);return{fillColor:snapshot.available?severity.fill:'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(hidden?0.12:0.82):0};}const v=k?yv(k,curM,curYI):null;return{fillColor:v!==null?gc(v,curM):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?0.76:0};}
 function findK(name){if(BASE[name])return name;for(const k of Object.keys(BASE)){if(k.toLowerCase()===name.toLowerCase())return k;const a=name.toLowerCase().split('/')[0].trim(),b=k.toLowerCase().split('/')[0].trim();if(a===b||a.includes(b)||b.includes(a))return k;}return null;}
-function buildLeg(){const m=MCFG[curM];document.getElementById('leg-title').textContent=m.label;const p=m.inv?PAL_B:PAL_G,r=m.max-m.min;let h='';for(let i=4;i>=0;i--){const lo=+(m.min+(i/5)*r).toFixed(1),hi=+(m.min+((i+1)/5)*r).toFixed(1);h+=`<div class="lr"><div class="ls" style="background:${p[i]}"></div><span>${lo}–${hi}${m.unit}</span></div>`;}document.getElementById('leg-body').innerHTML=h;document.getElementById('leg-meta').innerHTML=legendAccuracyLine(curM);document.getElementById('leg-source').textContent=sourceLine();}
+function buildLeg(){const m=MCFG[curM];if(gapMode){document.getElementById('leg-title').textContent=`Gap severity · ${m.label}`;document.getElementById('leg-body').innerHTML=`<div class="lr"><div class="ls" style="background:${TOKENS.success}"></div><span>0–14 pts · aligned</span></div><div class="lr"><div class="ls" style="background:${TOKENS.warn}"></div><span>15–29 pts · diverging</span></div><div class="lr"><div class="ls" style="background:${TOKENS.danger}"></div><span>30+ pts · contradicting</span></div>`;document.getElementById('leg-meta').innerHTML=gapLegendLine(curM);document.getElementById('leg-source').textContent=gapSourceLine();return;}document.getElementById('leg-title').textContent=m.label;const p=m.inv?PAL_B:PAL_G,r=m.max-m.min;let h='';for(let i=4;i>=0;i--){const lo=+(m.min+(i/5)*r).toFixed(1),hi=+(m.min+((i+1)/5)*r).toFixed(1);h+=`<div class="lr"><div class="ls" style="background:${p[i]}"></div><span>${lo}–${hi}${m.unit}</span></div>`;}document.getElementById('leg-body').innerHTML=h;document.getElementById('leg-meta').innerHTML=legendAccuracyLine(curM);document.getElementById('leg-source').textContent=sourceLine();}
 function setM(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');curM=btn.dataset.m;if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
 function onSlide(v){curYI=parseInt(v);document.getElementById('cur-yr').textContent=YEARS[curYI];if(geo)geo.setStyle(getStyle);refreshSide();updateShareStrip();}
 function togglePlay(){const playBtn=document.getElementById('play-btn');if(REDUCED_MOTION.matches){curYI=(curYI+1)%8;document.getElementById('yr-slider').value=curYI;onSlide(curYI);toast('Reduced-motion mode is on, advanced one year.');return;}playing=!playing;playBtn.textContent=playing?'■':'▶';playBtn.setAttribute('aria-label',playing?'Pause timeline':'Play timeline');if(playing){playT=setInterval(()=>{curYI=(curYI+1)%8;document.getElementById('yr-slider').value=curYI;onSlide(curYI);if(curYI===7){clearInterval(playT);playing=false;playBtn.textContent='▶';playBtn.setAttribute('aria-label','Play timeline');}},800);}else clearInterval(playT);}
 function togL(l){ls[l]=!ls[l];const toggle=document.getElementById('lt-'+l);toggle.classList.toggle('on',ls[l]);toggle.setAttribute('aria-pressed',String(ls[l]));if(l==='c'&&geo)geo.setStyle(getStyle);if(l==='r')rMks.forEach(m=>ls.r?m.addTo(map):map.removeLayer(m));if(l==='3')cMks.forEach(m=>ls['3']?m.addTo(map):map.removeLayer(m));}
+function updateGapToggleUI(){const gapBtn=document.getElementById('lt-gap');const blindBtn=document.getElementById('lt-blind');if(gapBtn){gapBtn.classList.toggle('on',gapMode);gapBtn.setAttribute('aria-pressed',String(gapMode));}if(blindBtn){blindBtn.classList.toggle('on',blindSpotsOnly);blindBtn.setAttribute('aria-pressed',String(blindSpotsOnly));}}
+function toggleGapMode(){gapMode=!gapMode;if(!gapMode)blindSpotsOnly=false;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
+function toggleBlindSpots(){blindSpotsOnly=!blindSpotsOnly;if(blindSpotsOnly)gapMode=true;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
 function onNSAClick(e){const name=geoName(e.target.feature.properties);const k=findK(name);if(!k)return;if(activeReportPinForm){captureReportLocation(activeReportPinForm,e.latlng,k);return;}if(activeSlot==='a'||!pinA){pinA=k;activeSlot='b';}else if(activeSlot==='b'||!pinB){if(k===pinA){toast('Pin a different neighborhood for B');return;}pinB=k;activeSlot='a';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
 function updatePinBar(){(['a','b']).forEach((s)=>{const p=s==='a'?pinA:pinB;const btn=document.getElementById('slot-btn-'+s);const clear=document.getElementById('clear-'+s);if(p){document.getElementById('empty-'+s).style.display='none';document.getElementById('dot-'+s).style.display='block';document.getElementById('info-'+s).style.display='flex';document.getElementById('name-'+s).textContent=p.split('/')[0];document.getElementById('score-'+s).textContent=yv(p,'hi',curYI);clear.style.display='inline-flex';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active. Current neighborhood ${p.split('/')[0]}`);}else{document.getElementById('empty-'+s).style.display='block';document.getElementById('dot-'+s).style.display='none';document.getElementById('info-'+s).style.display='none';clear.style.display='none';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active`);}btn.setAttribute('aria-pressed',String(activeSlot===s));});}
 function updatePinStyles(){if(!geo)return;geo.eachLayer(l=>{const name=geoName(l.feature?.properties);const k=findK(name);if(k===pinA)l.setStyle({weight:3,color:COL_A,fillOpacity:.9});else if(k===pinB)l.setStyle({weight:3,color:COL_B,fillOpacity:.9});else geo.resetStyle(l);});}
@@ -510,7 +702,7 @@ function unpin(s){if(s==='a'){pinA=null;activeSlot='a';}else{pinB=null;activeSlo
 function clearPin(evt,s){if(evt)evt.stopPropagation();unpin(s);}
 function focusSlot(s){activeSlot=s;updatePinBar();}
 function refreshSide(){updatePinBar();if(!pinA&&!pinB){document.getElementById('no-pin').style.display='flex';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='none';return;}if(pinA&&!pinB){document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='flex';document.getElementById('two-pin').style.display='none';renderOne();}else{document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='flex';renderTwo();}}
-function swTab(btn,tab){const group=btn.closest('.pt-row');group.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const allPanes=['t-ov1','t-tr1','t-dt1','t-rp1','t-vl1','t-sb1','t-cmp','t-tra','t-det','t-rp2','t-vl2','t-sb2'];allPanes.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});const el=document.getElementById('t-'+tab);if(el){el.style.display='flex';el.style.flexDirection='column';}if(tab==='tra')drawTrajChart();}
+function swTab(btn,tab){const group=btn.closest('.pt-row');group.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const allPanes=['t-ov1','t-tr1','t-dt1','t-gap1','t-rp1','t-vl1','t-sb1','t-cmp','t-tra','t-det','t-gap2','t-rp2','t-vl2','t-sb2'];allPanes.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});const el=document.getElementById('t-'+tab);if(el){el.style.display='flex';el.style.flexDirection='column';}if(tab==='tra')drawTrajChart();}
 function normalizeNeighborhood(name){return String(name||'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/[^a-z0-9]+/g,' ').trim();}
 function matchNeighborhoodKey(name){if(!name)return null;const direct=findK(name);if(direct)return direct;const target=normalizeNeighborhood(name);for(const k of Object.keys(BASE)){const norm=normalizeNeighborhood(k);if(norm===target||norm.includes(target)||target.includes(norm))return k;}return null;}
 function shortNeighborhood(name){const key=matchNeighborhoodKey(name)||name||'Baltimore neighborhood';return key.split('/')[0];}
@@ -557,6 +749,7 @@ function renderOne(){
   document.getElementById('t-tr1').innerHTML=`<div class="src-n" style="margin-bottom:4px">2016–${YEARS[yi]}</div>`+keys.map((kv,i)=>{const vals=allY(p,kv.k),cur=vals[yi],chg=Math.round((cur-vals[0])*10)/10;const improving=MCFG[kv.k].inv?chg<0:chg>0;const tone=improving?TOKENS.success:TOKENS.danger;const sign=chg>=0?'+':'';return`<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:0.5px solid var(--br)"><div style="flex:1;font-size:10px;color:var(--t2)">${kv.l}</div><canvas id="spk1-${i}" width="60" height="18" style="flex-shrink:0"></canvas><div style="min-width:26px;font-size:11px;font-weight:500">${cur}${MCFG[kv.k].unit}</div><div style="font-size:9px;min-width:24px;text-align:right;color:${tone}">${sign}${chg}</div></div>`;}).join('');
   requestAnimationFrame(()=>keys.forEach((kv,i)=>drawSpk('spk1-'+i,allY(p,kv.k),yi,COL_A)));
   document.getElementById('t-dt1').innerHTML=`${makeLevelSwitcher('dt1','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}`+[['hi','Health idx',100,false,''],['le','Life exp',85,false,' yrs'],['as',asthmaMetricMeta().compact,100,true,MCFG.as.unit],['la','Lead exp',75,true,'%'],['pv','Poverty',55,true,'%'],['un','Unemploy.',25,true,'%'],['va','Vacant',28,true,'%'],['hz','Total Hazards',250,true,' calls'],['rt','Rat Erad.',100,true,' calls'],['dp','Illegal Dump',100,true,' calls'],['ws','Water/Sewer',100,true,' calls']].map(([k,l,mx,inv,u])=>{const v=yv(p,k,yi)||0,cv=benchComparison(k,yi),pct=pctForMetric(v,k,mx),cpct=cv!==null?pctForMetric(cv,k,mx):null,better=cv===null?null:(inv?v<cv:v>cv),col=better===null?TOKENS.brand:better?TOKENS.success:TOKENS.danger;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div class="vs-track-wrap"><div class="vs-track"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div>${cpct!==null?`<div class="vs-benchmark" style="left:${cpct}%"></div>`:''}</div></div><div style="width:32px;text-align:right;font-size:10px;font-weight:500">${v}${u}</div><div style="font-size:9px;color:${cv===null?TOKENS.t3:col};width:74px;text-align:right">${cv!==null?`${compText}: ${cv}${u}`:'Local'}</div></div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()}</div>`;
+  renderGapPanelOne(p,'t-gap1');
   renderReportsFor(p,'t-rp1');
   document.getElementById('t-vl1').innerHTML=makeValidationPanel([p],'vl1');
   document.getElementById('t-sb1').innerHTML=makeSubmitForm('sb1',p);
@@ -567,6 +760,7 @@ function renderTwo(){
   document.getElementById('t-cmp').innerHTML=`${makeLevelSwitcher('cmp')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:5px;margin-bottom:4px"><div style="flex:1;background:${TOKENS.accentLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p1)}</div><div style="font-size:20px;font-weight:500;color:${COL_A}">${v1}</div></div><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 3px"><div style="font-size:9px;color:var(--t3)">gap</div><div style="font-size:14px;font-weight:500">${gap}</div></div><div style="flex:1;background:${TOKENS.brandLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p2)}</div><div style="font-size:20px;font-weight:500;color:${COL_B}">${v2}</div></div></div><div class="bench-chip"><span class="bench-dot"></span>${compHi!==null?`${compText}: ${compHi}`:'Local-only comparison'}</div>${mkeys.map(({k,l,u})=>{const a=yv(p1,k,yi),b=yv(p2,k,yi),comp=benchComparison(k,yi),mx=MCFG[k]?.max||100,w1=Math.min(92,pctForMetric(a,k,mx)),w2=Math.min(92,pctForMetric(b,k,mx)),wc=comp!==null?Math.min(92,pctForMetric(comp,k,mx)):null;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A};font-weight:500">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B};font-weight:500">${b}${u}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3};font-weight:500">${compText}: ${comp}${u}</span></div>`:''}</div></div></div>`;}).join('')}<div style="background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this comparison</strong><br><span style="font-family:var(--font-mono);word-break:break-all;font-size:9px">${buildURL()}</span><br><div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap"><button type="button" onclick="copyURL()" aria-label="Copy shareable comparison link for ${shortNeighborhood(p1)} and ${shortNeighborhood(p2)}" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Share options</button><button type="button" onclick="shareEmail()" aria-label="Share this neighborhood comparison by email" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Email</button><button type="button" onclick="copyEmbed()" aria-label="Show embed code for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Embed</button></div></div><div class="src-n">${sourceLine()} · ${YEARS[yi]}</div>`;
   document.getElementById('t-tra').innerHTML=`${makeLevelSwitcher('tra')}${metricAccuracyBox('hi','Trajectory metric')}<div class="cmp-legend"><div class="cll"><div class="clsq" style="background:${COL_A}"></div>${shortNeighborhood(p1)}</div><div class="cll"><div class="clsq" style="background:${COL_B}"></div>${shortNeighborhood(p2)}</div>${compHi!==null?`<div class="cll"><div class="clsq" style="background:${TOKENS.t3}"></div>${compText}</div>`:''}</div><div style="position:relative;width:100%;height:140px"><canvas id="traj-chart"></canvas></div><div class="src-n">${healthIndexSourceLine()}</div>`;
   document.getElementById('t-det').innerHTML=`${makeLevelSwitcher('det','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:8px;font-size:9px;margin-bottom:5px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_A};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p1)}</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_B};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p2)}</span>${compHi!==null?`<span class="bench-chip" style="margin-left:auto"><span class="bench-dot"></span>${compText}</span>`:''}</div>`+[['le','Life exp',85,' yrs'],['as',asthmaMetricMeta().compact,100,MCFG.as.unit],['la','Lead',75,'%'],['pv','Poverty',55,'%'],['un','Unemploy.',25,'%'],['va','Vacant',28,'%'],['hz','Total Hazards',250,' calls'],['rt','Rat Erad.',100,' calls'],['dp','Illegal Dump',100,' calls'],['ws','Water/Sewer',100,' calls']].map(([k,l,mx,u])=>{const a=yv(p1,k,yi)||0,b=yv(p2,k,yi)||0,comp=benchComparison(k,yi),w1=pctForMetric(a,k,mx),w2=pctForMetric(b,k,mx),wc=comp!==null?pctForMetric(comp,k,mx):null,g=Math.abs(Math.round((a-b)*10)/10);return`<div style="padding:3px 0;border-bottom:0.5px solid var(--br)"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:9px;color:var(--t2)">${l}${metricAccuracyInline(k)}</span><span style="font-size:9px;color:var(--t3)">gap:${g}${u}</span></div><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A}">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B}">${b}${u}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px;margin-top:2px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3}">${compText}: ${comp}${u}</span></div>`:''}</div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()} · EJScreen</div>`;
+  renderGapPanelTwo(p1,p2,'t-gap2');
   renderReportsFor2(p1,p2,'t-rp2');
   document.getElementById('t-vl2').innerHTML=makeValidationPanel([p1,p2],'vl2');
   document.getElementById('t-sb2').innerHTML=makeSubmitForm('sb2',p1,p2);
@@ -602,7 +796,7 @@ function rebuildReportMarkers(){if(!map)return;rMks.forEach(marker=>{if(map.hasL
 function initMks(){rebuildReportMarkers();THREE11.forEach(c=>{const r=Math.max(8,Math.min(22,c.cnt/7));const ic=L.divIcon({className:'',html:`<div style="width:${r*2}px;height:${r*2}px;border-radius:50%;background:${TOKENS.warnLt};border:1.5px solid ${TOKENS.warn};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:${TOKENS.warn}">${c.cnt}</div>`,iconSize:[r*2,r*2],iconAnchor:[r,r]});cMks.push(L.marker([c.lat,c.lng],{icon:ic}));});}
 document.getElementById('share-modal').addEventListener('click',closeModal);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-async function initMap(){document.getElementById('ylabels').innerHTML=YEARS.map(y=>`<span>${y}</span>`).join('');map=L.map('balt-map',{zoomControl:true,attributionControl:false}).setView([39.29,-76.62],11);map.on('click',e=>{if(activeReportPinForm)captureReportLocation(activeReportPinForm,e.latlng);});L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);try{const [baseResp, geoResp] = await Promise.all([fetch('data.json',{cache:'no-store'}),fetch('csa_boundaries.geojson',{cache:'no-store'})]);if(!baseResp.ok) throw new Error(`Failed to load data.json (${baseResp.status})`);if(!geoResp.ok) throw new Error(`Failed to load csa_boundaries.geojson (${geoResp.status})`);const normalizedData=normalizeDataset(await baseResp.json());DATA_META=normalizedData.meta||{};BASE=normalizedData.neighborhoods||{};BENCHMARKS=normalizedData.benchmarks||{city:{},state:{},federal:{}};applyMetricMetadata();const geoData = await geoResp.json();geo=L.geoJSON(geoData,{style:getStyle,onEachFeature:(feature,layer)=>{const name=geoName(feature.properties);const key=findK(name);layer.on({click:onNSAClick,mouseover:()=>{const label=key||name||'Neighborhood';const score=key?yv(key,curM,curYI):'N/A';layer.bindTooltip(`${label}<br>${MCFG[curM].label}: ${score}${score==='N/A'?'':MCFG[curM].unit}`,{sticky:true,direction:'top',opacity:0.95}).openTooltip();if(key!==pinA&&key!==pinB) layer.setStyle({weight:2,color:TOKENS.neutralInverse,fillOpacity:0.9});},mouseout:()=>{if(key===pinA||key===pinB) updatePinStyles();else geo.resetStyle(layer);}});}}).addTo(map);buildLeg();if(db){const loaded=await syncReportsFromSupabase();if(!loaded)resetFallbackReports();subscribeToReports();}initMks();if(ls['3']) cMks.forEach(m=>m.addTo(map));map.fitBounds(geo.getBounds(),{padding:[12,12]});document.getElementById('ml').style.display='none';loadFromURL();updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}catch(err){console.error(err);document.getElementById('ml').innerHTML='<div style="max-width:280px;text-align:center;line-height:1.5"><strong>Dashboard data failed to load.</strong><br>Make sure <code>data.json</code> and <code>csa_boundaries.geojson</code> are published in the repo root.</div>';}}
+async function initMap(){document.getElementById('ylabels').innerHTML=YEARS.map(y=>`<span>${y}</span>`).join('');map=L.map('balt-map',{zoomControl:true,attributionControl:false}).setView([39.29,-76.62],11);map.on('click',e=>{if(activeReportPinForm)captureReportLocation(activeReportPinForm,e.latlng);});L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);try{const [baseResp, geoResp] = await Promise.all([fetch('data.json',{cache:'no-store'}),fetch('csa_boundaries.geojson',{cache:'no-store'})]);if(!baseResp.ok) throw new Error(`Failed to load data.json (${baseResp.status})`);if(!geoResp.ok) throw new Error(`Failed to load csa_boundaries.geojson (${geoResp.status})`);const normalizedData=normalizeDataset(await baseResp.json());DATA_META=normalizedData.meta||{};BASE=normalizedData.neighborhoods||{};BENCHMARKS=normalizedData.benchmarks||{city:{},state:{},federal:{}};applyMetricMetadata();const geoData = await geoResp.json();geo=L.geoJSON(geoData,{style:getStyle,onEachFeature:(feature,layer)=>{const name=geoName(feature.properties);const key=findK(name);layer.on({click:onNSAClick,mouseover:()=>{const label=key||name||'Neighborhood';const tooltip=gapMode&&key?gapTooltipHtml(key,name):`${label}<br>${MCFG[curM].label}: ${key?yv(key,curM,curYI):'N/A'}${key&&yv(key,curM,curYI)!==null?MCFG[curM].unit:''}`;layer.bindTooltip(tooltip,{sticky:true,direction:'top',opacity:0.95}).openTooltip();if(key!==pinA&&key!==pinB) layer.setStyle({weight:2,color:TOKENS.neutralInverse,fillOpacity:gapMode?0.92:0.9});},mouseout:()=>{if(key===pinA||key===pinB) updatePinStyles();else geo.resetStyle(layer);}});}}).addTo(map);updateGapToggleUI();buildLeg();if(db){const loaded=await syncReportsFromSupabase();if(!loaded)resetFallbackReports();subscribeToReports();}initMks();if(ls['3']) cMks.forEach(m=>m.addTo(map));map.fitBounds(geo.getBounds(),{padding:[12,12]});document.getElementById('ml').style.display='none';loadFromURL();updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}catch(err){console.error(err);document.getElementById('ml').innerHTML='<div style="max-width:280px;text-align:center;line-height:1.5"><strong>Dashboard data failed to load.</strong><br>Make sure <code>data.json</code> and <code>csa_boundaries.geojson</code> are published in the repo root.</div>';}}
 initSupabase();
 initMap();
 </script>
