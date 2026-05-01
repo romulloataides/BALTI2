@@ -210,6 +210,26 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .desk-actions{display:flex;gap:6px;flex-wrap:wrap}
 .desk-btn{padding:5px 10px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg2);color:var(--t2);font-size:9px;cursor:pointer}
 .desk-btn.primary{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
+.desk-btn:disabled,.desk-chip:disabled{opacity:.58;cursor:not-allowed}
+.desk-inline{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.desk-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.desk-field{display:flex;flex-direction:column;gap:4px}
+.desk-select{width:100%;padding:7px 9px;border-radius:8px;border:0.5px solid var(--br);background:var(--bg2);color:var(--tx);font-size:10px}
+.desk-note{font-size:9px;color:var(--t3);line-height:1.45}
+.desk-status{padding:8px 9px;border-radius:8px;background:var(--bg2);border:0.5px solid var(--br);font-size:9px;color:var(--t2);line-height:1.45}
+.desk-auth{display:flex;flex-direction:column;gap:8px;padding:10px 11px;border-radius:9px;background:var(--bg2);border:0.5px solid var(--br)}
+.desk-chat{display:flex;flex-direction:column;gap:7px}
+.desk-msg{display:flex;flex-direction:column;gap:4px;padding:9px 10px;border-radius:10px;border:0.5px solid var(--br);background:var(--bg2)}
+.desk-msg.user{background:var(--brand-lt);border-color:color-mix(in oklab,var(--brand) 20%,var(--bg))}
+.desk-msg.assistant{background:var(--bg);border-color:var(--br)}
+.desk-msg.tool{background:var(--accent-lt);border-color:color-mix(in oklab,var(--accent) 20%,var(--bg))}
+.desk-msg-role{font-size:9px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.04em}
+.desk-msg-copy{font-size:10px;color:var(--t2);line-height:1.55}
+.desk-empty{padding:10px 11px;border-radius:9px;background:var(--bg2);border:0.5px dashed var(--br);font-size:10px;color:var(--t3);line-height:1.5}
+.desk-pill{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg);font-size:9px;color:var(--t2)}
+.desk-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.desk-session-row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pilot-vote-count{font-variant-numeric:tabular-nums;opacity:.82}
 .desk-answer{display:flex;flex-direction:column;gap:7px;padding:10px 11px;border-radius:9px;background:var(--bg2);border:0.5px solid var(--br)}
 .desk-answer-title{font-size:11px;font-weight:500}
 .desk-answer-copy{font-size:10px;color:var(--t2);line-height:1.5}
@@ -272,6 +292,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .annotation-grid{grid-template-columns:1fr}
   .admin-grid{grid-template-columns:1fr}
   .pilot-grid{grid-template-columns:1fr}
+  .desk-grid{grid-template-columns:1fr}
   .desk-shell{left:8px;right:8px;bottom:8px}
 }
 @media (prefers-reduced-motion: reduce){
@@ -478,10 +499,82 @@ const YEARS=[2016,2017,2018,2019,2020,2021,2022,2023];
 let BASE={},BENCHMARKS={city:{},state:{},federal:{}},DATA_META={};
 // ── Supabase client ──────────────────────────────────────────────────────────
 let db=null;
-function initSupabase(){
+function analysisDeskEnabled(){return window.BALTI2_ENABLE_ANALYSIS_DESK===true;}
+function pilotVoteSyncEnabled(){return window.BALTI2_ENABLE_PILOT_VOTES===true;}
+async function initSupabase(){
   if(window.SUPABASE_URL&&window.SUPABASE_URL!=='https://YOUR_PROJECT_ID.supabase.co'){
-    db=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY);
+    db=window.supabase.createClient(window.SUPABASE_URL,window.SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+    await completeAuthRedirect();
+    const {data:{session}}=await db.auth.getSession();
+    await handleAuthSession(session);
+    db.auth.onAuthStateChange((_event,sessionState)=>{handleAuthSession(sessionState);});
   }
+}
+async function completeAuthRedirect(){
+  if(!db)return;
+  const url=new URL(window.location.href);
+  const code=url.searchParams.get('code');
+  if(!code)return;
+  const {error}=await db.auth.exchangeCodeForSession(code);
+  if(error){
+    console.error(error);
+    adminAuthMessage='Magic-link sign-in could not be completed. Check your Supabase auth redirect settings.';
+    return;
+  }
+  ['code','type','access_token','refresh_token','expires_in','token_type'].forEach(key=>url.searchParams.delete(key));
+  const nextQuery=url.searchParams.toString();
+  window.history.replaceState({},'',`${url.pathname}${nextQuery?`?${nextQuery}`:''}${url.hash}`);
+}
+async function handleAuthSession(session){
+  adminSession=session||null;
+  adminUserEmail=session?.user?.email||'';
+  if(!db||!adminUserEmail){
+    adminAuthorized=false;
+    adminRole='';
+    adminAuthMessage=adminMode?'Admin mode now requires a signed-in Supabase admin session.':'';
+    analysisProfiles=[];
+    analysisSessions=[];
+    analysisMessages=[];
+    activeAnalysisSessionId=null;
+    analysisError='';
+    analysisStatus='';
+    updateModeUI();
+    if(pinA||pinB)refreshSide();
+    return;
+  }
+  try{
+    const {data,error}=await db.from('admin_users').select('email,role').ilike('email',adminUserEmail).maybeSingle();
+    if(error){
+      console.error(error);
+      adminAuthorized=false;
+      adminRole='';
+      adminAuthMessage='Admin access lookup failed. Run the latest Supabase migration and confirm your email is allowlisted.';
+    }else if(!data){
+      adminAuthorized=false;
+      adminRole='';
+      adminAuthMessage=`Signed in as ${adminUserEmail}, but this email is not allowlisted in admin_users yet.`;
+    }else{
+      adminAuthorized=true;
+      adminRole=data.role||'admin';
+      adminAuthMessage='';
+      if(analysisDeskEnabled())await bootstrapAnalysisDesk();
+      else{
+        analysisProfiles=[];
+        analysisSessions=[];
+        analysisMessages=[];
+        activeAnalysisSessionId=null;
+        analysisError='';
+        analysisStatus='Live analysis is wired in code, but disabled in supabase/config.js until the Edge Function is deployed.';
+      }
+    }
+  }catch(error){
+    console.error(error);
+    adminAuthorized=false;
+    adminRole='';
+    adminAuthMessage='Admin access lookup failed unexpectedly.';
+  }
+  updateModeUI();
+  if(pinA||pinB)refreshSide();
 }
 function escapeHtml(value){
   return String(value??'').replace(/[&<>"']/g,char=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[char]));
@@ -781,12 +874,13 @@ const THREE11=[{lat:39.310,lng:-76.665,cnt:180},{lat:39.248,lng:-76.622,cnt:140}
 let REPORTS=[],VALIDATION_CASES=[];
 let map,geo,rMks=[],cMks=[],curM='hi',curYI=7,pinA=null,pinB=null,activeSlot='a',ls={c:true,r:true,'3':false},benchMode='city',gapMode=false,blindSpotsOnly=false;
 let playing=false,playT=null,trajChart=null;
-let reportSyncChannel=null,annotationSyncChannel=null,activeReportPinForm=null;
+let reportSyncChannel=null,annotationSyncChannel=null,pilotVoteSyncChannel=null,activeReportPinForm=null;
 const draftReportLocations={};
 let ANNOTATIONS=[];
 const OPEN_ANNOTATION_PANELS=new Set();
 const LOCAL_ANNOTATION_KEY='blt_annotations_local';
 let adminMode=false;
+let adminSession=null,adminAuthorized=false,adminUserEmail='',adminRole='',adminAuthMessage='';
 let pilotMode=null,deskOpen=false;
 const PILOT_META={
   carrollton:{
@@ -799,7 +893,9 @@ const PILOT_META={
 };
 const PILOT_VOTE_KEY='blt_pilot_accuracy_votes';
 let PILOT_VOTES={};
-let deskAnswerState={title:'Analysis desk',copy:'Choose a template or ask a question to generate a local prototype briefing.',items:[]};
+let PILOT_VOTE_COUNTS={};
+let pilotVoteBackendState='pending',pilotVoteBackendMessage='';
+let analysisProfiles=[],analysisSessions=[],analysisMessages=[],activeAnalysisSessionId=null,analysisProfileSlug='',analysisBusy=false,analysisError='',analysisStatus='';
 const DIGITAL_KEYWORDS=/\bbroadband\b|\binternet\b|\bwi[- ]?fi\b|\bwifi\b|\bhotspot\b|\bdevice\b|\bconnection\b|\bconnectivity\b|\bdigital\b/i;
 const EFFICACY_TRACKS=[
   {id:'sanitation',label:'Sanitation recurrence',metric:'hz',reportFamilies:['sanitation','environmental'],metricLabel:'311 hazards proxy'},
@@ -817,11 +913,118 @@ function loadPilotVotes(){try{const parsed=JSON.parse(localStorage.getItem(PILOT
 function persistPilotVotes(){try{localStorage.setItem(PILOT_VOTE_KEY,JSON.stringify(PILOT_VOTES));}catch(e){}}
 function pilotVoteKey(issue){return `${pilotMode||'default'}:${issue}`;}
 function pilotVoteState(issue){return PILOT_VOTES[pilotVoteKey(issue)]||null;}
-function setPilotVote(issue,value){if(!currentPilotConfig())return;PILOT_VOTES[pilotVoteKey(issue)]=value;persistPilotVotes();refreshSide();toast(`Saved pilot feedback: ${value.replace('_',' ')} for ${issue}.`);}
+function pilotVoteCountKey(issue){return `${pilotMode||'default'}:${issue}`;}
+function pilotVoteCounts(issue){return PILOT_VOTE_COUNTS[pilotVoteCountKey(issue)]||{yes_count:0,no_count:0,not_sure_count:0,total_votes:0};}
+function relationMissing(error,relation){const text=`${error?.code||''} ${error?.message||''} ${error?.details||''} ${error?.hint||''}`;return /PGRST205|42P01/i.test(String(error?.code||''))||new RegExp(relation.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'i').test(text);}
+function setPilotVoteCountsFromView(rows){
+  PILOT_VOTE_COUNTS={};
+  (rows||[]).forEach(row=>{
+    const key=`${row.pilot_slug||'default'}:${row.issue_key}`;
+    PILOT_VOTE_COUNTS[key]={yes_count:Number(row.yes_count||0),no_count:Number(row.no_count||0),not_sure_count:Number(row.not_sure_count||0),total_votes:Number(row.total_votes||0)};
+  });
+}
+function setPilotVoteCountsFromRows(rows){
+  const counts={};
+  (rows||[]).forEach(row=>{
+    const key=`${row.pilot_slug||'default'}:${row.issue_key}`;
+    if(!counts[key])counts[key]={yes_count:0,no_count:0,not_sure_count:0,total_votes:0};
+    const bucket=String(row.response||'').toLowerCase();
+    if(bucket==='yes')counts[key].yes_count+=1;
+    else if(bucket==='no')counts[key].no_count+=1;
+    else counts[key].not_sure_count+=1;
+    counts[key].total_votes+=1;
+  });
+  PILOT_VOTE_COUNTS=counts;
+}
+function pilotVoteStatusCopy(issue){
+  const counts=pilotVoteCounts(issue);
+  if(pilotVoteBackendState==='ready')return `Persistent pilot votes: ${counts.total_votes||0} total`;
+  return pilotVoteBackendMessage||'Shared pilot vote sync is pending the latest Supabase migration. This browser still remembers your choice for the demo.';
+}
+async function syncPilotVotesFromSupabase(){
+  if(!db)return false;
+  if(!pilotVoteSyncEnabled()){
+    pilotVoteBackendState='local';
+    pilotVoteBackendMessage='Shared pilot vote sync is disabled in supabase/config.js until the Phase 7 migration is live.';
+    PILOT_VOTE_COUNTS={};
+    refreshSide();
+    return false;
+  }
+  let {data,error}=await db.from('pilot_accuracy_vote_counts').select('*');
+  if(error&&relationMissing(error,'pilot_accuracy_vote_counts')){
+    const fallback=await db.from('pilot_accuracy_votes').select('pilot_slug,nsa,issue_key,response');
+    if(fallback.error){
+      if(relationMissing(fallback.error,'pilot_accuracy_votes')){
+        pilotVoteBackendState='local';
+        pilotVoteBackendMessage='Shared pilot vote sync is pending the Phase 7 Supabase migration. This browser is still tracking your demo selection locally.';
+        PILOT_VOTE_COUNTS={};
+        refreshSide();
+        return false;
+      }
+      console.error(fallback.error);
+      pilotVoteBackendState='local';
+      pilotVoteBackendMessage='Pilot vote sync is temporarily unavailable, so this browser is showing local demo state only.';
+      PILOT_VOTE_COUNTS={};
+      refreshSide();
+      return false;
+    }
+    pilotVoteBackendState='ready';
+    pilotVoteBackendMessage='';
+    setPilotVoteCountsFromRows(fallback.data||[]);
+    refreshSide();
+    return true;
+  }
+  if(error){
+    console.error(error);
+    pilotVoteBackendState='local';
+    pilotVoteBackendMessage='Pilot vote sync is temporarily unavailable, so this browser is showing local demo state only.';
+    PILOT_VOTE_COUNTS={};
+    return false;
+  }
+  pilotVoteBackendState='ready';
+  pilotVoteBackendMessage='';
+  setPilotVoteCountsFromView(data||[]);
+  refreshSide();
+  return true;
+}
+function subscribeToPilotVotes(){
+  if(!db||!pilotVoteSyncEnabled()||pilotVoteSyncChannel||pilotVoteBackendState==='local')return;
+  pilotVoteSyncChannel=db.channel('blt-pilot-votes').on('postgres_changes',{event:'*',schema:'public',table:'pilot_accuracy_votes'},()=>{syncPilotVotesFromSupabase();}).subscribe();
+}
+async function setPilotVote(issue,value){
+  if(!currentPilotConfig())return;
+  PILOT_VOTES[pilotVoteKey(issue)]=value;
+  persistPilotVotes();
+  refreshSide();
+  if(db&&pilotVoteSyncEnabled()&&pilotVoteBackendState!=='local'){
+    const cfg=currentPilotConfig();
+    const payload={pilot_slug:pilotMode||'default',nsa:resolvePilotNeighborhood()||cfg.csa,issue_key:issue,response:value,voter_fp:getVoterFp()};
+    const {error}=await db.from('pilot_accuracy_votes').upsert(payload,{onConflict:'pilot_slug,nsa,issue_key,voter_fp'});
+    if(error){
+      if(relationMissing(error,'pilot_accuracy_votes')){
+        pilotVoteBackendState='local';
+        pilotVoteBackendMessage='Shared pilot vote sync is pending the Phase 7 Supabase migration. This browser is still tracking your demo selection locally.';
+        PILOT_VOTE_COUNTS={};
+        refreshSide();
+        toast(`Saved pilot feedback in this browser for ${issue}. Run the latest Supabase migration to make it shared.`);
+        return;
+      }
+      console.error(error);
+      toast('Pilot feedback could not be saved to Supabase right now.');
+      return;
+    }
+    await syncPilotVotesFromSupabase();
+  }
+  if(pilotVoteBackendState==='local'){toast(`Saved pilot feedback locally for ${issue}.`);return;}
+  toast(`Saved pilot feedback: ${value.replace('_',' ')} for ${issue}.`);
+}
 function enforcePilotSelection(){const target=resolvePilotNeighborhood();if(!target)return;if(pinA!==target)pinA=target;pinB=null;activeSlot='a';}
 function updateModeUI(){
   const badge=document.getElementById('admin-badge');
-  if(badge)badge.style.display=adminMode?'inline-flex':'none';
+  if(badge){
+    badge.style.display=adminMode?'inline-flex':'none';
+    badge.textContent=adminAuthorized?'Admin':'Admin sign-in';
+  }
   ['tab-ad1','tab-ad2'].forEach(id=>{const tab=document.getElementById(id);if(tab)tab.style.display=adminMode?'inline-flex':'none';});
   const noPinAdmin=document.getElementById('no-pin-admin');
   if(noPinAdmin)noPinAdmin.style.display=adminMode?'flex':'none';
@@ -831,7 +1034,10 @@ function updateModeUI(){
   const subtitle=document.getElementById('hdr-sub');
   if(subtitle)subtitle.textContent=cfg?`${cfg.scopeLabel} pilot · illegal dumping and broadband access`:'Click map · Pin 2 neighborhoods · Share comparison';
   const deskLaunch=document.getElementById('lt-desk');
-  if(deskLaunch)deskLaunch.style.display=adminMode?'inline-flex':'none';
+  if(deskLaunch){
+    deskLaunch.style.display=adminMode?'inline-flex':'none';
+    deskLaunch.title=adminAuthorized?'Open the analysis desk':'Open the sign-in gate for the analysis desk';
+  }
   const deskShell=document.getElementById('desk-shell');
   if(!adminMode&&deskShell){
     deskOpen=false;
@@ -865,6 +1071,7 @@ function loadFromURL(){
     const p=new URLSearchParams(window.location.search);
     const a=p.get('a'),b=p.get('b'),m=p.get('m'),y=p.get('y'),lvl=p.get('lvl'),pilot=p.get('pilot');
     adminMode=p.get('admin')==='1';
+    if(adminMode&&!adminAuthorized&&!adminUserEmail)adminAuthMessage='Admin mode now requires a signed-in Supabase admin session.';
     pilotMode=pilot&&PILOT_META[pilot]?pilot:null;
     if(a){const k=decodeNSA(a);if(k)pinA=k;}
     if(b){const k=decodeNSA(b);if(k)pinB=k;}
@@ -945,7 +1152,7 @@ function truncateText(text,max=88){const clean=String(text||'').replace(/\s+/g,'
 function titleFromReport(raw){return truncateText(raw.title||raw.description||'Community report',72);}
 function relativeReportAge(createdAt,fallbackDays){if(Number.isFinite(Number(fallbackDays)))return `${Math.max(0,Math.round(Number(fallbackDays)))}d ago`;if(!createdAt)return 'Today';const ageMs=Date.now()-new Date(createdAt).getTime();if(!Number.isFinite(ageMs))return 'Today';const days=Math.max(0,Math.round(ageMs/86400000));if(days<1)return 'Today';if(days===1)return '1 day ago';if(days<7)return `${days} days ago`;const weeks=Math.max(1,Math.round(days/7));return weeks===1?'1 week ago':`${weeks} weeks ago`;}
 function reportDays(createdAt,fallbackDays){if(Number.isFinite(Number(fallbackDays)))return Math.max(0,Math.round(Number(fallbackDays)));if(!createdAt)return 0;const ageMs=Date.now()-new Date(createdAt).getTime();return Number.isFinite(ageMs)?Math.max(0,Math.round(ageMs/86400000)):0;}
-function normalizeReportRecord(raw,index=0){const category=normalizeReportCategory(raw.category||raw.cat);const confirms=Number(raw.confirms??raw.c??0)||0;const disputes=Number(raw.disputes??raw.d??0)||0;const createdAt=raw.created_at||raw.createdAt||null;const trackingId=raw.tracking_id||raw.trackingId||raw.id||`fallback-${index}`;const status=raw.status||'open';return{id:raw.id||trackingId,trackingId,nsa:raw.nsa||'Unknown',category,cat:category,color:raw.color||reportColor(category),title:titleFromReport(raw),description:String(raw.description||raw.desc||raw.title||'Community report').trim(),severity:raw.severity||'medium',authorRole:raw.author_role||raw.authorRole||'anonymous',status,confirms,disputes,c:confirms,d:disputes,createdAt,submitted:raw.submitted||relativeReportAge(createdAt,raw.days),days:reportDays(createdAt,raw.days),lat:Number.isFinite(Number(raw.lat))?Number(raw.lat):null,lng:Number.isFinite(Number(raw.lng))?Number(raw.lng):null};}
+function normalizeReportRecord(raw,index=0){const category=normalizeReportCategory(raw.category||raw.cat);const confirms=Number(raw.confirms??raw.c??0)||0;const disputes=Number(raw.disputes??raw.d??0)||0;const createdAt=raw.created_at||raw.createdAt||null;const trackingId=raw.tracking_id||raw.trackingId||raw.id||`fallback-${index}`;const status=raw.status||'open';return{id:raw.id||trackingId,trackingId,nsa:raw.nsa||'Unknown',category,cat:category,color:raw.color||reportColor(category),title:titleFromReport(raw),description:String(raw.description||raw.desc||raw.title||'Community report').trim(),severity:raw.severity||'medium',authorRole:raw.author_role||raw.authorRole||'anonymous',status,confirms,disputes,c:confirms,d:disputes,createdAt,submitted:raw.submitted||relativeReportAge(createdAt,raw.days),days:reportDays(createdAt,raw.days),lat:Number.isFinite(Number(raw.lat))?Number(raw.lat):null,lng:Number.isFinite(Number(raw.lng))?Number(raw.lng):null,source:raw.source||'dashboard',pilotSlug:raw.pilot_slug||raw.pilotSlug||null,blockLabel:raw.block_label||raw.blockLabel||null,observedOn:raw.observed_on||raw.observedOn||null,metadata:raw.metadata&&typeof raw.metadata==='object'?raw.metadata:{}};}
 function reportConfidence(report){const baseline=report.status==='verified'?74:report.status==='review'?58:52;return Math.max(18,Math.min(96,baseline+(report.confirms*3)-(report.disputes*4)));}
 function reportEvidence(report){if(report.confirms||report.disputes)return `${report.confirms} confirmations and ${report.disputes} disputes are currently recorded for this report.`;return 'No community votes have been recorded yet. Use confirmation or dispute votes to strengthen this item.';}
 function buildValidationCases(reports){return reports.map(report=>({id:report.id,trackingId:report.trackingId,nsa:report.nsa,cat:prettifyCategory(report.category),submitted:report.submitted,status:report.status,title:report.title,desc:report.description,evidence:reportEvidence(report),confidence:reportConfidence(report),confirms:report.confirms,disputes:report.disputes})).sort((a,b)=>(b.confidence-a.confidence)||(a.status>b.status?1:-1));}
@@ -1129,6 +1336,10 @@ function qaCleanupSql(neighborhoods=[]){
 function renderAdminPanel(neighborhoods,targetId){
   const target=document.getElementById(targetId);
   if(!target)return;
+  if(!adminAuthorized){
+    target.innerHTML=`<div class="admin-panel"><div class="shd">Admin</div><div class="admin-note"><strong style="color:var(--tx)">Admin access is locked.</strong> ${escapeHtml(adminAuthMessage||'Open the analysis desk, sign in with an allowlisted Supabase admin email, and then reload this panel.')}</div></div>`;
+    return;
+  }
   const reports=scopedReports(neighborhoods).sort((a,b)=>new Date(b.createdAt||0).getTime()-new Date(a.createdAt||0).getTime());
   const annotations=scopedAnnotations(neighborhoods).sort((a,b)=>new Date(b.createdAt||0).getTime()-new Date(a.createdAt||0).getTime());
   const scopeLabel=neighborhoods.length===2?`${shortNeighborhood(neighborhoods[0])} and ${shortNeighborhood(neighborhoods[1])}`:neighborhoods.length===1?shortNeighborhood(neighborhoods[0]):'All neighborhoods';
@@ -1263,18 +1474,20 @@ function pilotIssueSnapshot(nsa,issue,yi=curYI){
   };
 }
 function renderPilotVoteButtons(issue){
+  const counts=pilotVoteCounts(issue);
   const options=[['yes','Yes'],['no','No'],['not_sure','Not sure']];
-  return `<div class="pilot-vote-row">${options.map(([value,label])=>`<button type="button" class="pilot-vote ${pilotVoteState(issue)===value?'active':''}" onclick="setPilotVote('${issue}','${value}')">${label}</button>`).join('')}</div>`;
+  const labels={yes:counts.yes_count||0,no:counts.no_count||0,not_sure:counts.not_sure_count||0};
+  return `<div class="pilot-vote-row">${options.map(([value,label])=>`<button type="button" class="pilot-vote ${pilotVoteState(issue)===value?'active':''}" onclick="setPilotVote('${issue}','${value}')">${label} <span class="pilot-vote-count">${labels[value]}</span></button>`).join('')}</div>`;
 }
 function renderPilotIssueCard(nsa,issue){
   const snapshot=pilotIssueSnapshot(nsa,issue,curYI);
   const severity=gapSeverityMeta({available:snapshot.severity!=='pending',severity:snapshot.severity});
-  return `<div class="pilot-card"><div class="pilot-card-head"><div><div class="pilot-card-title">${escapeHtml(snapshot.title)}</div><div class="pilot-card-value">${escapeHtml(snapshot.valueLabel)}</div></div><span class="gap-pill ${severity.level}">${severity.label}</span></div><div class="pilot-card-meta">${escapeHtml(snapshot.meta)}</div><div class="pilot-card-copy">${escapeHtml(snapshot.copy)}</div><div class="pilot-card-copy"><strong style="color:var(--tx)">Is this accurate for your block?</strong></div>${renderPilotVoteButtons(issue)}${renderAnnotationPanel(nsa,snapshot.context,snapshot.title)}</div>`;
+  return `<div class="pilot-card"><div class="pilot-card-head"><div><div class="pilot-card-title">${escapeHtml(snapshot.title)}</div><div class="pilot-card-value">${escapeHtml(snapshot.valueLabel)}</div></div><span class="gap-pill ${severity.level}">${severity.label}</span></div><div class="pilot-card-meta">${escapeHtml(snapshot.meta)}</div><div class="pilot-card-copy">${escapeHtml(snapshot.copy)}</div><div class="pilot-card-copy"><strong style="color:var(--tx)">Is this accurate for your block?</strong></div>${renderPilotVoteButtons(issue)}<div class="pilot-card-meta">${escapeHtml(pilotVoteStatusCopy(issue))}</div>${renderAnnotationPanel(nsa,snapshot.context,snapshot.title)}</div>`;
 }
 function renderPilotOverview(nsa){
   const cfg=currentPilotConfig();
   if(!cfg)return'';
-  return `<div class="pilot-shell"><div class="pilot-hero"><div class="pilot-kicker">Community pilot</div><div class="pilot-title">${escapeHtml(cfg.label)}</div><div class="pilot-copy">This prototype narrows the view to ${escapeHtml(cfg.scopeLabel)} and foregrounds the two issues we can demonstrate most honestly today: illegal dumping and broadband access. Both cards stay explicit about whether they are official series or community-signal proxies.</div><div class="pilot-actions"><a class="pilot-submit-link" href="${escapeHtml(pilotSubmitUrl())}">Digital Navigator submit</a></div></div><div class="pilot-grid">${cfg.focus.map(issue=>renderPilotIssueCard(nsa,issue)).join('')}</div></div>`;
+  return `<div class="pilot-shell"><div class="pilot-hero"><div class="pilot-kicker">Community pilot</div><div class="pilot-title">${escapeHtml(cfg.label)}</div><div class="pilot-copy">This prototype narrows the view to ${escapeHtml(cfg.scopeLabel)} and foregrounds the two issues we can demonstrate most honestly today: illegal dumping and broadband access. Both cards stay explicit about whether they are official series or community-signal proxies. Official dashboard metrics are still anchored to the ${escapeHtml(cfg.csa)} CSA until a tighter Carrollton-specific source is connected.</div><div class="pilot-actions"><a class="pilot-submit-link" href="${escapeHtml(pilotSubmitUrl())}">Digital Navigator submit</a></div></div><div class="pilot-grid">${cfg.focus.map(issue=>renderPilotIssueCard(nsa,issue)).join('')}</div></div>`;
 }
 function renderPilotSubmitIntro(){
   const cfg=currentPilotConfig();
@@ -1294,20 +1507,9 @@ function deskScopeLabel(){
   if(scope.length===1)return shortNeighborhood(scope[0]);
   return 'all neighborhoods';
 }
-function deskMetricDelta(nsa,metric,startIndex=Math.max(0,curYI-3),endIndex=curYI){
-  const start=latestNeighborhoodMetric(nsa,metric,startIndex).value;
-  const end=latestNeighborhoodMetric(nsa,metric,endIndex).value;
-  if(start===null||end===null)return null;
-  return round1(end-start);
-}
-function deskCommunityDelta(nsa,metric,startIndex=Math.max(0,curYI-3),endIndex=curYI){
-  const start=communitySignalForMetric(nsa,metric,startIndex);
-  const end=communitySignalForMetric(nsa,metric,endIndex);
-  if(start===null||end===null)return null;
-  return round1(end-start);
-}
 function deskTemplateList(){
   const base=[
+    {id:'scope',label:'Scope snapshot'},
     {id:'efficacy',label:'Efficacy check'},
     {id:'blind_spots',label:'Blind spot scan'},
     {id:'vacancy',label:'Vacancy pattern'}
@@ -1315,85 +1517,206 @@ function deskTemplateList(){
   if(currentPilotConfig())base.unshift({id:'pilot',label:'Pilot snapshot'});
   return base;
 }
-function setDeskAnswer(state){deskAnswerState=state;if(deskOpen)renderDeskPanel();}
-function runDeskTemplate(templateId,question=''){
-  const scope=deskScopeNeighborhoods();
-  if(templateId==='pilot'){
-    const target=scope[0];
-    const dumping=pilotIssueSnapshot(target,'dumping',curYI);
-    const broadband=pilotIssueSnapshot(target,'broadband',curYI);
-    setDeskAnswer({
-      title:'Pilot snapshot',
-      copy:`Focused prototype brief for ${deskScopeLabel()}. These cards mix an official hazards proxy with community-signal-only broadband context.`,
-      items:[
-        {title:dumping.title,copy:`${dumping.meta}. ${dumping.copy}`},
-        {title:broadband.title,copy:`${broadband.meta}. ${broadband.copy}`}
-      ]
-    });
-    return;
-  }
-  if(templateId==='efficacy'){
-    const ranked=scope.flatMap(nsa=>EFFICACY_TRACKS.map(track=>efficacySnapshot(nsa,track))).filter(item=>item.severity!=='pending').sort((a,b)=>(b.recurrenceScore||0)-(a.recurrenceScore||0)).slice(0,6);
-    setDeskAnswer({
-      title:'Efficacy proxy watchlist',
-      copy:`Prototype proxy for ${deskScopeLabel()}. This looks for repeat resident signal after service burden stays elevated. It is useful for demos, but it is not the final spending-linked efficacy model yet.`,
-      items:ranked.length?ranked.map(item=>({title:`${shortNeighborhood(item.nsa)} · ${item.label}`,copy:`${efficacySummaryCopy(item)} Recent reports: ${item.reports.length}, still active: ${item.activeCount}, watch score: ${item.recurrenceScore||0}.`})): [{title:'No proxy watch items yet',copy:'The current scope does not have enough matched burden and report activity to generate a watchlist.'}]
-    });
-    return;
-  }
-  if(templateId==='blind_spots'){
-    const startIndex=Math.max(0,curYI-3);
-    const ranked=scope.map(nsa=>{
-      const officialDelta=deskMetricDelta(nsa,'hi',startIndex,curYI);
-      const communityDelta=deskCommunityDelta(nsa,'hi',startIndex,curYI);
-      const gapNow=gapSnapshot(nsa,'hi',curYI);
-      return{nsa,officialDelta,communityDelta,gapNow,score:round1((communityDelta??-999)-(officialDelta??0))};
-    }).filter(item=>item.officialDelta!==null&&item.communityDelta!==null&&item.officialDelta>=1.5&&item.communityDelta>=8).sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,6);
-    setDeskAnswer({
-      title:'Official improvement vs community worsening',
-      copy:`Screening ${deskScopeLabel()} for neighborhoods where the health index improved while resident-generated concern kept getting worse. This is the closest local stand-in for the future sentiment blind-spot query.`,
-      items:ranked.length?ranked.map(item=>({title:shortNeighborhood(item.nsa),copy:`Health index improved ${item.officialDelta} points since ${YEARS[startIndex]}, but community signal worsened ${item.communityDelta} points. Current gap severity: ${gapSeverityMeta(item.gapNow).label.toLowerCase()}.`})): [{title:'No strong blind-spot reversals in scope',copy:'Nothing in the current scope crossed the prototype threshold for official improvement paired with worsening community signal.'}]
-    });
-    return;
-  }
-  if(templateId==='vacancy'){
-    const startIndex=Math.max(0,curYI-3);
-    const ranked=scope.map(nsa=>{
-      const vacancyStart=latestNeighborhoodMetric(nsa,'va',startIndex).value;
-      const vacancyEnd=latestNeighborhoodMetric(nsa,'va',curYI).value;
-      const hazardStart=latestNeighborhoodMetric(nsa,'hz',startIndex).value;
-      const hazardEnd=latestNeighborhoodMetric(nsa,'hz',curYI).value;
-      const unemploymentDelta=deskMetricDelta(nsa,'un',startIndex,curYI);
-      const vacancyChange=vacancyStart!==null&&vacancyEnd!==null?round1(vacancyStart-vacancyEnd):null;
-      const hazardChange=hazardStart!==null&&hazardEnd!==null?round1(hazardStart-hazardEnd):null;
-      return{nsa,vacancyChange,hazardChange,unemploymentDelta};
-    }).filter(item=>item.vacancyChange!==null).sort((a,b)=>(b.vacancyChange||0)-(a.vacancyChange||0)).slice(0,6);
-    setDeskAnswer({
-      title:'Vacancy reduction pattern scan',
-      copy:`Directional scan for ${deskScopeLabel()}. This is not causal inference yet; it is a fast admin briefing that lines vacancy reduction up against hazard and unemployment movement.`,
-      items:ranked.length?ranked.map(item=>({title:shortNeighborhood(item.nsa),copy:`Vacant housing fell ${item.vacancyChange} points since ${YEARS[startIndex]}. 311 hazards ${item.hazardChange===null?'are unavailable':item.hazardChange>0?`fell ${item.hazardChange} calls`:`rose ${Math.abs(item.hazardChange)} calls`}, and unemployment ${item.unemploymentDelta===null?'is unavailable':item.unemploymentDelta<=0?`improved ${Math.abs(item.unemploymentDelta)} points`:`worsened ${item.unemploymentDelta} points`}.`})): [{title:'No vacancy trend found',copy:'The current scope did not have enough matched vacancy data to summarize.'}]
-    });
-    return;
-  }
-  const genericScope=scope.slice(0,6).map(nsa=>({title:shortNeighborhood(nsa),copy:`Health index ${yv(nsa,'hi',curYI)} · gap severity ${gapSeverityMeta(gapSnapshot(nsa,'hi',curYI)).label.toLowerCase()} · reports ${scopedReports([nsa]).length}.`}));
-  setDeskAnswer({
-    title:'Scope snapshot',
-    copy:question?`Mapped your question to a general scope snapshot for ${deskScopeLabel()}.`:`Quick snapshot for ${deskScopeLabel()}.`,
-    items:genericScope
-  });
+function currentAnalysisScope(){
+  return{
+    neighborhoods:deskScopeNeighborhoods(),
+    scopeLabel:deskScopeLabel(),
+    pilotSlug:pilotMode||null,
+    pilotScopeLabel:currentPilotConfig()?.scopeLabel||null,
+    metric:curM,
+    metricLabel:MCFG[curM]?.label||curM,
+    year:YEARS[curYI],
+    benchmarkLevel:benchMode,
+    gapMode,
+    blindSpotsOnly
+  };
 }
-function inferDeskTemplate(question){
-  const q=String(question||'').toLowerCase();
-  if(currentPilotConfig()&&(/pilot|carroll|dump|broadband|wifi|internet/.test(q)))return'pilot';
-  if(/spent|effic|complaint|came back|returned|repeat|recurr/.test(q))return'efficacy';
-  if(/blind|sentiment|perception|official|worsened|worse/.test(q))return'blind_spots';
-  if(/vacan|property reduction|vacant/.test(q))return'vacancy';
-  return'scope';
+function analysisSessionLabel(session){
+  if(!session)return'';
+  const suffix=session.pilot_slug?' · pilot':session.profile_slug==='pilot'?' · pilot':'';
+  return `${session.title||'Untitled session'}${suffix}`;
 }
-function submitDeskQuestion(){
+function upsertAnalysisSessionSummary(session){
+  if(!session?.id)return;
+  analysisSessions=[session,...analysisSessions.filter(item=>item.id!==session.id)].slice(0,12);
+}
+async function bootstrapAnalysisDesk(){
+  if(!analysisDeskEnabled()){
+    analysisProfiles=[];
+    analysisSessions=[];
+    analysisMessages=[];
+    activeAnalysisSessionId=null;
+    analysisError='';
+    analysisStatus='Live analysis is wired in code, but disabled in supabase/config.js until the Edge Function is deployed.';
+    if(deskOpen)renderDeskPanel();
+    return;
+  }
+  if(!db||!adminSession||!adminAuthorized)return;
+  analysisBusy=true;
+  analysisError='';
+  analysisStatus='Loading analysis desk…';
+  if(deskOpen)renderDeskPanel();
+  const {data,error}=await db.functions.invoke('analysis-desk',{body:{action:'bootstrap'}});
+  analysisBusy=false;
+  if(error){
+    console.error(error);
+    analysisError='The analysis function is not reachable yet. Deploy supabase/functions/analysis-desk after running the latest migration.';
+    analysisStatus='';
+    if(deskOpen)renderDeskPanel();
+    return;
+  }
+  analysisProfiles=Array.isArray(data?.profiles)?data.profiles:[];
+  analysisSessions=Array.isArray(data?.sessions)?data.sessions:[];
+  if(!analysisProfileSlug)analysisProfileSlug=(currentPilotConfig()&&analysisProfiles.some(profile=>profile.slug==='pilot'))?'pilot':'default';
+  analysisStatus=data?.model?`Signed in as ${adminUserEmail}. Live model: ${data.model}.`:`Signed in as ${adminUserEmail}.`;
+  if(!activeAnalysisSessionId&&analysisSessions[0]?.id)activeAnalysisSessionId=analysisSessions[0].id;
+  if(deskOpen)renderDeskPanel();
+}
+async function loadAnalysisSession(sessionId){
+  if(!analysisDeskEnabled()){
+    analysisStatus='Live analysis is still disabled in supabase/config.js.';
+    renderDeskPanel();
+    return;
+  }
+  if(!db||!adminAuthorized)return;
+  if(!sessionId||sessionId==='__new__'){
+    activeAnalysisSessionId=null;
+    analysisMessages=[];
+    analysisError='';
+    analysisStatus='Started a fresh analysis session.';
+    renderDeskPanel();
+    return;
+  }
+  analysisBusy=true;
+  analysisError='';
+  analysisStatus='Loading session…';
+  renderDeskPanel();
+  const {data,error}=await db.functions.invoke('analysis-desk',{body:{action:'history',sessionId}});
+  analysisBusy=false;
+  if(error){
+    console.error(error);
+    analysisError='Session history could not be loaded.';
+    analysisStatus='';
+    renderDeskPanel();
+    return;
+  }
+  activeAnalysisSessionId=sessionId;
+  analysisMessages=Array.isArray(data?.messages)?data.messages:[];
+  if(data?.session)upsertAnalysisSessionSummary(data.session);
+  analysisStatus='Loaded saved analysis session.';
+  renderDeskPanel();
+}
+async function sendAdminMagicLink(){
+  if(!db){
+    toast('Supabase is not configured for this dashboard.');
+    return;
+  }
+  const emailInput=document.getElementById('desk-admin-email');
+  const email=emailInput?.value?.trim()||'';
+  if(!email){
+    toast('Enter your admin email first.');
+    if(emailInput)emailInput.focus();
+    return;
+  }
+  analysisBusy=true;
+  analysisError='';
+  analysisStatus='Sending magic link…';
+  renderDeskPanel();
+  const redirectTo=buildURL();
+  const {error}=await db.auth.signInWithOtp({email,options:{emailRedirectTo:redirectTo,shouldCreateUser:false}});
+  analysisBusy=false;
+  if(error){
+    console.error(error);
+    analysisError='Could not send the admin magic link. Confirm email auth is enabled in Supabase and that this redirect URL is allowed.';
+    analysisStatus='';
+    renderDeskPanel();
+    return;
+  }
+  analysisStatus=`Magic link sent to ${email}. Finish the sign-in from your inbox, then the desk will unlock automatically.`;
+  renderDeskPanel();
+}
+async function signOutAdmin(){
+  if(!db)return;
+  await db.auth.signOut();
+  adminAuthorized=false;
+  adminUserEmail='';
+  adminRole='';
+  adminAuthMessage='You have been signed out of admin mode.';
+  analysisProfiles=[];
+  analysisSessions=[];
+  analysisMessages=[];
+  activeAnalysisSessionId=null;
+  analysisError='';
+  analysisStatus='';
+  renderDeskPanel();
+}
+function deskTemplatePrompt(templateId){
+  const scopeLabel=deskScopeLabel();
+  if(templateId==='pilot')return`Give me a Carrollton Ridge pilot snapshot for ${scopeLabel}. Focus on illegal dumping, broadband access, recent pilot accuracy votes, community reports, and any intervention signals we have.`;
+  if(templateId==='efficacy')return`Show me where we may have spent effort but complaints or burden returned in ${scopeLabel}. Use reports, 311 history, and spending records if any exist.`;
+  if(templateId==='blind_spots')return`Which neighborhoods in ${scopeLabel} improved officially but still look worse in community signal? Call out the strongest blind spots and why.`;
+  if(templateId==='vacancy')return`What patterns line up with vacant property reduction in ${scopeLabel}? Use vacancy, hazards, unemployment, and report context.`;
+  return`Give me a scope snapshot for ${scopeLabel}. What are the highest-signal issues right now?`;
+}
+async function runDeskTemplate(templateId){
   const input=document.getElementById('desk-question');
-  const question=input?.value?.trim()||'';
-  runDeskTemplate(inferDeskTemplate(question),question);
+  if(input)input.value=deskTemplatePrompt(templateId);
+  await submitDeskQuestion(deskTemplatePrompt(templateId),templateId);
+}
+async function submitDeskQuestion(forcedQuestion='',templateId=null){
+  if(!db){
+    toast('Supabase is not configured for this dashboard.');
+    return;
+  }
+  if(!analysisDeskEnabled()){
+    toast('Enable BALTI2 live analysis in supabase/config.js after the Edge Function is deployed.');
+    renderDeskPanel();
+    return;
+  }
+  if(!adminMode){
+    toast('Analysis desk is available in admin mode only.');
+    return;
+  }
+  if(!adminAuthorized){
+    toast('Sign in with an allowlisted admin email first.');
+    renderDeskPanel();
+    return;
+  }
+  const input=document.getElementById('desk-question');
+  const question=(forcedQuestion||input?.value||'').trim();
+  if(!question){
+    toast('Add a question for the analysis desk first.');
+    if(input)input.focus();
+    return;
+  }
+  const profileSelect=document.getElementById('desk-profile');
+  const profileSlug=profileSelect?.value||analysisProfileSlug||((currentPilotConfig()&&analysisProfiles.some(profile=>profile.slug==='pilot'))?'pilot':'default');
+  analysisProfileSlug=profileSlug;
+  analysisBusy=true;
+  analysisError='';
+  analysisStatus='Generating live analysis…';
+  renderDeskPanel();
+  const {data,error}=await db.functions.invoke('analysis-desk',{body:{action:'chat',sessionId:activeAnalysisSessionId,profileSlug,prompt:question,templateId,pilotSlug:pilotMode||null,scope:currentAnalysisScope()}});
+  analysisBusy=false;
+  if(error){
+    console.error(error);
+    analysisError=error.message||'The live analysis request failed.';
+    analysisStatus='';
+    renderDeskPanel();
+    return;
+  }
+  if(input)input.value='';
+  if(data?.session){
+    activeAnalysisSessionId=data.session.id||activeAnalysisSessionId;
+    upsertAnalysisSessionSummary(data.session);
+  }
+  analysisMessages=Array.isArray(data?.messages)?data.messages:[];
+  analysisStatus=data?.model?`Last response generated with ${data.model}.`:'Analysis updated.';
+  renderDeskPanel();
+}
+function renderDeskConversation(){
+  if(!analysisMessages.length)return `<div class="desk-empty">No live analysis has been generated yet. Start with a template or ask your own question.</div>`;
+  return `<div class="desk-chat">${analysisMessages.slice(-12).map(message=>{const role=message.role||'assistant';const klass=role==='user'?'user':role==='tool'?'tool':'assistant';const roleLabel=role==='tool'?(message.tool_name?`Tool · ${message.tool_name}`:'Tool result'):role==='user'?'You':'Assistant';return `<div class="desk-msg ${klass}"><div class="desk-msg-role">${escapeHtml(roleLabel)}</div><div class="desk-msg-copy">${escapeHtmlWithBreaks(message.content||'')}</div></div>`;}).join('')}</div>`;
 }
 function renderDeskPanel(){
   const shell=document.getElementById('desk-shell');
@@ -1403,12 +1726,17 @@ function renderDeskPanel(){
   shell.classList.toggle('open',deskOpen);
   shell.setAttribute('aria-hidden',String(!deskOpen));
   toggle.setAttribute('aria-expanded',String(deskOpen));
-  panel.innerHTML=`<div class="desk-top"><div><div class="desk-title">${escapeHtml(deskAnswerState.title||'Analysis desk')}</div><div class="desk-copy">${escapeHtml(deskAnswerState.copy||'Choose a template or ask a question to generate a local prototype briefing.')}</div></div><button type="button" class="desk-btn" onclick="toggleDesk(false)">Close</button></div><div class="desk-templates">${deskTemplateList().map(template=>`<button type="button" class="desk-chip" onclick="runDeskTemplate('${template.id}')">${escapeHtml(template.label)}</button>`).join('')}</div><div class="desk-form"><label class="rfl" for="desk-question">Prototype question</label><textarea class="desk-input" id="desk-question" placeholder="Ask about complaint recurrence, blind spots, vacancy trends, or the Carrollton pilot."></textarea><div class="desk-actions"><button type="button" class="desk-btn primary" onclick="submitDeskQuestion()">Generate briefing</button><button type="button" class="desk-btn" onclick="runDeskTemplate('scope')">Scope snapshot</button></div></div><div class="desk-answer"><div class="desk-answer-title">${escapeHtml(deskAnswerState.title||'Analysis desk')}</div><div class="desk-answer-copy">${escapeHtml(deskAnswerState.copy||'Choose a template or ask a question to generate a local prototype briefing.')}</div><div class="desk-list">${(deskAnswerState.items||[]).map(item=>`<div class="desk-item"><div class="desk-item-title">${escapeHtml(item.title||'Insight')}</div><div class="desk-item-copy">${escapeHtml(item.copy||'')}</div></div>`).join('')}</div></div>`;
+  const activeProfile=analysisProfileSlug||((currentPilotConfig()&&analysisProfiles.some(profile=>profile.slug==='pilot'))?'pilot':'default');
+  const profileOptions=analysisProfiles.length?analysisProfiles.map(profile=>`<option value="${escapeHtml(profile.slug)}"${activeProfile===profile.slug?' selected':''}>${escapeHtml(profile.label)}</option>`).join(''):'<option value="default">Default profile</option>';
+  const sessionOptions=['<option value="__new__">New session</option>',...analysisSessions.map(session=>`<option value="${escapeHtml(session.id)}"${activeAnalysisSessionId===session.id?' selected':''}>${escapeHtml(analysisSessionLabel(session))}</option>`)].join('');
+  const statusBlock=analysisError?`<div class="desk-status" style="background:var(--accent-lt);border-color:color-mix(in oklab,var(--accent) 20%,var(--bg));color:var(--danger)">${escapeHtml(analysisError)}</div>`:analysisStatus?`<div class="desk-status">${escapeHtml(analysisStatus)}</div>`:'';
+  const authBlock=!db?`<div class="desk-auth"><div class="desk-copy">Supabase is not configured in this environment, so the live analysis desk cannot start yet.</div></div>`:!analysisDeskEnabled()?`<div class="desk-auth"><div class="desk-copy">Live analysis is wired in code, but currently disabled in <code>supabase/config.js</code> so the public demo does not probe an undeployed Edge Function.</div><div class="desk-note">After you deploy <code>analysis-desk</code> and set the OpenAI secret, flip <code>window.BALTI2_ENABLE_ANALYSIS_DESK</code> to <code>true</code>.</div></div>`:!adminUserEmail?`<div class="desk-auth"><div class="desk-copy">This desk now uses a live model-backed Supabase Edge Function and requires a signed-in allowlisted admin account.</div><div class="desk-field"><label class="rfl" for="desk-admin-email">Admin email</label><input class="desk-select" id="desk-admin-email" type="email" autocomplete="email" placeholder="you@example.org"></div><div class="desk-actions"><button type="button" class="desk-btn primary" onclick="sendAdminMagicLink()"${analysisBusy?' disabled':''}>Send magic link</button></div><div class="desk-note">Make sure your Supabase auth settings allow the current dashboard URL as a redirect target.</div></div>`:!adminAuthorized?`<div class="desk-auth"><div class="desk-copy">${escapeHtml(adminAuthMessage||`Signed in as ${adminUserEmail}, but this account is not allowlisted yet.`)}</div><div class="desk-actions"><button type="button" class="desk-btn" onclick="signOutAdmin()">Sign out</button></div><div class="desk-note">Add this email to <code>public.admin_users</code> after running the Phase 6 migration.</div></div>`:`<div class="desk-grid"><div class="desk-field"><label class="rfl" for="desk-profile">Prompt profile</label><select class="desk-select" id="desk-profile" onchange="analysisProfileSlug=this.value">${profileOptions}</select></div><div class="desk-field"><label class="rfl" for="desk-session">Session</label><select class="desk-select" id="desk-session" onchange="loadAnalysisSession(this.value)">${sessionOptions}</select></div></div><div class="desk-toolbar"><div class="desk-inline"><span class="desk-pill">${escapeHtml(adminUserEmail)}</span>${adminRole?`<span class="desk-pill">${escapeHtml(adminRole)}</span>`:''}${currentPilotConfig()?`<span class="desk-pill">${escapeHtml(currentPilotConfig().label)}</span>`:''}</div><button type="button" class="desk-btn" onclick="signOutAdmin()">Sign out</button></div><div class="desk-templates">${deskTemplateList().map(template=>`<button type="button" class="desk-chip" onclick="runDeskTemplate('${template.id}')"${analysisBusy?' disabled':''}>${escapeHtml(template.label)}</button>`).join('')}</div><div class="desk-form"><label class="rfl" for="desk-question">Analysis question</label><textarea class="desk-input" id="desk-question" placeholder="Ask about blind spots, returned complaints, spending efficacy, pilot signal, or intervention patterns."></textarea><div class="desk-actions"><button type="button" class="desk-btn primary" onclick="submitDeskQuestion('',null)"${analysisBusy?' disabled':''}>Ask assistant</button><button type="button" class="desk-btn" onclick="loadAnalysisSession('__new__')"${analysisBusy?' disabled':''}>New session</button></div></div>${renderDeskConversation()}`;
+  panel.innerHTML=`<div class="desk-top"><div><div class="desk-title">Analysis desk</div><div class="desk-copy">Live admin assistant for neighborhood data, community reports, 311 history, spending records, and pilot votes. It stays explicit about proxy, derived, and missing coverage.</div></div><button type="button" class="desk-btn" onclick="toggleDesk(false)">Close</button></div>${statusBlock}${authBlock}`;
 }
 function toggleDesk(force){
   if(!adminMode){toast('Analysis desk is available in admin mode only.');return;}
   deskOpen=typeof force==='boolean'?force:!deskOpen;
-  if(deskOpen&&!(deskAnswerState.items||[]).length)runDeskTemplate(currentPilotConfig()?'pilot':'efficacy');
+  if(deskOpen&&adminAuthorized&&!analysisMessages.length&&activeAnalysisSessionId&&db)loadAnalysisSession(activeAnalysisSessionId);
   renderDeskPanel();
 }
 function renderOne(){
@@ -1462,20 +1790,22 @@ function drawSpk(id,vals,yi,col){const c=document.getElementById(id);if(!c)retur
 function renderReportsFor(nsa,tid){const selected=matchNeighborhoodKey(nsa)||nsa;const items=REPORTS.filter(r=>(matchNeighborhoodKey(r.nsa)||r.nsa)===selected);document.getElementById(tid).innerHTML=`${demoModeNote()}${!items.length?`<div style="font-size:11px;color:var(--t3)">No reports yet.</div>`:items.map((r,i)=>{const rowId=`${tid}-${i}`;const meta=statusMeta(r.status);const safeTitle=escapeHtml(r.title);const safeTracking=escapeHtml(r.trackingId);const safePlace=escapeHtml(shortNeighborhood(r.nsa));const context=annotationContext('report',r.trackingId||String(r.id));return`<div class="ric" id="${rowId}"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px"><div><div class="rit">${safeTitle}</div><div style="font-size:9px;color:var(--t3);margin-top:2px">${safeTracking}</div></div><span class="ris ${meta.klass}">${meta.label}</span></div><div class="rim">${escapeHtml(r.submitted)} · ${safePlace}</div><div class="ria"><button type="button" class="rib c" onclick="vt('${String(r.id)}','confirm','${rowId}')" aria-label="Confirm report ${safeTitle}">Confirm <span id="${rowId}-confirm">${r.confirms}</span></button><button type="button" class="rib d" onclick="vt('${String(r.id)}','dispute','${rowId}')" aria-label="Dispute report ${safeTitle}">Dispute <span id="${rowId}-dispute">${r.disputes}</span></button></div>${renderAnnotationPanel(r.nsa,context,`${r.trackingId} report`)}</div>`;}).join('')}`;}
 function renderReportsFor2(p1,p2,tid){const selected=new Set([matchNeighborhoodKey(p1)||p1,matchNeighborhoodKey(p2)||p2]);const items=REPORTS.filter(r=>selected.has(matchNeighborhoodKey(r.nsa)||r.nsa));document.getElementById(tid).innerHTML=`${demoModeNote()}${!items.length?`<div style="font-size:11px;color:var(--t3)">No reports for these neighborhoods.</div>`:`<div style="font-size:9px;color:var(--t3);margin-bottom:4px">Reports from both neighborhoods</div>`+items.map((r,i)=>{const key=matchNeighborhoodKey(r.nsa)||r.nsa;const isA=key===(matchNeighborhoodKey(p1)||p1);const rowId=`${tid}-${i}`;const meta=statusMeta(r.status);const safeTitle=escapeHtml(r.title);const safeNeighborhood=escapeHtml(isA?shortNeighborhood(p1):shortNeighborhood(p2));const context=annotationContext('report',r.trackingId||String(r.id));return`<div class="ric" id="${rowId}"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:4px"><div><div class="rit">${safeTitle}</div><div style="font-size:9px;font-weight:500;color:${isA?COL_A:COL_B}">${safeNeighborhood}</div></div><span class="ris ${meta.klass}">${meta.label}</span></div><div class="rim">${escapeHtml(r.submitted)}</div><div class="ria"><button type="button" class="rib c" onclick="vt('${String(r.id)}','confirm','${rowId}')" aria-label="Confirm report ${safeTitle}">Confirm <span id="${rowId}-confirm">${r.confirms}</span></button><button type="button" class="rib d" onclick="vt('${String(r.id)}','dispute','${rowId}')" aria-label="Dispute report ${safeTitle}">Dispute <span id="${rowId}-dispute">${r.disputes}</span></button></div>${renderAnnotationPanel(r.nsa,context,`${r.trackingId} report`)}</div>`;}).join('')}`;}
 async function vt(reportId,type,rowId){if(hasSessionVote(reportId,type)){toast(type==='confirm'?'You already confirmed this report in this browser session.':'You already disputed this report in this browser session.');return;}if(db&&isUuid(reportId)){const{error}=await db.from('votes').insert({report_id:reportId,vote_type:type,voter_fp:getVoterFp()});if(error&&error.code==='23505'){markSessionVote(reportId,type);toast(type==='confirm'?'You already confirmed this report.':'You already disputed this report.');return;}if(error){console.error(error);toast('Vote could not be recorded right now.');return;}markSessionVote(reportId,type);await syncReportsFromSupabase();toast(type==='confirm'?'Confirmation recorded. Thank you.':'Dispute noted — a moderator will review.');return;}markSessionVote(reportId,type);upsertLocalReportVote(reportId,type);const counter=document.getElementById(`${rowId}-${type}`);if(counter)counter.textContent=String(parseInt(counter.textContent||'0',10)+1);toast(type==='confirm'?'Confirmation recorded. Thank you.':'Dispute noted — a moderator will review.');}
+function legacyReportPayload(payload){const{nsa,category,description,severity,author_role,lat,lng}=payload;return{nsa,category,description,severity,author_role,lat,lng};}
+function shouldRetryLegacyReportInsert(message){return /column|pilot_slug|block_label|observed_on|metadata|source/i.test(String(message||''));}
+async function insertReportPayload(payload){const attempt=async(body)=>await db.from('reports').insert(body).select('id,tracking_id').single();let result=await attempt(payload);if(result.error&&shouldRetryLegacyReportInsert(result.error.message))result=await attempt(legacyReportPayload(payload));return result;}
 function makeValidationPanel(neighborhoods,prefix){const selected=new Set(neighborhoods.map(n=>matchNeighborhoodKey(n)||n).filter(Boolean));const cases=VALIDATION_CASES.map((item,index)=>({item,index,key:matchNeighborhoodKey(item.nsa)||item.nsa})).filter(entry=>selected.has(entry.key));if(!cases.length)return`<div class="validate-panel">${demoModeNote('Demo mode: validation votes are working in-browser now and will become shared once Supabase is connected.')}<div style="font-size:11px;color:var(--t3)">No validation cases yet for this selection.</div></div>`;const intro=neighborhoods.length>1?`<div style="font-size:9px;color:var(--t3)">Cases surfaced from both selected neighborhoods. Confirm, dispute, or add local context.</div>`:`<div style="font-size:9px;color:var(--t3)">Help verify whether community-submitted items for ${escapeHtml(shortNeighborhood(neighborhoods[0]))} reflect what residents are seeing on the ground.</div>`;return`<div class="validate-panel">${demoModeNote('Demo mode: validation votes are working in-browser now and will become shared once Supabase is connected.')}${intro}${cases.map(({item,index})=>{const tone=item.confidence>=80?TOKENS.success:item.confidence>=60?TOKENS.warn:TOKENS.danger;const meta=statusMeta(item.status);const ref=item.trackingId||item.id;const safeTitle=escapeHtml(item.title);const safeMeta=`${escapeHtml(ref)} · ${escapeHtml(item.cat)} · ${escapeHtml(item.nsa)}`;const context=annotationContext('report',item.trackingId||String(item.id));return`<div class="validate-card" id="vcrd-${prefix}-${index}"><div class="validate-header"><div><div class="validate-title">${safeTitle}</div><div style="font-size:11px;color:var(--t3);margin-top:2px;">${safeMeta}</div></div><div style="font-size:12px;color:var(--t3);">${escapeHtml(item.submitted)}</div></div><div class="validate-meta">${escapeHtml(item.desc)}</div><div class="evidence-box"><strong style="color:var(--tx)">Evidence:</strong> ${escapeHtml(item.evidence)}</div><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><span class="ris ${meta.klass}">${meta.label}</span><span style="font-size:9px;color:${tone};font-weight:500">Confidence ${item.confidence}%</span></div><div class="confidence-bar"><span>Community confidence</span><div class="conf-track"><div class="conf-fill" id="${prefix}-conf-${index}" style="width:${item.confidence}%;background:${tone}"></div></div><span id="${prefix}-conf-label-${index}">${item.confidence}%</span></div><div class="validate-actions"><button type="button" class="validate-btn confirm" id="${prefix}-confirm-${index}" onclick="castValidateVote('${prefix}',${index},'confirm')" aria-label="Confirm report ${escapeHtml(ref)} in ${escapeHtml(item.nsa)}">Confirm <span id="${prefix}-confirm-count-${index}">${item.confirms}</span></button><button type="button" class="validate-btn dispute" id="${prefix}-dispute-${index}" onclick="castValidateVote('${prefix}',${index},'dispute')" aria-label="Dispute report ${escapeHtml(ref)} in ${escapeHtml(item.nsa)}">Dispute <span id="${prefix}-dispute-count-${index}">${item.disputes}</span></button></div>${renderAnnotationPanel(item.nsa,context,`${ref} validation note`)}</div>`;}).join('')}</div>`;}
 async function castValidateVote(tid,i,type){const item=VALIDATION_CASES[i];const card=document.getElementById(`vcrd-${tid}-${i}`);if(!item||!card)return;if(type==='evidence'){toast(`Use the Submit tab to attach additional evidence — reference ID ${item.trackingId||item.id}.`);return;}if(hasSessionVote(item.id,type)){toast(type==='confirm'?'You already confirmed this report in this browser session.':'You already disputed this report in this browser session.');return;}if(db&&isUuid(item.id)){const{error}=await db.from('votes').insert({report_id:item.id,vote_type:type,voter_fp:getVoterFp()});if(error&&error.code==='23505'){markSessionVote(item.id,type);toast(type==='confirm'?'You already confirmed this report.':'You already disputed this report.');return;}if(error){console.error(error);toast('Vote could not be recorded right now.');return;}markSessionVote(item.id,type);await syncReportsFromSupabase();toast(type==='confirm'?'Confirmation recorded.':'Dispute noted — a moderator will review.');return;}markSessionVote(item.id,type);if(type==='confirm'){item.confirms+=1;item.confidence=Math.min(99,item.confidence+2);}else{item.disputes+=1;item.confidence=Math.max(5,item.confidence-4);}upsertLocalReportVote(item.id,type);const tone=item.confidence>=80?TOKENS.success:item.confidence>=60?TOKENS.warn:TOKENS.danger;document.getElementById(`${tid}-confirm-count-${i}`).textContent=String(item.confirms);document.getElementById(`${tid}-dispute-count-${i}`).textContent=String(item.disputes);document.getElementById(`${tid}-conf-${i}`).style.width=`${item.confidence}%`;document.getElementById(`${tid}-conf-${i}`).style.background=tone;document.getElementById(`${tid}-conf-label-${i}`).textContent=`${item.confidence}%`;card.style.opacity='0.5';card.style.pointerEvents='none';toast(type==='confirm'?'Confirmation recorded.':'Dispute noted — a moderator will review.');}
 function makeSubmitForm(formId,p1,p2){const options=[p1,p2].filter(Boolean);const intro=db?'Community-submitted items are displayed separately from official data. Neighbors can later confirm, dispute, or add context.':'Demo mode: submitted reports stay in this browser for the walkthrough and will become shared once Supabase is connected.';const successCopy=db?'Your report is now visible as a community-submitted item and can be validated by neighbors.':'Your report is now visible in this browser for the demo and can be validated during the walkthrough.';return`<div class="rpt-preface">${intro}</div><form class="rf" id="${formId}-form" onsubmit="subR('${formId}');return false;"><div class="rf-row"><div><label class="rfl" for="rf-nsa">Neighborhood</label><select class="rfs" id="rf-nsa" name="neighborhood" autocomplete="off">${options.map((opt,i)=>`<option value="${opt}"${i===0?' selected':''}>${opt}</option>`).join('')}</select></div><div><label class="rfl" for="rf-cat">Category</label><select class="rfs" id="rf-cat" name="category" autocomplete="off"><option>Infrastructure damage</option><option>Sanitation / trash</option><option>Vacant property</option><option>Street / traffic</option><option>Lighting</option><option>Safety concern</option><option>Environmental hazard</option><option>Data may be incorrect</option><option>Community asset</option></select></div></div><div><label class="rfl" for="${formId}-location">Approximate map location</label><button type="button" class="map-picker" id="${formId}-location" onclick="toggleLocationPin('${formId}')" aria-pressed="false" aria-label="Pin an approximate location for this community report"><span aria-hidden="true">📍</span><span id="${formId}-pin-label">Click to pin approximate location</span></button></div><div><label class="rfl" for="rf-desc">Description</label><textarea class="rft" id="rf-desc" name="description" autocomplete="on" placeholder="What did you observe? Include landmarks, urgency, and how long it has been present." required></textarea></div><div class="rf-row"><div><label class="rfl" for="rf-sev">Severity</label><select class="rfs" id="rf-sev" name="severity" autocomplete="off"><option>Low — informational</option><option selected>Medium — needs attention</option><option>High — urgent</option></select></div><div><label class="rfl" for="rf-role">Your role</label><select class="rfs" id="rf-role" name="role" autocomplete="off"><option>Resident</option><option>Community organization</option><option>Business owner</option><option>City staff</option><option>Anonymous</option></select></div></div><button type="submit" class="rfb">Submit report</button></form><div id="${formId}-success" class="validate-card" style="display:none;background:var(--success-lt);border-color:color-mix(in oklab,var(--success) 28%,var(--bg))"><div style="font-size:16px;font-weight:500;color:var(--success)">Report submitted</div><div style="font-size:13px;color:var(--t2);line-height:1.45">${successCopy} Tracking ID: <strong style="color:var(--tx)">#<span id="${formId}-tracking">BLT-0000</span></strong></div><button type="button" class="validate-btn" onclick="newReport('${formId}')" aria-label="Submit another community report">Submit another</button></div>`;}
 function toggleLocationPin(formId){const picker=document.getElementById(`${formId}-location`);const label=document.getElementById(`${formId}-pin-label`);if(!picker||!label)return;const next=picker.getAttribute('aria-pressed')!=='true';if(next){activeReportPinForm=formId;picker.setAttribute('aria-pressed','true');label.textContent='Click the map to pin location';toast('Click a spot on the map to capture an approximate report location.');return;}if(activeReportPinForm===formId)activeReportPinForm=null;delete draftReportLocations[formId];picker.setAttribute('aria-pressed','false');label.textContent='Click to pin approximate location';toast('Location pin cleared.');}
-async function subR(formId){const form=document.getElementById(`${formId}-form`);const nsa=form?.querySelector('#rf-nsa')?.value||pinA||'Unknown';const cat=form?.querySelector('#rf-cat')?.value||'General';const descEl=form?.querySelector('#rf-desc');const desc=descEl?.value?.trim();const sev=form?.querySelector('#rf-sev')?.value||'medium';const role=(form?.querySelector('#rf-role')?.value||'anonymous').toLowerCase();const success=document.getElementById(`${formId}-success`);if(!desc){toast('Please add a description before submitting.');if(descEl)descEl.focus();return false;}const draftLoc=draftReportLocations[formId];const neighborhoodCenter=reportLocation({nsa});const locationDraft=draftLoc||(neighborhoodCenter?{lat:neighborhoodCenter[0],lng:neighborhoodCenter[1]}:null);let trackingId=`BLT-${Math.floor(1000+Math.random()*9000)}`;if(db){const payload={nsa,category:cat,description:desc,severity:sev.toLowerCase().startsWith('low')?'low':sev.toLowerCase().startsWith('high')?'high':'medium',author_role:role,lat:locationDraft?.lat??null,lng:locationDraft?.lng??null};const{data,error}=await db.from('reports').insert(payload).select('id,tracking_id').single();if(error){console.error(error);toast('Submission failed — please try again.');return false;}trackingId=data?.tracking_id||trackingId;await syncReportsFromSupabase();toast(`Report submitted · ID: ${trackingId}`);}else{const fallbackReport=normalizeReportRecord({id:`local-${Date.now()}`,tracking_id:trackingId,nsa,category:cat,description:desc,severity:sev,author_role:role,status:'open',created_at:new Date().toISOString(),lat:locationDraft?.lat??null,lng:locationDraft?.lng??null},REPORTS.length);REPORTS.unshift(fallbackReport);VALIDATION_CASES=buildValidationCases(REPORTS);refreshReportUI();toast(`Report submitted · ID: ${trackingId} (offline)`);}const trackingEl=document.getElementById(`${formId}-tracking`);if(trackingEl)trackingEl.textContent=trackingId;if(form)form.style.display='none';if(success)success.style.display='flex';if(descEl)descEl.value='';delete draftReportLocations[formId];if(activeReportPinForm===formId)activeReportPinForm=null;return false;}
+async function subR(formId){const form=document.getElementById(`${formId}-form`);const nsa=form?.querySelector('#rf-nsa')?.value||pinA||'Unknown';const cat=form?.querySelector('#rf-cat')?.value||'General';const descEl=form?.querySelector('#rf-desc');const desc=descEl?.value?.trim();const sev=form?.querySelector('#rf-sev')?.value||'medium';const role=(form?.querySelector('#rf-role')?.value||'anonymous').toLowerCase();const success=document.getElementById(`${formId}-success`);if(!desc){toast('Please add a description before submitting.');if(descEl)descEl.focus();return false;}const draftLoc=draftReportLocations[formId];const neighborhoodCenter=reportLocation({nsa});const locationDraft=draftLoc||(neighborhoodCenter?{lat:neighborhoodCenter[0],lng:neighborhoodCenter[1]}:null);const pilotCfg=currentPilotConfig();const payloadBase={nsa,category:cat,description:desc,severity:sev.toLowerCase().startsWith('low')?'low':sev.toLowerCase().startsWith('high')?'high':'medium',author_role:role,lat:locationDraft?.lat??null,lng:locationDraft?.lng??null,source:pilotCfg?'pilot_dashboard':'dashboard',pilot_slug:pilotMode||null,metadata:pilotCfg?{origin:'dashboard-pilot',scope_label:pilotCfg.scopeLabel,current_metric:curM,current_year:YEARS[curYI]}:{origin:'dashboard'}};let trackingId=`BLT-${Math.floor(1000+Math.random()*9000)}`;if(db){const{data,error}=await insertReportPayload(payloadBase);if(error){console.error(error);toast('Submission failed — please try again.');return false;}trackingId=data?.tracking_id||trackingId;await syncReportsFromSupabase();toast(`Report submitted · ID: ${trackingId}`);}else{const fallbackReport=normalizeReportRecord({id:`local-${Date.now()}`,tracking_id:trackingId,status:'open',created_at:new Date().toISOString(),...payloadBase},REPORTS.length);REPORTS.unshift(fallbackReport);VALIDATION_CASES=buildValidationCases(REPORTS);refreshReportUI();toast(`Report submitted · ID: ${trackingId} (offline)`);}const trackingEl=document.getElementById(`${formId}-tracking`);if(trackingEl)trackingEl.textContent=trackingId;if(form)form.style.display='none';if(success)success.style.display='flex';if(descEl)descEl.value='';delete draftReportLocations[formId];if(activeReportPinForm===formId)activeReportPinForm=null;return false;}
 function newReport(formId){const form=document.getElementById(`${formId}-form`);const success=document.getElementById(`${formId}-success`);if(form)form.reset();if(form)form.style.display='flex';if(success)success.style.display='none';const picker=document.getElementById(`${formId}-location`);const label=document.getElementById(`${formId}-pin-label`);delete draftReportLocations[formId];if(activeReportPinForm===formId)activeReportPinForm=null;if(picker)picker.setAttribute('aria-pressed','false');if(label)label.textContent='Click to pin approximate location';const desc=form?.querySelector('#rf-desc');if(desc)desc.focus();}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);}
 function rebuildReportMarkers(){if(!map)return;rMks.forEach(marker=>{if(map.hasLayer(marker))map.removeLayer(marker);});rMks=[];REPORTS.forEach(report=>{const location=reportLocation(report);if(!location)return;const ic=L.divIcon({className:'',html:`<div style="width:10px;height:10px;border-radius:50%;background:${report.color};border:2px solid ${TOKENS.bg};cursor:pointer"></div>`,iconSize:[10,10],iconAnchor:[5,5]});const mk=L.marker(location,{icon:ic});mk.bindPopup(`<div style="font-size:11px;font-family:sans-serif;min-width:130px"><strong>${escapeHtml(report.title)}</strong><br><span style="color:${TOKENS.t3};font-size:10px">${escapeHtml(report.nsa)}</span><br><span style="color:${TOKENS.t3};font-size:10px">${escapeHtml(report.trackingId)}</span></div>`,{closeButton:false});rMks.push(mk);if(ls.r)mk.addTo(map);});}
 function initMks(){rebuildReportMarkers();THREE11.forEach(c=>{const r=Math.max(8,Math.min(22,c.cnt/7));const ic=L.divIcon({className:'',html:`<div style="width:${r*2}px;height:${r*2}px;border-radius:50%;background:${TOKENS.warnLt};border:1.5px solid ${TOKENS.warn};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:${TOKENS.warn}">${c.cnt}</div>`,iconSize:[r*2,r*2],iconAnchor:[r,r]});cMks.push(L.marker([c.lat,c.lng],{icon:ic}));});}
 document.getElementById('share-modal').addEventListener('click',closeModal);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();if(deskOpen)toggleDesk(false);}});
-async function initMap(){document.getElementById('ylabels').innerHTML=YEARS.map(y=>`<span>${y}</span>`).join('');map=L.map('balt-map',{zoomControl:true,attributionControl:false}).setView([39.29,-76.62],11);map.on('click',e=>{if(activeReportPinForm)captureReportLocation(activeReportPinForm,e.latlng);});L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);try{const [baseResp, geoResp] = await Promise.all([fetch('data.json',{cache:'no-store'}),fetch('csa_boundaries.geojson',{cache:'no-store'})]);if(!baseResp.ok) throw new Error(`Failed to load data.json (${baseResp.status})`);if(!geoResp.ok) throw new Error(`Failed to load csa_boundaries.geojson (${geoResp.status})`);const normalizedData=normalizeDataset(await baseResp.json());DATA_META=normalizedData.meta||{};BASE=normalizedData.neighborhoods||{};BENCHMARKS=normalizedData.benchmarks||{city:{},state:{},federal:{}};applyMetricMetadata();const geoData = await geoResp.json();geo=L.geoJSON(geoData,{style:getStyle,onEachFeature:(feature,layer)=>{const name=geoName(feature.properties);const key=findK(name);layer.on({click:onNSAClick,mouseover:()=>{const label=key||name||'Neighborhood';const tooltip=gapMode&&key?gapTooltipHtml(key,name):`${label}<br>${MCFG[curM].label}: ${key?yv(key,curM,curYI):'N/A'}${key&&yv(key,curM,curYI)!==null?MCFG[curM].unit:''}`;layer.bindTooltip(tooltip,{sticky:true,direction:'top',opacity:0.95}).openTooltip();if(key!==pinA&&key!==pinB) layer.setStyle({weight:2,color:TOKENS.neutralInverse,fillOpacity:gapMode?0.92:0.9});},mouseout:()=>{if(key===pinA||key===pinB) updatePinStyles();else geo.resetStyle(layer);}});}}).addTo(map);updateGapToggleUI();buildLeg();if(db){const loaded=await syncReportsFromSupabase();if(!loaded)resetFallbackReports();await syncAnnotationsFromSupabase();subscribeToReports();subscribeToAnnotations();}initMks();if(ls['3']) cMks.forEach(m=>m.addTo(map));map.fitBounds(geo.getBounds(),{padding:[12,12]});document.getElementById('ml').style.display='none';loadFromURL();updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}catch(err){console.error(err);document.getElementById('ml').innerHTML='<div style="max-width:280px;text-align:center;line-height:1.5"><strong>Dashboard data failed to load.</strong><br>Make sure <code>data.json</code> and <code>csa_boundaries.geojson</code> are published in the repo root.</div>';}}
-initSupabase();
-initMap();
+async function initMap(){document.getElementById('ylabels').innerHTML=YEARS.map(y=>`<span>${y}</span>`).join('');map=L.map('balt-map',{zoomControl:true,attributionControl:false}).setView([39.29,-76.62],11);map.on('click',e=>{if(activeReportPinForm)captureReportLocation(activeReportPinForm,e.latlng);});L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);try{const [baseResp, geoResp] = await Promise.all([fetch('data.json',{cache:'no-store'}),fetch('csa_boundaries.geojson',{cache:'no-store'})]);if(!baseResp.ok) throw new Error(`Failed to load data.json (${baseResp.status})`);if(!geoResp.ok) throw new Error(`Failed to load csa_boundaries.geojson (${geoResp.status})`);const normalizedData=normalizeDataset(await baseResp.json());DATA_META=normalizedData.meta||{};BASE=normalizedData.neighborhoods||{};BENCHMARKS=normalizedData.benchmarks||{city:{},state:{},federal:{}};applyMetricMetadata();const geoData = await geoResp.json();geo=L.geoJSON(geoData,{style:getStyle,onEachFeature:(feature,layer)=>{const name=geoName(feature.properties);const key=findK(name);layer.on({click:onNSAClick,mouseover:()=>{const label=key||name||'Neighborhood';const tooltip=gapMode&&key?gapTooltipHtml(key,name):`${label}<br>${MCFG[curM].label}: ${key?yv(key,curM,curYI):'N/A'}${key&&yv(key,curM,curYI)!==null?MCFG[curM].unit:''}`;layer.bindTooltip(tooltip,{sticky:true,direction:'top',opacity:0.95}).openTooltip();if(key!==pinA&&key!==pinB) layer.setStyle({weight:2,color:TOKENS.neutralInverse,fillOpacity:gapMode?0.92:0.9});},mouseout:()=>{if(key===pinA||key===pinB) updatePinStyles();else geo.resetStyle(layer);}});}}).addTo(map);updateGapToggleUI();buildLeg();if(db){const loaded=await syncReportsFromSupabase();if(!loaded)resetFallbackReports();await syncAnnotationsFromSupabase();await syncPilotVotesFromSupabase();subscribeToReports();subscribeToAnnotations();subscribeToPilotVotes();}initMks();if(ls['3']) cMks.forEach(m=>m.addTo(map));map.fitBounds(geo.getBounds(),{padding:[12,12]});document.getElementById('ml').style.display='none';loadFromURL();updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}catch(err){console.error(err);document.getElementById('ml').innerHTML='<div style="max-width:280px;text-align:center;line-height:1.5"><strong>Dashboard data failed to load.</strong><br>Make sure <code>data.json</code> and <code>csa_boundaries.geojson</code> are published in the repo root.</div>';}}
+(async function startDashboard(){await initSupabase();await initMap();})();
 </script>
 </body>
 </html>

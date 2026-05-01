@@ -37,11 +37,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .btn{padding:11px 14px;border-radius:999px;border:1px solid var(--br);background:var(--bg2);color:var(--tx);cursor:pointer}
 .btn.primary{background:var(--brand);border-color:var(--brand);color:var(--bg)}
 .btn.ghost{background:transparent}
+.btn.small{padding:7px 11px;font-size:12px}
 .sync-box{padding:14px;border-radius:14px;background:var(--bg2);border:1px solid var(--br);display:flex;flex-direction:column;gap:8px}
 .sync-line{font-size:13px;color:var(--t2);line-height:1.5}
 .success{padding:14px;border-radius:14px;background:var(--successLt);border:1px solid color-mix(in oklab,var(--success) 26%,var(--bg));display:none;flex-direction:column;gap:6px}
 .success strong{font-size:18px;color:var(--success)}
 .small{font-size:12px;color:var(--t3);line-height:1.45}
+.queue-list{display:flex;flex-direction:column;gap:10px}
+.queue-item{padding:12px;border-radius:14px;border:1px solid var(--br);background:var(--bg2);display:flex;flex-direction:column;gap:8px}
+.queue-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.queue-title{font-size:14px;font-weight:600}
+.queue-meta{font-size:12px;color:var(--t2);line-height:1.45}
+.queue-actions{display:flex;gap:8px;flex-wrap:wrap}
+.queue-empty{font-size:13px;color:var(--t3);line-height:1.5}
 @media (max-width: 720px){
   body{padding:14px}
   .title{font-size:24px}
@@ -61,6 +69,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     <div class="pill" id="scope-pill">Scope: Carrollton Ridge / Franklin Square</div>
     <div class="pill" id="network-pill">Checking connection…</div>
     <div class="pill" id="queue-pill">Queued drafts: 0</div>
+    <div class="pill" id="sync-pill">Last sync: waiting</div>
   </div>
 
   <div class="card">
@@ -88,7 +97,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div class="field">
           <label class="label" for="pilot-neighborhood">Neighborhood scope</label>
           <input class="input" id="pilot-neighborhood" name="neighborhood" value="Southwest Baltimore" readonly>
-          <div class="hint">This pilot view is currently mapped to the BNIA CSA used in the dashboard data.</div>
+          <div class="hint" id="pilot-neighborhood-note">This pilot view is currently mapped to the BNIA CSA used in the dashboard data.</div>
         </div>
         <div class="field">
           <label class="label" for="pilot-role">Your role</label>
@@ -122,9 +131,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <textarea class="textarea" id="pilot-description" name="description" placeholder="Describe what you saw, who it affected, and what would make the issue feel resolved." required></textarea>
       </div>
 
-      <div class="field">
-        <label class="label" for="pilot-observed">When was this observed?</label>
-        <input class="input" id="pilot-observed" name="observed" type="date">
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="pilot-observed">When was this observed?</label>
+          <input class="input" id="pilot-observed" name="observed" type="date">
+        </div>
+        <div class="field">
+          <label class="label" for="geo-btn">Approximate GPS location</label>
+          <button type="button" class="btn small" id="geo-btn">Capture current location</button>
+          <div class="hint" id="geo-copy">Optional. Helps the pilot team place the report more precisely when a navigator is in the field.</div>
+        </div>
       </div>
 
       <div class="actions">
@@ -147,11 +163,18 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     <div class="sync-line">As soon as the page comes back online, the queue tries to post each report to Supabase and replaces the local draft with a real tracking ID.</div>
     <div class="small">This is a prototype convenience layer, not a full audited offline sync engine yet.</div>
   </div>
+
+  <div class="card">
+    <div class="card-title">Queued outbox</div>
+    <div class="queue-empty" id="queue-empty">No queued drafts yet. Offline reports will appear here until they sync.</div>
+    <div class="queue-list" id="queue-list"></div>
+  </div>
 </div>
 
 <script src="../supabase/config.js"></script>
 <script>
-const PILOT_QUEUE_KEY='balti2_submit_queue_v1';
+const PILOT_QUEUE_KEY='balti2_submit_queue_v2';
+const LEGACY_PILOT_QUEUE_KEY='balti2_submit_queue_v1';
 const PILOT_META={
   carrollton:{
     title:'Carrollton Ridge field submit',
@@ -160,31 +183,42 @@ const PILOT_META={
   }
 };
 let currentFocus='Illegal dumping';
+let capturedLocation=null;
 
 function byId(id){return document.getElementById(id);}
 function nowIsoDate(){return new Date().toISOString().slice(0,10);}
+function nowIsoTs(){return new Date().toISOString();}
+function legacyPayload(payload){const {nsa,category,description,severity,author_role,lat,lng}=payload;return{nsa,category,description,severity,author_role,lat,lng};}
+function shouldRetryLegacy(errorText){return /column|pilot_slug|block_label|observed_on|metadata|source/i.test(String(errorText||''));}
 function readQueue(){
   try{
-    const parsed=JSON.parse(localStorage.getItem(PILOT_QUEUE_KEY)||'[]');
+    const raw=localStorage.getItem(PILOT_QUEUE_KEY)||localStorage.getItem(LEGACY_PILOT_QUEUE_KEY)||'[]';
+    const parsed=JSON.parse(raw);
     return Array.isArray(parsed)?parsed:[];
   }catch(e){
     return [];
   }
 }
-function writeQueue(queue){localStorage.setItem(PILOT_QUEUE_KEY,JSON.stringify(queue));}
+function writeQueue(queue){localStorage.setItem(PILOT_QUEUE_KEY,JSON.stringify(queue));localStorage.removeItem(LEGACY_PILOT_QUEUE_KEY);}
 function queueCount(){return readQueue().length;}
 function updateQueuePill(){byId('queue-pill').textContent=`Queued drafts: ${queueCount()}`;}
 function updateNetworkPill(){byId('network-pill').textContent=navigator.onLine?'Connection: online':'Connection: offline';}
+function updateSyncPill(message=navigator.onLine?'Live save ready':'Last sync: offline mode'){byId('sync-pill').textContent=message;}
 function activePilot(){
   const params=new URLSearchParams(window.location.search);
   const pilot=params.get('pilot');
   return PILOT_META[pilot]||PILOT_META.carrollton;
 }
+function activePilotSlug(){
+  return new URLSearchParams(window.location.search).get('pilot')||'carrollton';
+}
 function applyPilotCopy(){
   const pilot=activePilot();
+  const dataAnchor=new URLSearchParams(window.location.search).get('nsa')||pilot.nsa;
   byId('hero-title').textContent=pilot.title;
   byId('scope-pill').textContent=`Scope: ${pilot.scopeLabel}`;
-  byId('pilot-neighborhood').value=pilot.nsa;
+  byId('pilot-neighborhood').value=pilot.scopeLabel;
+  byId('pilot-neighborhood-note').textContent=`Official dashboard metrics are still anchored to ${dataAnchor} while this pilot uses the tighter ${pilot.scopeLabel} framing.`;
   byId('return-link').href=`../?pilot=${encodeURIComponent(new URLSearchParams(window.location.search).get('pilot')||'carrollton')}`;
 }
 function setFocus(focus){
@@ -206,51 +240,123 @@ function payloadFromForm(form){
   const role=formData.get('role')?.toString().trim()||'Digital Navigator';
   const severity=normalizeSeverity(formData.get('severity'));
   const category=currentFocus==='Illegal dumping'?'Sanitation / trash':currentFocus==='Broadband access'?'Broadband access':'General';
+  const neighborhood=new URLSearchParams(window.location.search).get('nsa')||pilot.nsa;
   return{
-    nsa:pilot.nsa,
+    nsa:neighborhood,
     category,
     description:`[Pilot ${pilot.scopeLabel}] Focus: ${currentFocus}. Observed: ${observed}. Location: ${block}. ${description}`.trim(),
     severity,
-    author_role:role.toLowerCase()
+    author_role:role.toLowerCase(),
+    lat:capturedLocation?.lat??null,
+    lng:capturedLocation?.lng??null,
+    source:'pilot_submit',
+    pilot_slug:activePilotSlug(),
+    block_label:block,
+    observed_on:observed||null,
+    metadata:{
+      intake_version:'phase7-v2',
+      focus:currentFocus,
+      scope_label:pilot.scopeLabel,
+      geo_accuracy_m:capturedLocation?.accuracy??null,
+      captured_at:capturedLocation?.captured_at??null
+    }
   };
 }
 async function postReport(payload){
   if(!window.SUPABASE_URL||!window.SUPABASE_ANON_KEY)throw new Error('Supabase config is missing.');
-  const response=await fetch(`${window.SUPABASE_URL}/rest/v1/reports`,{
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      apikey:window.SUPABASE_ANON_KEY,
-      Authorization:`Bearer ${window.SUPABASE_ANON_KEY}`,
-      Prefer:'return=representation'
-    },
-    body:JSON.stringify(payload)
-  });
-  if(!response.ok){
-    const body=await response.text();
-    throw new Error(body||`Supabase error ${response.status}`);
+  const send=async(bodyPayload)=>{
+    const response=await fetch(`${window.SUPABASE_URL}/rest/v1/reports`,{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        apikey:window.SUPABASE_ANON_KEY,
+        Authorization:`Bearer ${window.SUPABASE_ANON_KEY}`,
+        Prefer:'return=representation'
+      },
+      body:JSON.stringify(bodyPayload)
+    });
+    if(!response.ok){
+      const body=await response.text();
+      throw new Error(body||`Supabase error ${response.status}`);
+    }
+    const rows=await response.json();
+    return rows?.[0]||null;
+  };
+  try{
+    return await send(payload);
+  }catch(error){
+    if(!shouldRetryLegacy(error?.message))throw error;
+    return await send(legacyPayload(payload));
   }
-  const rows=await response.json();
-  return rows?.[0]||null;
 }
 function showSuccess(message){
   const box=byId('success-box');
   byId('success-copy').textContent=message;
   box.style.display='flex';
 }
+function setGeoCopy(){
+  if(!capturedLocation){
+    byId('geo-copy').textContent='Optional. Helps the pilot team place the report more precisely when a navigator is in the field.';
+    return;
+  }
+  byId('geo-copy').textContent=`Captured at ${capturedLocation.lat.toFixed(5)}, ${capturedLocation.lng.toFixed(5)} with roughly ${Math.round(capturedLocation.accuracy||0)}m accuracy.`;
+}
+async function captureLocation(){
+  if(!navigator.geolocation){
+    showSuccess('This browser does not support geolocation.');
+    return;
+  }
+  byId('geo-btn').disabled=true;
+  byId('geo-copy').textContent='Capturing your current location…';
+  navigator.geolocation.getCurrentPosition(position=>{
+    capturedLocation={lat:position.coords.latitude,lng:position.coords.longitude,accuracy:position.coords.accuracy,captured_at:nowIsoTs()};
+    byId('geo-btn').disabled=false;
+    byId('geo-btn').textContent='Update captured location';
+    setGeoCopy();
+  },error=>{
+    byId('geo-btn').disabled=false;
+    byId('geo-btn').textContent='Capture current location';
+    byId('geo-copy').textContent=error?.message||'Location capture was not available.';
+  },{enableHighAccuracy:true,timeout:12000,maximumAge:300000});
+}
+function queueSummary(entry){
+  const focus=entry.payload?.metadata?.focus||'Pilot issue';
+  const block=entry.payload?.block_label||'Approximate block not provided';
+  return `${focus} · ${block}`;
+}
+function renderQueue(){
+  const queue=readQueue();
+  const list=byId('queue-list');
+  const empty=byId('queue-empty');
+  empty.style.display=queue.length?'none':'block';
+  list.innerHTML=queue.map(entry=>`<div class="queue-item"><div class="queue-top"><div><div class="queue-title">${queueSummary(entry)}</div><div class="queue-meta">${entry.id} · queued ${new Date(entry.queued_at||Date.now()).toLocaleString()}</div></div><span class="pill">${entry.sync_attempts?`Attempts: ${entry.sync_attempts}`:'Waiting'}</span></div><div class="queue-meta">${entry.last_error?`Last error: ${entry.last_error}`:'Ready to sync when the network is available.'}</div><div class="queue-actions"><button type="button" class="btn small" onclick="retryQueueItem('${entry.id}')">Retry now</button><button type="button" class="btn small ghost" onclick="removeQueueItem('${entry.id}')">Remove</button></div></div>`).join('');
+}
+function enqueuePayload(payload,lastError='Waiting for connection'){
+  const queue=readQueue();
+  const draftId=`QUEUE-${Date.now().toString(36).toUpperCase()}`;
+  queue.push({id:draftId,payload,queued_at:nowIsoTs(),sync_attempts:0,last_error:lastError});
+  writeQueue(queue);
+  updateQueuePill();
+  renderQueue();
+  return draftId;
+}
 async function flushQueue(){
   if(!navigator.onLine||!queueCount())return;
   const queue=readQueue();
   const remaining=[];
+  let synced=0;
   for(const entry of queue){
     try{
       await postReport(entry.payload);
+      synced+=1;
     }catch(error){
-      remaining.push(entry);
+      remaining.push({...entry,sync_attempts:Number(entry.sync_attempts||0)+1,last_error:error?.message||'Sync failed'});
     }
   }
   writeQueue(remaining);
   updateQueuePill();
+  renderQueue();
+  updateSyncPill(remaining.length?`Last sync: ${synced} sent, ${remaining.length} still queued`:`Last sync: queue clear at ${new Date().toLocaleTimeString()}`);
 }
 async function handleSubmit(event){
   event.preventDefault();
@@ -265,38 +371,80 @@ async function handleSubmit(event){
       const row=await postReport(payload);
       form.reset();
       byId('pilot-observed').value=nowIsoDate();
+      capturedLocation=null;
+      byId('geo-btn').textContent='Capture current location';
+      setGeoCopy();
       showSuccess(`Saved to Supabase with tracking ID ${row?.tracking_id||'pending'}.`);
+      updateSyncPill(`Last sync: saved live at ${new Date().toLocaleTimeString()}`);
       await flushQueue();
       return;
-    }catch(error){}
+    }catch(error){
+      const draftId=enqueuePayload(payload,error?.message||'Live save failed');
+      form.reset();
+      byId('pilot-observed').value=nowIsoDate();
+      capturedLocation=null;
+      byId('geo-btn').textContent='Capture current location';
+      setGeoCopy();
+      showSuccess(`Live save failed, so the report was queued locally as ${draftId}.`);
+      return;
+    }
   }
-  const queue=readQueue();
-  const draftId=`QUEUE-${Date.now().toString(36).toUpperCase()}`;
-  queue.push({id:draftId,payload,queued_at:new Date().toISOString()});
-  writeQueue(queue);
-  updateQueuePill();
+  const draftId=enqueuePayload(payload,'Offline');
   form.reset();
   byId('pilot-observed').value=nowIsoDate();
+  capturedLocation=null;
+  byId('geo-btn').textContent='Capture current location';
+  setGeoCopy();
   showSuccess(`Saved offline as ${draftId}. It will sync when the connection returns.`);
+}
+async function retryQueueItem(id){
+  const queue=readQueue();
+  const entry=queue.find(item=>item.id===id);
+  if(!entry)return;
+  try{
+    await postReport(entry.payload);
+    removeQueueItem(id,false);
+    updateSyncPill(`Last sync: sent ${id} at ${new Date().toLocaleTimeString()}`);
+    showSuccess(`Queued draft ${id} synced successfully.`);
+  }catch(error){
+    const next=queue.map(item=>item.id===id?{...item,sync_attempts:Number(item.sync_attempts||0)+1,last_error:error?.message||'Retry failed'}:item);
+    writeQueue(next);
+    renderQueue();
+    updateQueuePill();
+    showSuccess(`Draft ${id} is still queued. ${error?.message||'Retry failed.'}`);
+  }
+}
+function removeQueueItem(id,showToast=true){
+  const next=readQueue().filter(item=>item.id!==id);
+  writeQueue(next);
+  updateQueuePill();
+  renderQueue();
+  if(showToast)showSuccess(`Removed queued draft ${id}.`);
 }
 async function init(){
   applyPilotCopy();
   updateNetworkPill();
   updateQueuePill();
+  updateSyncPill();
+  renderQueue();
   byId('pilot-observed').value=nowIsoDate();
+  setGeoCopy();
   document.querySelectorAll('.focus-btn').forEach(button=>button.addEventListener('click',()=>setFocus(button.dataset.focus)));
   byId('pilot-form').addEventListener('submit',handleSubmit);
+  byId('geo-btn').addEventListener('click',captureLocation);
   byId('sync-btn').addEventListener('click',async()=>{
     await flushQueue();
     showSuccess(queueCount()?`Still holding ${queueCount()} queued draft(s).`:'Queue sync complete.');
   });
-  window.addEventListener('online',async()=>{updateNetworkPill();await flushQueue();});
-  window.addEventListener('offline',updateNetworkPill);
+  window.addEventListener('online',async()=>{updateNetworkPill();updateSyncPill('Back online — syncing queued drafts…');await flushQueue();});
+  window.addEventListener('offline',()=>{updateNetworkPill();updateSyncPill('Last sync: offline mode');});
   if('serviceWorker'in navigator){
     try{await navigator.serviceWorker.register('./sw.js');}catch(error){}
   }
   await flushQueue();
 }
+window.retryQueueItem=retryQueueItem;
+window.removeQueueItem=removeQueueItem;
 init();
 </script>
 </body>

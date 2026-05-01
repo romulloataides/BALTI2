@@ -1,3 +1,5 @@
 # This project runs as a static client app. Supabase anon/public keys are safe
 # to ship to the browser and should not be ignored by default.
 # Never commit a Supabase service-role key or any other privileged secret.
+supabase/functions/.env
+supabase/functions/.env.*

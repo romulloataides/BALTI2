@@ -1,4 +1,4 @@
-const CACHE_NAME='balti2-submit-v1';
+const CACHE_NAME='balti2-submit-v2';
 const ASSETS=[
   './',
   './index.html',

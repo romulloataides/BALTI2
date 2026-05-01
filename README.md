@@ -126,25 +126,58 @@ Because `index.html` now fetches `data.json` and `csa_boundaries.geojson` at run
 
 ## Live prototype backend
 
-The prototype now supports three community-data layers through Supabase:
+The Supabase-backed prototype now supports five live community-data layers:
 
 - `reports` for community-submitted items
 - `votes` for confirm / dispute validation
 - `annotations` for inline human context attached to metrics, gap flags, and reports
+- `pilot_accuracy_votes` for persistent `Yes / No / Not sure` responses on the Carrollton pilot cards
+- `analysis_sessions` / `analysis_messages` for the admin analysis desk
 
-The annotation UI is intentionally separate from official data. It stores the context target in the `annotations.metric` field using namespaced keys such as `metric:hi`, `gap:la`, and `report:BLT-1234ABCD`.
+The annotation UI remains intentionally separate from official data. It stores the context target in the `annotations.metric` field using namespaced keys such as `metric:hi`, `gap:la`, and `report:BLT-1234ABCD`.
 
-For prototype moderation, opening the dashboard with `?admin=1` reveals an admin helper view. It does not perform destructive actions from the browser; instead it generates copy-ready SQL for status updates and cleanup in Supabase SQL Editor.
+Opening the dashboard with `?admin=1` still reveals the moderation helper, but it now also expects a real Supabase-authenticated admin session. The browser does not grant admin power from the URL alone anymore:
 
-If you rerun the Supabase SQL after pulling this repo, it now also adds:
+- the user must sign in through Supabase Auth
+- the email must be allowlisted in `public.admin_users`
+- the live analysis desk then talks to the `analysis-desk` Edge Function instead of the old deterministic local template engine
 
-- an index for `annotations (nsa, metric, created_at desc)`
-- explicit anon/authenticated grants for `reports`, `votes`, and `annotations`
-- realtime publication coverage for `annotations`
+The new Phase 6 / 7 migration is [`supabase/migrations/002_ai_admin_pilot.sql`](./supabase/migrations/002_ai_admin_pilot.sql). It extends the original schema with:
+
+- admin allowlisting
+- analysis prompt profiles
+- persisted analysis sessions and messages
+- `spending_events` as the first real backend hook for efficacy work
+- `pilot_accuracy_votes` plus the `pilot_accuracy_vote_counts` view
+- richer `reports` columns (`source`, `pilot_slug`, `block_label`, `observed_on`, `metadata`)
+
+If the Phase 7 objects are not live yet, the dashboard now falls back cleanly: pilot accuracy cards keep the current browser choice locally and explain that shared vote sync is still pending the latest Supabase migration.
+
+## Phase 6 setup
+
+To activate the live admin assistant after pulling this repo:
+
+1. Run [`supabase/migrations/001_initial_schema.sql`](./supabase/migrations/001_initial_schema.sql).
+2. Run [`supabase/migrations/002_ai_admin_pilot.sql`](./supabase/migrations/002_ai_admin_pilot.sql).
+3. Add an allowlisted admin row, for example:
+
+```sql
+insert into public.admin_users (email, role)
+values ('you@example.org', 'admin')
+on conflict do nothing;
+```
+
+4. Set Supabase Edge Function secrets:
+   - `OPENAI_API_KEY`
+   - optional `OPENAI_MODEL`
+   - optional `DASHBOARD_DATA_URL`
+5. Deploy [`supabase/functions/analysis-desk/index.ts`](./supabase/functions/analysis-desk/index.ts).
+6. In Supabase Auth settings, allow your dashboard URL as a redirect target for magic-link sign-in.
+7. Flip `window.BALTI2_ENABLE_ANALYSIS_DESK = true` in [`supabase/config.js`](./supabase/config.js) after the function is live.
 
 ## Phase 3, 6, and 7 prototype coverage
 
-The current repo now covers the next three product phases as honest prototype layers:
+The current repo now covers the next three product phases with a mixed live/prototype split:
 
 - **Phase 3 — Gap View**
   - Gap mode now includes an **Efficacy watch** section.
@@ -152,18 +185,32 @@ The current repo now covers the next three product phases as honest prototype la
   - Blind-spot filtering and gap-severity map mode remain URL-shareable.
 
 - **Phase 6 — Admin analysis desk**
-  - Opening the dashboard with `?admin=1` now reveals the moderation helper **and** an **Analysis desk** drawer.
-  - The desk is intentionally deterministic right now. It answers local prototype templates such as complaint recurrence, blind-spot reversals, vacancy-pattern scans, and pilot snapshots without pretending a live Claude integration already exists.
-  - This keeps the admin workflow demoable while leaving a clean slot for a future real LLM-backed tool layer.
+  - Opening the dashboard with `?admin=1` now reveals the moderation helper **and** a live **Analysis desk** drawer.
+  - The desk is no longer deterministic in the repo code. It is wired for a real model-backed Supabase Edge Function with tool access to:
+    - neighborhood data from `data.json`
+    - live community reports
+    - 311 proxy history
+    - spending records
+    - pilot accuracy votes
+  - Proper admin access now depends on Supabase Auth plus the `admin_users` allowlist.
+  - The remaining manual step is deployment: until the `analysis-desk` function and secrets are live, the UI will show a clear setup error instead of silently faking answers.
 
 - **Phase 7 — Carrollton Ridge pilot**
   - Opening the dashboard with `?pilot=carrollton` locks the prototype to `Southwest Baltimore`, which is the current CSA stand-in for `Carrollton Ridge / Franklin Square`.
   - Pilot mode foregrounds two focal issues:
     - illegal dumping, using the current `311 hazards` and sanitation-signal proxy
     - broadband access, using reports and annotations that mention connectivity-related terms
-  - Each pilot card includes a local browser-stored **Yes / No / Not sure** accuracy vote.
-  - `submit/index.html` provides a focused mobile field-intake page for the pilot.
-  - `submit/sw.js` caches that flow after first load and stores drafts locally when the device is offline, then retries sync to Supabase later.
+  - Each pilot card now keeps the current user's selection in the browser and will persist shared vote counts through `pilot_accuracy_votes` once the Phase 7 migration is live.
+  - If that migration has not been applied yet, the UI now says so explicitly instead of throwing backend errors.
+  - The public demo can keep `window.BALTI2_ENABLE_PILOT_VOTES = false` in [`supabase/config.js`](./supabase/config.js) until the migration is live, which prevents noisy 404s while preserving the local demo selection.
+  - [`submit/index.html`](./submit/index.html) is now a richer field-intake flow with:
+    - an explicit queued outbox
+    - optional GPS capture
+    - richer pilot metadata in `reports.metadata`
+    - legacy-schema fallback while the new migration is being rolled out
+    - clearer pilot-vs-CSA copy, so the form shows `Carrollton Ridge / Franklin Square` while staying explicit that official dashboard metrics are still anchored to the `Southwest Baltimore` CSA
+  - [`submit/sw.js`](./submit/sw.js) still caches the flow after first load, but the page itself now exposes queue state instead of treating offline drafts as a hidden implementation detail.
+  - Physical field-testing is still a human step. The repo now supports it better; it does not replace it.
 
 ## GitHub Pages Setup Reference
 
@@ -194,7 +241,10 @@ node scripts/migrate_data_schema.mjs data.json
 - Replace the CDC asthma proxy with a direct neighborhood-level official asthma ED source if BNIA or Maryland publishes a current one again.
 - Add a defensible federal `la` source and newer official `le` years if you want the benchmark switcher to be fully non-scaffolded.
 - Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
-- Add lightweight moderation / cleanup controls now that reports, votes, and annotations persist.
+- Run the new Supabase migration and deploy the `analysis-desk` Edge Function so Phase 6 becomes live end to end.
+- Add real spending / work-order records to `spending_events` so efficacy queries stop saying "no spending data loaded yet."
+- Replace the Carrollton-to-`Southwest Baltimore` proxy if BNIA or another defensible CSA mapping source becomes available.
+- Finish human mobile field-testing with Digital Navigators and adjust the pilot intake copy based on what they actually need in the street.
 
 ## Notes
 
