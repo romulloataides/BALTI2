@@ -33,4 +33,3 @@ jobs:
         with:
           commit_message: Automated SDoH data update
           file_pattern: data.json
-          push_options: '--force'
