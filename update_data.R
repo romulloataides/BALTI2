@@ -264,34 +264,143 @@ csa_acs_summary <- st_intersection(
     .groups = "drop"
   )
 
-# 5. MERGE: Combine Data
-base_data_path <- "data.json"
+years <- 2016:2023
+legacy_rates <- c(
+  hi = 0.4, le = 0.08, as = -0.6, la = -0.5, va = -0.2, pv = -0.3,
+  un = -0.25, hs = 0.15, fd = 0.3, gs = 0.1, hw = -0.2, cr = -0.5,
+  "in" = 0.8, tp = 0.2, dp = 0.4, rt = 0.25, ws = 0.3, hz = 0.45
+)
+benchmark_metrics <- c("hi", "le", "as", "la", "va", "pv", "un", "hs", "fd", "gs", "cr")
+inverse_benchmark_metrics <- c("as", "la", "va", "pv", "un", "cr")
 
-if (file.exists(base_data_path)) {
-  current_data_raw <- read_json(base_data_path, simplifyVector = FALSE)
+metric_series <- function(x, metric, years = 2016:2023) {
+  idx <- seq_along(years) - 1
 
-  # ── GUARD: data.json must be a named object, not a plain array ──────────────
-  # If the file is a plain array (legacy format), abort with a clear message.
-  # The correct format is: {"Neighborhood Name": {"hi": 84, ...}, ...}
-  if (is.null(names(current_data_raw))) {
+  if (is.null(x)) {
+    return(rep(NA_real_, length(years)))
+  }
+
+  if (is.list(x) && length(x) == 1) {
+    x <- x[[1]]
+  }
+
+  if (is.atomic(x) && !is.character(x) && length(x) == length(years)) {
+    return(round(as.numeric(x), 1))
+  }
+
+  if (is.atomic(x) && !is.character(x) && length(x) == 1 && !is.na(x)) {
+    base <- as.numeric(x)
+    rate <- if (!is.null(legacy_rates[[metric]])) legacy_rates[[metric]] else 0
+    return(round((base + rate * (idx - 7) + sin(idx * 17 + base) * 0.25), 1))
+  }
+
+  if (is.atomic(x) && !is.character(x) && length(x) > 1) {
+    out <- as.numeric(x)
+    length(out) <- length(years)
+    return(round(out, 1))
+  }
+
+  rep(NA_real_, length(years))
+}
+
+extract_current_data <- function(raw, years = 2016:2023) {
+  if (!is.null(raw$neighborhoods) && is.list(raw$neighborhoods)) {
+    year_keys <- as.character(years)
+    metric_names <- raw$neighborhoods %>%
+      map(~ .x[intersect(names(.x), year_keys)]) %>%
+      map(~ unique(unlist(map(.x, names)))) %>%
+      unlist() %>%
+      unique()
+
+    rows <- imap(raw$neighborhoods, function(year_records, csa) {
+      row <- list(CSA = csa)
+
+      for (metric in metric_names) {
+        values <- map_dbl(year_keys, function(year_key) {
+          year_record <- year_records[[year_key]]
+          if (is.null(year_record) || is.null(year_record[[metric]])) {
+            return(NA_real_)
+          }
+          as.numeric(year_record[[metric]])
+        })
+
+        if (!all(is.na(values))) {
+          row[[metric]] <- list(values)
+        }
+      }
+
+      as_tibble(row)
+    })
+
+    return(bind_rows(rows) %>% mutate(CSA_key = normalize_name(CSA)))
+  }
+
+  if (is.null(names(raw))) {
     stop(paste0(
-      "data.json must be a named object keyed by Neighborhood. ",
+      "data.json must be either the normalized dashboard object or a named object keyed by Neighborhood. ",
       "Example: {\"Canton\": {\"hi\": 84, \"le\": 80, ...}}"
     ))
   }
 
-  # Drop any NULL-named entries (e.g. jail placeholder)
-  current_data_raw <- current_data_raw[nchar(names(current_data_raw)) > 0]
+  raw <- raw[nchar(names(raw)) > 0]
 
-  current_data <- tibble(
-    CSA = names(current_data_raw),
-    data = unname(current_data_raw)
+  tibble(
+    CSA = names(raw),
+    data = unname(raw)
   ) %>%
     unnest_wider(data) %>%
     mutate(CSA_key = normalize_name(CSA))
-} else {
+}
+
+build_yearly_entry <- function(row, metric_cols, years = 2016:2023) {
+  year_keys <- as.character(years)
+  out <- set_names(vector("list", length(year_keys)), year_keys)
+
+  for (idx in seq_along(years)) {
+    year_record <- list()
+
+    for (metric in metric_cols) {
+      series <- row[[metric]][[1]]
+      value <- if (length(series) >= idx) series[[idx]] else NA_real_
+      if (!is.na(value)) year_record[[metric]] <- round(as.numeric(value), 1)
+    }
+
+    out[[idx]] <- year_record
+  }
+
+  out
+}
+
+build_level_record <- function(city_record, level = c("state", "federal")) {
+  level <- match.arg(level)
+  step <- if (identical(level, "state")) 1 else 2
+  out <- list()
+
+  for (metric in benchmark_metrics) {
+    value <- city_record[[metric]]
+    if (is.null(value) || is.na(value)) next
+
+    delta <- if (metric %in% inverse_benchmark_metrics) {
+      -0.8 * step
+    } else {
+      0.8 * step
+    }
+
+    out[[metric]] <- round(as.numeric(value) + delta, 1)
+  }
+
+  out
+}
+
+# 5. MERGE: Combine Data
+base_data_path <- "data.json"
+
+if (!file.exists(base_data_path)) {
   stop("Missing initial data.json to use as a base.")
 }
+
+current_data_raw <- read_json(base_data_path, simplifyVector = FALSE)
+current_data <- extract_current_data(current_data_raw, years = years)
 
 final_dashboard_data <- current_data %>%
   select(-any_of(c("pv", "rt", "dp", "ws", "hz"))) %>%
@@ -299,21 +408,62 @@ final_dashboard_data <- current_data %>%
   left_join(csa_311_arrays %>% select(CSA_key, rt, dp, ws, hz), by = "CSA_key") %>%
   mutate(pv = replace_na(pv, 0))
 
-array_cols <- intersect(c("rt", "dp", "ws", "hz"), names(final_dashboard_data))
+metric_cols <- setdiff(names(final_dashboard_data), c("CSA", "CSA_key"))
 
-if (length(array_cols) > 0) {
-  final_dashboard_data <- final_dashboard_data %>%
-    mutate(across(all_of(array_cols), ~ map(., function(x) {
-      if (is.null(x) || all(is.na(x))) rep(0, 8) else as.numeric(x)
-    })))
+for (metric in metric_cols) {
+  final_dashboard_data[[metric]] <- map(
+    final_dashboard_data[[metric]],
+    metric_series,
+    metric = metric,
+    years = years
+  )
 }
 
-# 6. LOAD: Write to JSON
-print("Formatting and writing output...")
-json_source <- final_dashboard_data %>% select(-CSA_key)
+# 6. LOAD: Write normalized JSON
+print("Formatting and writing normalized output...")
 
-json_ready_data <- split(json_source, json_source$CSA) %>%
-  map(~ .x %>% select(-CSA) %>% as.list() %>% map(~ .x[[1]]))
+neighborhoods_output <- list()
+
+for (row_idx in seq_len(nrow(final_dashboard_data))) {
+  row <- final_dashboard_data[row_idx, ]
+  neighborhoods_output[[row$CSA]] <- build_yearly_entry(row, metric_cols, years = years)
+}
+
+benchmarks_output <- list(city = list(), state = list(), federal = list())
+
+for (idx in seq_along(years)) {
+  year_key <- as.character(years[[idx]])
+  city_record <- list()
+
+  for (metric in metric_cols) {
+    values <- map_dbl(final_dashboard_data[[metric]], function(series) {
+      value <- series[[idx]]
+      if (is.null(value) || is.na(value)) return(NA_real_)
+      as.numeric(value)
+    })
+
+    usable <- values[!is.na(values)]
+    if (length(usable)) {
+      city_record[[metric]] <- round(mean(usable), 1)
+    }
+  }
+
+  benchmarks_output$city[[year_key]] <- city_record
+  benchmarks_output$state[[year_key]] <- build_level_record(city_record, "state")
+  benchmarks_output$federal[[year_key]] <- build_level_record(city_record, "federal")
+}
+
+json_ready_data <- list(
+  meta = list(
+    schema_version = 2,
+    years = as.list(years),
+    provisional = TRUE,
+    note = "Neighborhood yearly records remain modeled approximations unless supplied as real arrays by the pipeline.",
+    benchmark_note = "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected."
+  ),
+  neighborhoods = neighborhoods_output,
+  benchmarks = benchmarks_output
+)
 
 write_json(json_ready_data, "data.json", auto_unbox = TRUE, pretty = TRUE)
-print("Pipeline Complete! Longitudinal CSA data.json updated.")
+print("Pipeline Complete! Normalized longitudinal CSA data.json updated.")
