@@ -1,0 +1,457 @@
+{
+  "health_index": {
+    "label": "Health Index",
+    "description": "Composite neighborhood health score synthesizing life expectancy, asthma ED rate, lead exposure, vacant housing, poverty, unemployment, and high school graduation rate into a single 0–100 scale. Higher values indicate better health outcomes.",
+    "unit": "Score (0–100)",
+    "data_type": "Derived composite",
+    "years_available": "2016–2023 (dashboard slider range; BNIA source covers 2010–2022)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "Derived composite — not a single-source measurement. Component weights and formula are documented in DESIGN.md. Provisional values for years where any component is missing are flagged in data.json meta.provisional. Label as 'Health index — derived from BNIA Vital Signs components' in legend and tooltips.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "Composite of leXX, astXX, nleaXX, vacXX, hhpovXX, unemXX, compXX",
+        "notes": "Computed in update_data.R from BNIA component indicators. Higher-is-better orientation applied to all components before averaging."
+      },
+      "city": {
+        "source_id": "bnia_vital_signs",
+        "variable": "Mean of all 55 CSA health index values",
+        "notes": "City benchmark is the population-weighted mean across all CSAs, computed at build time."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "life_expectancy": {
+    "label": "Life Expectancy at Birth",
+    "description": "Estimated average number of years a newborn would live if current age-specific mortality rates remain constant throughout their lifetime. Computed from vital statistics for the CSA.",
+    "unit": "Years",
+    "data_type": "Administrative (vital statistics)",
+    "years_available": "2010–2022 (BNIA Vital Signs)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "BNIA Vital Signs is the neighborhood-level source. City Health Dashboard provides city and national benchmark values. Small-area life expectancy estimates carry uncertainty due to small denominators in some CSAs — interpret with care for CSAs with fewer than 5,000 residents.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "leXX (e.g., le22 for 2022)",
+        "notes": "Computed by Baltimore City Health Department from vital statistics death records and census population denominators."
+      },
+      "city": {
+        "source_id": "city_health_dashboard",
+        "variable": "life_expectancy (place=Baltimore City)",
+        "notes": "Baltimore City aggregate from City Health Dashboard API. Cross-check against BNIA city-wide mean."
+      },
+      "state": {
+        "source_id": "city_health_dashboard",
+        "variable": "life_expectancy (state=Maryland)",
+        "notes": "Maryland statewide life expectancy from City Health Dashboard."
+      },
+      "national": {
+        "source_id": "city_health_dashboard",
+        "variable": "life_expectancy (national benchmark)",
+        "notes": "U.S. national life expectancy from City Health Dashboard."
+      }
+    }
+  },
+
+  "asthma_ed_rate": {
+    "label": "Asthma Emergency Department Visit Rate",
+    "description": "Number of emergency department visits for asthma per 1,000 residents in the CSA. Counts visits where the primary diagnosis is asthma (ICD-10 J45.x). Higher values indicate worse asthma burden.",
+    "unit": "ED visits per 1,000 residents",
+    "data_type": "Administrative (hospital discharge records)",
+    "years_available": "2010–2022 (BNIA Vital Signs); 2020–2024 (CDC PLACES modeled estimate as proxy)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "Two distinct asthma metrics are available and must NOT be mixed on the same chart without labeling. BNIA astXX is an administrative ED visit rate (actual visits). CDC PLACES asthma is a modeled prevalence estimate (% adults with current asthma). When proxy_metrics metadata flag is set, CDC PLACES is displayed with explicit 'Modeled estimate — CDC PLACES' label. Default to BNIA ED rate whenever available.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "astXX (e.g., ast22 for 2022)",
+        "notes": "ED visit rate per 1,000 from Maryland hospital discharge data. Available for all 55 CSAs."
+      },
+      "city": {
+        "source_id": "cdc_places",
+        "variable": "CASTHMA (current asthma among adults, %)",
+        "notes": "City-level modeled estimate from CDC PLACES. Different metric from BNIA ED rate — label clearly as 'CDC PLACES modeled estimate, adult asthma prevalence (%)'. Use only for benchmark context, not direct comparison."
+      },
+      "state": {
+        "source_id": "cdc_places",
+        "variable": "CASTHMA (Maryland statewide, from BRFSS aggregation)",
+        "notes": "State-level modeled estimate. Must be labeled as modeled estimate."
+      },
+      "national": {
+        "source_id": "cdc_places",
+        "variable": "CASTHMA (U.S. national, from BRFSS aggregation)",
+        "notes": "National-level modeled estimate. Must be labeled as modeled estimate."
+      }
+    }
+  },
+
+  "lead_exposure": {
+    "label": "Childhood Lead Exposure",
+    "description": "Percentage of children under age 6 tested who have blood lead levels at or above 5 micrograms per deciliter (the CDC reference level). Higher values indicate worse lead exposure burden.",
+    "unit": "Percent of tested children under 6 (%)",
+    "data_type": "Administrative (blood lead level screening records)",
+    "years_available": "2010–2022 (BNIA Vital Signs)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "Screening-based rate — reflects only children who were tested, not all children in the CSA. CSAs with low testing rates may understate true burden. A community health worker validation flag exists in VALIDATION_CASES for Cherry Hill (BLT-0049). Lead paint housing stock proxy is available from EPA EJScreen (LDPNT) as a complementary environmental risk indicator.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "nleaXX (e.g., nlea22 for 2022)",
+        "notes": "Percentage of children tested with BLL ≥5 µg/dL. Data from Maryland Department of Health childhood blood lead surveillance."
+      },
+      "city": {
+        "source_id": "bnia_vital_signs",
+        "variable": "Mean of nleaXX across all 55 CSAs",
+        "notes": "Baltimore City average computed from BNIA CSA values at build time."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "vacant_housing_pct": {
+    "label": "Vacant Housing Units",
+    "description": "Percentage of housing units in the CSA classified as vacant. Includes abandoned, tax-sale, and uninhabitable properties. Higher values are associated with neighborhood disinvestment and health risks.",
+    "unit": "Percent of housing units (%)",
+    "data_type": "Administrative (Baltimore City vacancy surveys and property records)",
+    "years_available": "2010–2022 (BNIA Vital Signs)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "Vacancy counts from Baltimore City housing inspections and property tax records. The 'Collapsed porch — N Gilmor St' community report (BLT-0047) in Sandtown-Winchester is an example of a condition that can generate a validation case for this metric. Vacancy is a lagging indicator — counts may understate current conditions by 6–12 months.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "vacXX (e.g., vac22 for 2022)",
+        "notes": "Percentage of housing units classified as vacant from Baltimore City property and housing inspection records."
+      },
+      "city": {
+        "source_id": "bnia_vital_signs",
+        "variable": "Mean of vacXX across all 55 CSAs",
+        "notes": "Baltimore City average computed at build time."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "poverty_rate": {
+    "label": "Household Poverty Rate",
+    "description": "Percentage of households with annual income below the federal poverty line. Federal poverty thresholds vary by household size and composition. Higher values indicate greater economic deprivation.",
+    "unit": "Percent of households (%)",
+    "data_type": "Survey estimate (ACS / BNIA)",
+    "years_available": "2010–2022 (BNIA Vital Signs); 2010–2024 (ACS 5-year for benchmarks)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "BNIA Vital Signs is the neighborhood source (derived from ACS). ACS 5-year estimates are used for city/state/national benchmarks. Note that ACS 5-year estimates lag approximately 18 months. Margins of error are larger for small CSAs — display with caution for CSAs with fewer than 3,000 households.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "hhpovXX (e.g., hhpov22 for 2022)",
+        "notes": "Percentage of households below federal poverty line, derived by BNIA from ACS 5-year estimates at census tract level aggregated to CSA."
+      },
+      "city": {
+        "source_id": "acs_5yr",
+        "variable": "B17001_002E / B17001_001E (poverty rate for Baltimore City, FIPS 2404000)",
+        "notes": "ACS 5-year estimate for Baltimore City. Use most recent available year (2020–2024 release)."
+      },
+      "state": {
+        "source_id": "acs_5yr",
+        "variable": "B17001_002E / B17001_001E (poverty rate for Maryland, state FIPS 24)",
+        "notes": "ACS 5-year estimate for Maryland statewide poverty rate."
+      },
+      "national": {
+        "source_id": "acs_5yr",
+        "variable": "B17001_002E / B17001_001E (U.S. national)",
+        "notes": "ACS 5-year national estimate for poverty rate."
+      }
+    }
+  },
+
+  "unemployment_rate": {
+    "label": "Unemployment Rate",
+    "description": "Percentage of the civilian labor force that is unemployed (actively seeking work but without employment). Higher values indicate worse labor market conditions.",
+    "unit": "Percent of civilian labor force (%)",
+    "data_type": "Survey and administrative (ACS / BNIA / BLS)",
+    "years_available": "2010–2022 (BNIA for neighborhoods); 1990–present (BLS for benchmarks)",
+    "update_frequency": "Annual (BNIA); Monthly (BLS)",
+    "dashboard_notes": "BNIA Vital Signs is the CSA-level source, derived from ACS. BLS LAUS series provides city/state/national benchmarks and is more current than ACS. City Health Dashboard can provide an independent city-level cross-check. Note: BNIA and BLS may differ slightly due to different survey vintages and methodology — differences of 0.5–1.5 percentage points are normal.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "unemXX (e.g., unem22 for 2022)",
+        "notes": "Unemployment rate from ACS 5-year estimates aggregated to CSA by BNIA."
+      },
+      "city": {
+        "source_id": "bls",
+        "variable": "LAUCN245100000000003A (Baltimore City annual unemployment rate)",
+        "notes": "BLS Local Area Unemployment Statistics for Baltimore City. Annual average series. Cross-check with ACS B23025 for consistency."
+      },
+      "state": {
+        "source_id": "bls",
+        "variable": "LASST240000000000003 (Maryland unemployment rate)",
+        "notes": "BLS LAUS annual series for Maryland statewide unemployment rate."
+      },
+      "national": {
+        "source_id": "bls",
+        "variable": "LNS14000000 (U.S. national unemployment rate)",
+        "notes": "BLS Current Population Survey national unemployment rate. Annual average derived from monthly series."
+      }
+    }
+  },
+
+  "median_household_income": {
+    "label": "Median Household Income",
+    "description": "The income level at which half of all households in the CSA earn more and half earn less, measured annually. Expressed in nominal dollars (not inflation-adjusted across years).",
+    "unit": "Dollars (nominal USD)",
+    "data_type": "Survey estimate (ACS / BNIA)",
+    "years_available": "2010–2022 (BNIA Vital Signs); 2010–2024 (ACS 5-year for benchmarks)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "Values are nominal dollars — not inflation-adjusted. Year-over-year comparisons should note that rising nominal income may not reflect real purchasing power gains. ACS 5-year estimates carry margins of error that are larger for smaller CSAs. BNIA source rounds to the nearest $100. City/state/national benchmarks from ACS are more timely than BNIA for the most recent year.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "mhiXX (e.g., mhi22 for 2022)",
+        "notes": "Median household income in nominal dollars, derived by BNIA from ACS 5-year estimates at tract level aggregated to CSA."
+      },
+      "city": {
+        "source_id": "acs_5yr",
+        "variable": "B19013_001E (median household income for Baltimore City, FIPS 2404000)",
+        "notes": "ACS 5-year estimate for Baltimore City median household income."
+      },
+      "state": {
+        "source_id": "acs_5yr",
+        "variable": "B19013_001E (median household income for Maryland, state FIPS 24)",
+        "notes": "ACS 5-year estimate for Maryland statewide median household income."
+      },
+      "national": {
+        "source_id": "acs_5yr",
+        "variable": "B19013_001E (U.S. national median household income)",
+        "notes": "ACS 5-year national estimate for median household income."
+      }
+    }
+  },
+
+  "hs_graduation_rate": {
+    "label": "High School Graduation Rate",
+    "description": "Percentage of adults age 25 and older in the CSA who have attained a high school diploma or equivalent (including GED). Higher values indicate better educational attainment.",
+    "unit": "Percent of adults 25+ (%)",
+    "data_type": "Survey estimate (ACS / BNIA)",
+    "years_available": "2010–2022 (BNIA Vital Signs); 2010–2024 (ACS 5-year for benchmarks)",
+    "update_frequency": "Annual",
+    "dashboard_notes": "Measured as educational attainment among adults 25+, not a cohort graduation rate. This is different from Baltimore City Public Schools on-time graduation rate, which tracks individual cohorts through high school. Both metrics are valid but measure different things — this indicator measures the adult stock of educational attainment, not annual school outcomes.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "bnia_vital_signs",
+        "variable": "compXX (e.g., comp22 for 2022)",
+        "notes": "Percentage of adults 25+ with HS diploma or equivalent, derived from ACS B15003 aggregated to CSA by BNIA."
+      },
+      "city": {
+        "source_id": "acs_5yr",
+        "variable": "B15003 (compute HS+ rate for Baltimore City, FIPS 2404000)",
+        "notes": "Sum of B15003_017E through B15003_025E (HS diploma through doctoral degree) divided by B15003_001E (total population 25+)."
+      },
+      "state": {
+        "source_id": "acs_5yr",
+        "variable": "B15003 (HS+ rate for Maryland, state FIPS 24)",
+        "notes": "Same computation as city level applied to Maryland statewide ACS estimates."
+      },
+      "national": {
+        "source_id": "acs_5yr",
+        "variable": "B15003 (HS+ rate, U.S. national)",
+        "notes": "Same computation applied to national ACS estimates."
+      }
+    }
+  },
+
+  "311_request_rate": {
+    "label": "311 Service Request Rate",
+    "description": "Number of 311 customer service requests per 1,000 residents submitted from addresses or locations within the CSA during the year. Includes all request categories (infrastructure, sanitation, rodent control, etc.). Higher values may indicate both greater resident engagement and greater unmet service needs.",
+    "unit": "Requests per 1,000 residents",
+    "data_type": "Administrative/operational",
+    "years_available": "2015–present (Open Baltimore 311)",
+    "update_frequency": "Near real-time (daily); dashboard updated annually at data build",
+    "dashboard_notes": "CSA attribution derived via point-in-polygon spatial join — there is no CSA field in the raw 311 data. Subcategory rates (rat eradication, illegal dumping, water/sewer) are stored separately as hz, rt, dp, ws fields. High rates can reflect either high service need OR high resident reporting engagement — interpret in context of other neighborhood indicators. Duplicate requests for the same incident are common in the raw data and should be de-duplicated before rate computation.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "open_baltimore_311",
+        "variable": "Count of requests with lat/lng inside CSA boundary, divided by CSA population (ACS B01003)",
+        "notes": "Point-in-polygon join performed in update_data.R using csa_boundaries.geojson. Requests without valid lat/lng are excluded. Rate denominator is ACS 5-year total population estimate for the CSA."
+      },
+      "city": {
+        "source_id": "open_baltimore_311",
+        "variable": "Total city 311 requests / Baltimore City population",
+        "notes": "City-wide rate computed from all requests with a Baltimore City location."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "311_resolution_time": {
+    "label": "311 Median Resolution Time",
+    "description": "Median number of calendar days from a 311 request being opened to its status changing to 'closed' for requests originating in the CSA. Shorter times indicate faster city service response.",
+    "unit": "Days (median)",
+    "data_type": "Administrative/operational",
+    "years_available": "2015–present (Phase 2 implementation; not in MVP data.json)",
+    "update_frequency": "Annual at data build; near real-time in raw source",
+    "dashboard_notes": "Phase 2 metric — not populated in MVP data.json. Resolution time is affected by city staffing levels, workflow changes, and request category composition — differences across CSAs reflect a mix of service prioritization and geographic equity factors. Requests still open after 365 days are excluded from median computation as potential data quality outliers.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "open_baltimore_311",
+        "variable": "Median of (closed_date - created_date) in days, per CSA, for closed requests",
+        "notes": "Computed in ETL pipeline from Open Baltimore 311 data after point-in-polygon CSA join. Exclude records where closed_date is null or created_date is null."
+      },
+      "city": {
+        "source_id": "open_baltimore_311",
+        "variable": "City-wide median resolution time for all closed requests",
+        "notes": "Benchmark for comparison in the Determinants tab."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "pm25_air_quality": {
+    "label": "PM2.5 Air Quality (Annual Mean)",
+    "description": "Annual mean concentration of fine particulate matter (PM2.5, particles 2.5 micrometers or smaller) in the air, modeled at the census block group level. Higher values indicate worse air quality and greater respiratory health risk.",
+    "unit": "Micrograms per cubic meter (µg/m³)",
+    "data_type": "Modeled/derived screening estimate (EPA EJScreen)",
+    "years_available": "EJScreen 2.3 (July 2024) — annual versions available since ~2015",
+    "update_frequency": "Annual (EPA EJScreen annual update)",
+    "dashboard_notes": "SCREENING ESTIMATE — EPA EJScreen values must be labeled 'EPA EJScreen screening estimate' wherever displayed and must NOT be presented as regulatory air quality measurements or direct health exposure data. Values are modeled from EPA ambient monitoring networks and emissions inventories, not from local air monitors. Use as a relative ranking indicator for environmental justice context only. Block-group estimates are aggregated to CSA using population-weighted averaging.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "epa_ejscreen",
+        "variable": "PM25 (block group annual mean, µg/m³)",
+        "notes": "Download Maryland block-group CSV from EPA EJScreen download page. Aggregate to CSA using population-weighted mean after spatial join with csa_boundaries.geojson."
+      },
+      "city": {
+        "source_id": "epa_ejscreen",
+        "variable": "Population-weighted mean of PM25 across all Baltimore City block groups",
+        "notes": "Computed from EJScreen Maryland CSV filtered to Baltimore City FIPS 24510."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "traffic_proximity": {
+    "label": "Traffic Proximity and Volume",
+    "description": "A measure of proximity to major roads weighted by average daily traffic counts. Higher values indicate greater exposure to traffic-related air pollution and noise, which are associated with worse respiratory and cardiovascular health outcomes.",
+    "unit": "Daily vehicle count per meter (relative index)",
+    "data_type": "Modeled/derived screening estimate (EPA EJScreen)",
+    "years_available": "EJScreen 2.3 (July 2024)",
+    "update_frequency": "Annual (EPA EJScreen annual update)",
+    "dashboard_notes": "SCREENING ESTIMATE — must be labeled 'EPA EJScreen screening estimate — traffic proximity' wherever displayed. Values are a relative index based on EPA modeling of road proximity and traffic volume, not a measured concentration. Use for relative comparisons between neighborhoods, not as an absolute health exposure measurement.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "epa_ejscreen",
+        "variable": "PTRAF (traffic proximity and volume index, block group)",
+        "notes": "Block-group level. Aggregate to CSA using population-weighted mean after spatial join."
+      },
+      "city": {
+        "source_id": "epa_ejscreen",
+        "variable": "Population-weighted mean of PTRAF across Baltimore City block groups",
+        "notes": "City-level benchmark for relative comparison."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "lead_paint_risk": {
+    "label": "Lead Paint Risk (Pre-1960 Housing)",
+    "description": "Percentage of housing units built before 1960, used as a proxy indicator for the risk of lead paint hazards. Older housing has higher probability of containing lead-based paint. Higher values indicate greater potential lead paint exposure risk.",
+    "unit": "Percent of housing units built before 1960 (%)",
+    "data_type": "Modeled/derived indicator (EPA EJScreen, from ACS housing vintage data)",
+    "years_available": "EJScreen 2.3 (July 2024)",
+    "update_frequency": "Annual (EPA EJScreen annual update)",
+    "dashboard_notes": "PROXY INDICATOR — this measures housing vintage (pre-1960), not actual lead paint presence or tested lead levels. Many pre-1960 homes have had lead paint removed or encapsulated. Use alongside BNIA childhood lead exposure (nleaXX) for context. The two indicators measure different aspects of the lead problem: this measures potential housing risk stock; BNIA measures actual child blood lead level outcomes. Must be labeled 'Pre-1960 housing stock — EPA EJScreen proxy' when displayed.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "epa_ejscreen",
+        "variable": "LDPNT (percent housing units built before 1960, block group)",
+        "notes": "Block-group level from EPA EJScreen. Aggregate to CSA using housing-unit-weighted mean."
+      },
+      "city": {
+        "source_id": "epa_ejscreen",
+        "variable": "Housing-unit-weighted mean of LDPNT across Baltimore City block groups",
+        "notes": "City-level benchmark."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "environmental_justice_index": {
+    "label": "Environmental Justice Index",
+    "description": "A combined index from EPA EJScreen that integrates multiple environmental burden indicators (PM2.5, ozone, diesel PM, traffic proximity, toxic releases, Superfund proximity, wastewater discharge) with demographic vulnerability factors (low income and minority population percentages). Higher values indicate greater cumulative environmental justice concern.",
+    "unit": "Index value (percentile rank, 0–100)",
+    "data_type": "Modeled/derived composite screening index (EPA EJScreen)",
+    "years_available": "EJScreen 2.3 (July 2024)",
+    "update_frequency": "Annual (EPA EJScreen annual update)",
+    "dashboard_notes": "SCREENING ESTIMATE — EPA EJScreen environmental justice index must be labeled 'EPA EJScreen EJ Index — screening estimate only' wherever displayed. This is NOT a regulatory determination of environmental injustice. Values represent percentile rankings among all U.S. block groups — a value of 80 means the block group scores higher than 80% of U.S. block groups on the combined EJ index. Do not use to make causal claims about health outcomes. EJ_INDEXD2_B is the Supplemental EJ Index 2 (version in EJScreen 2.x).",
+    "sources": {
+      "neighborhood": {
+        "source_id": "epa_ejscreen",
+        "variable": "EJ_INDEXD2_B (Supplemental EJ Index 2, block group percentile)",
+        "notes": "Block-group level from EPA EJScreen Maryland CSV. Aggregate to CSA using population-weighted mean. EJ_INDEXD5_B is an alternative (Index 5) available in EJScreen 2.3."
+      },
+      "city": {
+        "source_id": "epa_ejscreen",
+        "variable": "Population-weighted mean of EJ_INDEXD2_B across Baltimore City block groups",
+        "notes": "City-level benchmark for relative comparison."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "community_sentiment_safety": {
+    "label": "Community Safety Perception",
+    "description": "Percentage of surveyed residents in the CSA (or pooled CSA area) who report feeling safe in their neighborhood. Measured in the Baltimore Area Survey conducted by Johns Hopkins 21st Century Cities Initiative. Includes separate day and night safety questions; this indicator uses the combined or daytime safe response unless otherwise noted.",
+    "unit": "Percent of respondents feeling safe (%)",
+    "data_type": "Probability sample survey (n ≈ 748 Baltimore City respondents per wave; CSA-level requires pooling ≥2 waves)",
+    "years_available": "2023, 2024, 2025 (annual December releases; Phase 3 implementation)",
+    "update_frequency": "Annual (December)",
+    "dashboard_notes": "RESIDENT PERCEPTION SURVEY — must be labeled 'Baltimore Area Survey — resident perception, Johns Hopkins 21CC' wherever displayed and clearly distinguished from administrative or clinical health data. CSA-level estimates require pooling at least 2 survey waves (n ≈ 1,496 combined) to achieve adequate sample size. Single-wave CSA estimates are unreliable for many CSAs. Report the pooled wave years in the data source footnote (e.g., 'Pooled 2023–2024 waves'). Not included in MVP — Phase 3 implementation.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "baltimore_area_survey",
+        "variable": "Safety perception variable (see GitHub codebook for exact variable name by wave)",
+        "notes": "CSA-level estimates require pooling ≥2 annual waves. Download microdata from https://github.com/JHUCities/baltimore-area-survey-data. Aggregate to CSA using the geographic identifier field in the microdata. Document pooled years in dashboard footnote."
+      },
+      "city": {
+        "source_id": "baltimore_area_survey",
+        "variable": "City-wide pooled safety perception across all Baltimore City respondents",
+        "notes": "Baltimore City aggregate from full pooled sample provides a more reliable city benchmark."
+      },
+      "state": null,
+      "national": null
+    }
+  },
+
+  "community_sentiment_neighborhood_quality": {
+    "label": "Neighborhood Quality Satisfaction",
+    "description": "Percentage of surveyed residents in the CSA (or pooled CSA area) who rate their neighborhood as 'good' or 'excellent' overall. Measured in the Baltimore Area Survey conducted by Johns Hopkins 21st Century Cities Initiative.",
+    "unit": "Percent of respondents rating neighborhood good or excellent (%)",
+    "data_type": "Probability sample survey (n ≈ 748 Baltimore City respondents per wave; CSA-level requires pooling ≥2 waves)",
+    "years_available": "2023, 2024, 2025 (annual December releases; Phase 3 implementation)",
+    "update_frequency": "Annual (December)",
+    "dashboard_notes": "RESIDENT PERCEPTION SURVEY — must be labeled 'Baltimore Area Survey — resident perception, Johns Hopkins 21CC' wherever displayed and clearly distinguished from administrative or clinical health data. Same sample size limitations as community_sentiment_safety apply — CSA-level estimates require pooling ≥2 waves. This indicator captures resident satisfaction, which may diverge from objective indicators like vacant housing or crime rate — both types of evidence are valuable and should be displayed together, not substituted for each other. Not included in MVP — Phase 3 implementation.",
+    "sources": {
+      "neighborhood": {
+        "source_id": "baltimore_area_survey",
+        "variable": "Neighborhood quality satisfaction variable (see GitHub codebook for exact variable name by wave)",
+        "notes": "CSA-level estimates require pooling ≥2 annual waves. Compute as percent responding 'good' or 'excellent' to the neighborhood quality question. Document pooled years in dashboard footnote."
+      },
+      "city": {
+        "source_id": "baltimore_area_survey",
+        "variable": "City-wide pooled neighborhood quality satisfaction across all Baltimore City respondents",
+        "notes": "Baltimore City aggregate from full pooled sample."
+      },
+      "state": null,
+      "national": null
+    }
+  }
+}

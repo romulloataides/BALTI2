@@ -490,16 +490,36 @@ normalize_component_scores <- function(values, inverse = FALSE) {
   scores
 }
 
+# Health Index (hi) — derived composite, NOT a direct BNIA metric.
+# This function is used only when BNIA does not supply a direct hi series.
+#
+# Formula:
+#   hi = 0.25*le_n + 0.15*as_n + 0.10*la_n + 0.20*pv_n + 0.15*un_n + 0.15*hs_n
+#
+# where each component is citywide min-max normalized to 0-100 for each year:
+#   component_n = (x - city_min_year) / (city_max_year - city_min_year) * 100
+# and inverse metrics (as, la, pv, un) are flipped:
+#   component_n = 100 - component_n
+#
+# Minimum component requirement: 4 of 6 components must be non-missing to produce hi.
+# Vacant housing (va) is intentionally excluded from hi and remains its own indicator.
+# See data/metadata/health_index_methodology.md for full documentation.
 derive_health_index_series <- function(df, years = 2016:2023) {
-  component_metrics <- c("le", "as", "la", "va", "pv", "un", "hs")
-  inverse_metrics <- c("as", "la", "va", "pv", "un")
+  component_weights <- c(le = 0.25, as = 0.15, la = 0.10, pv = 0.20, un = 0.15, hs = 0.15)
+  component_metrics <- names(component_weights)
+  inverse_metrics   <- c("as", "la", "pv", "un")
 
   available_components <- intersect(component_metrics, names(df))
   if (!length(available_components)) {
     return(rep(list(rep(NA_real_, length(years))), nrow(df)))
   }
 
+  # Normalize weights to available components so they still sum to 1
+  active_weights <- component_weights[available_components]
+  active_weights <- active_weights / sum(active_weights)
+
   out <- replicate(nrow(df), rep(NA_real_, length(years)), simplify = FALSE)
+  normalization_bounds <- list()
 
   for (idx in seq_along(years)) {
     component_values <- map_dfc(available_components, function(metric) {
@@ -510,6 +530,21 @@ derive_health_index_series <- function(df, years = 2016:2023) {
       }))
     })
 
+    normalization_bounds[[as.character(years[[idx]])]] <- map(
+      available_components,
+      function(metric) {
+        values <- component_values[[metric]]
+        usable <- values[!is.na(values)]
+        if (!length(usable)) {
+          return(list(min = NA_real_, max = NA_real_))
+        }
+        list(
+          min = round(min(usable, na.rm = TRUE), 3),
+          max = round(max(usable, na.rm = TRUE), 3)
+        )
+      }
+    ) %>% set_names(available_components)
+
     scaled_values <- map_dfc(available_components, function(metric) {
       tibble(!!metric := normalize_component_scores(
         component_values[[metric]],
@@ -518,9 +553,12 @@ derive_health_index_series <- function(df, years = 2016:2023) {
     })
 
     year_scores <- apply(as.matrix(scaled_values), 1, function(row_values) {
-      usable <- row_values[!is.na(row_values)]
+      usable_mask  <- !is.na(row_values)
+      usable       <- row_values[usable_mask]
+      usable_wts   <- active_weights[names(usable)]
       if (length(usable) < 4) return(NA_real_)
-      round(mean(usable), 1)
+      score <- weighted.mean(usable, w = usable_wts)
+      round(max(0, min(100, score)), 1)   # clamp to [0, 100]
     })
 
     for (row_idx in seq_len(nrow(df))) {
@@ -528,10 +566,45 @@ derive_health_index_series <- function(df, years = 2016:2023) {
     }
   }
 
+  attr(out, "normalization_bounds") <- normalization_bounds
   out
 }
 
 load_cdc_asthma_longitudinal <- function(csa_boundaries, years = 2016:2023) {
+  # TODO (BCHD asthma ED replacement):
+  # Replace the CDC PLACES adult asthma prevalence proxy with Baltimore City Health
+  # Department asthma emergency-department (ED) rate data by CSA/neighborhood.
+  #
+  # Current status (2026-05-01):
+  # - No public BCHD/Open Baltimore Socrata dataset ID for asthma ED rates was
+  #   discoverable during automation checks.
+  # - Until BCHD publishes a public endpoint, keep this proxy as a fallback.
+  #
+  # Action path:
+  # 1) Check https://data.baltimorecity.gov for a BCHD asthma ED dataset.
+  # 2) If unpublished, request the endpoint from BCHD data team.
+  # 3) Swap this function body to pull the official ED-rate series.
+  #
+  # Drop-in replacement structure when a Socrata endpoint exists:
+  # endpoint <- "https://data.baltimorecity.gov/resource/<dataset_id>.csv"
+  # raw <- readr::read_csv(endpoint, show_col_types = FALSE)
+  # asthma_series <- raw %>%
+  #   transmute(
+  #     CSA = <official CSA column>,
+  #     Year = as.integer(<year column>),
+  #     as_value = as.numeric(<asthma_ed_rate_column>)
+  #   ) %>%
+  #   filter(Year %in% years) %>%
+  #   mutate(CSA_key = normalize_name(CSA)) %>%
+  #   inner_join(csa_lookup, by = "CSA_key", suffix = c("_src", "")) %>%
+  #   transmute(CSA = CSA, CSA_key, Year, as_value) %>%
+  #   arrange(CSA, Year) %>%
+  #   group_by(CSA, CSA_key) %>%
+  #   summarize(as = list(as.numeric(as_value)), .groups = "drop")
+  # return(list(data = asthma_series, metrics = "as", sources = endpoint))
+  #
+  # Note: `as` is retained as the dashboard metric key for compatibility, but it
+  # should represent BCHD asthma ED rate values once connected.
   release_specs <- list(
     `2016` = list(dataset_id = "k25u-mg9b", schema = "legacy_500cities", year = 2016),
     `2017` = list(dataset_id = "k86t-wghb", schema = "legacy_500cities", year = 2017),
@@ -547,7 +620,7 @@ load_cdc_asthma_longitudinal <- function(csa_boundaries, years = 2016:2023) {
     st_drop_geometry() %>%
     distinct(CSA, CSA_key)
 
-  print("Loading CDC tract-based asthma prevalence proxy...")
+  print("Loading CDC tract-based asthma proxy (fallback until BCHD asthma ED is connected)...")
 
   requested_specs <- release_specs[intersect(as.character(years), names(release_specs))]
 
@@ -1567,9 +1640,11 @@ build_fallback_level_record <- function(city_record, level = c("state", "federal
 }
 
 derive_benchmark_health_index <- function(neighborhood_data, benchmark_record, year_index) {
-  component_metrics <- c("le", "as", "la", "va", "pv", "un", "hs")
-  inverse_metrics <- c("as", "la", "va", "pv", "un")
+  component_weights <- c(le = 0.25, as = 0.15, la = 0.10, pv = 0.20, un = 0.15, hs = 0.15)
+  component_metrics <- names(component_weights)
+  inverse_metrics <- c("as", "la", "pv", "un")
   scores <- numeric()
+  score_weights <- numeric()
 
   for (metric in component_metrics) {
     benchmark_value <- benchmark_record[[metric]]
@@ -1598,13 +1673,15 @@ derive_benchmark_health_index <- function(neighborhood_data, benchmark_record, y
     }
 
     scores <- c(scores, round(score, 1))
+    score_weights <- c(score_weights, component_weights[[metric]])
   }
 
   if (length(scores) < 3) {
     return(NULL)
   }
 
-  round(mean(scores), 1)
+  score_weights <- score_weights / sum(score_weights)
+  round(weighted.mean(scores, w = score_weights), 1)
 }
 
 # 5. MERGE: Combine Data
@@ -1733,6 +1810,7 @@ if (nrow(bnia_import$data) > 0) {
 metric_cols <- setdiff(names(final_dashboard_data), c("CSA", "CSA_key"))
 
 derive_hi_from_components <- !"hi" %in% bnia_metric_cols
+health_index_norm_bounds <- NULL
 
 for (metric in setdiff(metric_cols, if (derive_hi_from_components) "hi" else character())) {
   final_dashboard_data[[metric]] <- map(
@@ -1745,7 +1823,9 @@ for (metric in setdiff(metric_cols, if (derive_hi_from_components) "hi" else cha
 
 if (derive_hi_from_components) {
   final_dashboard_data <- ensure_metric_column(final_dashboard_data, "hi")
-  final_dashboard_data$hi <- derive_health_index_series(final_dashboard_data, years = years)
+  derived_hi <- derive_health_index_series(final_dashboard_data, years = years)
+  final_dashboard_data$hi <- derived_hi
+  health_index_norm_bounds <- attr(derived_hi, "normalization_bounds")
 } else if ("hi" %in% names(final_dashboard_data)) {
   final_dashboard_data$hi <- map(
     final_dashboard_data$hi,
@@ -1854,14 +1934,14 @@ json_ready_data <- list(
       if ("as" %in% cdc_metric_cols) {
         note_parts <- c(
           note_parts,
-          "CDC 500 Cities / PLACES tract releases supplied `as` as an adult current asthma prevalence proxy, aggregated to CSAs using tract centroid assignment and population weighting."
+          "CDC 500 Cities / PLACES tract releases currently supply `as` as an adult asthma prevalence proxy. TODO: replace with official BCHD asthma ED rate series when a public endpoint is available."
         )
       }
 
       if (derive_hi_from_components) {
         note_parts <- c(
           note_parts,
-          "The dashboard `hi` series is derived from official component metrics (le, as, la, va, pv, un, hs) using yearly min-max normalization and equal weighting."
+          "The dashboard `hi` series is a derived composite (not official BNIA): 0.25*le + 0.15*as + 0.10*la + 0.20*pv + 0.15*un + 0.15*hs after yearly citywide min-max normalization."
         )
       }
 
