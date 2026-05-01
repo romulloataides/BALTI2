@@ -296,6 +296,132 @@ load_bnia_longitudinal <- function(csa_lookup, years = 2016:2023) {
   parsed
 }
 
+fetch_bnia_service_metric <- function(metric, service_url, field_prefix, csa_lookup, years = 2016:2023, transform = identity) {
+  query_url <- paste0(
+    service_url,
+    "/0/query?where=1%3D1&returnGeometry=false&outFields=*&f=json"
+  )
+
+  payload <- tryCatch(
+    {
+      response <- GET(query_url, timeout(120))
+      stop_for_status(response)
+      fromJSON(content(response, "text", encoding = "UTF-8"), simplifyDataFrame = TRUE)
+    },
+    error = function(e) {
+      warning(paste("BNIA service import failed for", metric, ":", conditionMessage(e)))
+      NULL
+    }
+  )
+
+  attrs <- payload$features$attributes
+  if (is.null(attrs) || !nrow(as_tibble(attrs))) {
+    return(tibble(CSA = character(), CSA_key = character()))
+  }
+
+  attrs <- as_tibble(attrs)
+  csa_2020_col <- names(attrs)[str_detect(str_to_lower(names(attrs)), "^csa2020$")][1]
+  csa_2010_col <- names(attrs)[str_detect(str_to_lower(names(attrs)), "^csa2010$|^community$|^name$")][1]
+
+  if (is.na(csa_2010_col) && is.na(csa_2020_col)) {
+    warning(paste("BNIA service import failed for", metric, ": CSA name column not found."))
+    return(tibble(CSA = character(), CSA_key = character()))
+  }
+
+  year_fields <- set_names(
+    paste0(field_prefix, substr(years, 3, 4)),
+    as.character(years)
+  )
+
+  available_fields <- intersect(unname(year_fields), names(attrs))
+
+  if (!length(available_fields)) {
+    return(tibble(CSA = character(), CSA_key = character()))
+  }
+
+  service_tbl <- attrs %>%
+    transmute(
+      CSA = coalesce(
+        if (!is.na(csa_2020_col)) as.character(.data[[csa_2020_col]]) else NA_character_,
+        if (!is.na(csa_2010_col)) as.character(.data[[csa_2010_col]]) else NA_character_
+      )
+    ) %>%
+    mutate(CSA = str_squish(CSA), CSA_key = normalize_name(CSA))
+
+  service_tbl[[metric]] <- purrr::pmap(
+    attrs[, available_fields, drop = FALSE],
+    function(...) {
+      row_values <- list(...)
+      series <- map_dbl(as.character(years), function(year_key) {
+        field_name <- year_fields[[year_key]]
+        if (!field_name %in% available_fields) return(NA_real_)
+        value <- row_values[[match(field_name, available_fields)]]
+        transformed <- tryCatch(transform(as.numeric(value)), error = function(e) NA_real_)
+        if (is.na(transformed)) NA_real_ else round(as.numeric(transformed), 1)
+      })
+      series
+    }
+  )
+
+  service_tbl %>%
+    inner_join(csa_lookup, by = "CSA_key", suffix = c("_service", "")) %>%
+    transmute(CSA = coalesce(CSA, CSA_service), CSA_key, !!metric := .data[[metric]])
+}
+
+load_bnia_service_longitudinal <- function(csa_lookup, years = 2016:2023) {
+  service_specs <- list(
+    le = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Lifexp/FeatureServer", prefix = "lifexp", transform = identity),
+    la = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ebll/FeatureServer", prefix = "ebll", transform = identity),
+    va = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer", prefix = "vacant", transform = identity),
+    un = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Unempr/FeatureServer", prefix = "unempr", transform = identity),
+    hs = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Lesshs/FeatureServer", prefix = "lesshs", transform = function(x) ifelse(is.na(x), NA_real_, 100 - x))
+  )
+
+  print("Loading BNIA ArcGIS service metrics...")
+
+  metric_tables <- imap(service_specs, function(spec, metric) {
+    fetch_bnia_service_metric(
+      metric = metric,
+      service_url = spec$url,
+      field_prefix = spec$prefix,
+      csa_lookup = csa_lookup,
+      years = years,
+      transform = spec$transform
+    )
+  })
+
+  available_metrics <- names(metric_tables)[map_lgl(metric_tables, ~ nrow(.x) > 0)]
+  if (!length(available_metrics)) {
+    print("No BNIA ArcGIS service metrics were imported.")
+    return(list(
+      data = tibble(CSA = character(), CSA_key = character()),
+      metrics = character(),
+      sources = character()
+    ))
+  }
+
+  merged <- reduce(
+    metric_tables[available_metrics],
+    function(x, y) full_join(x, y, by = c("CSA", "CSA_key"))
+  ) %>%
+    mutate(CSA = coalesce(CSA, csa_lookup$CSA[match(CSA_key, csa_lookup$CSA_key)]))
+
+  print(
+    paste(
+      "  Imported",
+      length(available_metrics),
+      "metrics from BNIA ArcGIS services:",
+      paste(available_metrics, collapse = ", ")
+    )
+  )
+
+  list(
+    data = merged,
+    metrics = available_metrics,
+    sources = map_chr(service_specs[available_metrics], "url")
+  )
+}
+
 has_series_data <- function(x) {
   if (is.null(x)) return(FALSE)
   values <- suppressWarnings(as.numeric(unlist(x, use.names = FALSE)))
@@ -425,6 +551,7 @@ csa_lookup <- csa_boundaries %>%
   distinct(CSA, CSA_key)
 
 bnia_import <- load_bnia_longitudinal(csa_lookup, years = years)
+bnia_service_import <- load_bnia_service_longitudinal(csa_lookup, years = years)
 
 # 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
 print("Fetching historical 311 data with GPS coordinates...")
@@ -773,6 +900,32 @@ if (has_311_data && nrow(csa_311_arrays) > 0) {
   final_dashboard_data <- final_dashboard_data %>% select(-ends_with("_311"))
 }
 
+if (nrow(bnia_service_import$data) > 0) {
+  service_metric_cols <- setdiff(names(bnia_service_import$data), c("CSA", "CSA_key"))
+
+  final_dashboard_data <- final_dashboard_data %>%
+    left_join(
+      bnia_service_import$data %>%
+        rename_with(~ paste0(.x, "_service"), all_of(service_metric_cols)) %>%
+        select(CSA_key, ends_with("_service")),
+      by = "CSA_key"
+    )
+
+  for (metric in service_metric_cols) {
+    final_dashboard_data <- ensure_metric_column(final_dashboard_data, metric)
+    override_col <- paste0(metric, "_service")
+    final_dashboard_data[[metric]] <- map2(
+      final_dashboard_data[[override_col]],
+      final_dashboard_data[[metric]],
+      prefer_metric_input
+    )
+  }
+
+  final_dashboard_data <- final_dashboard_data %>% select(-ends_with("_service"))
+} else {
+  service_metric_cols <- character()
+}
+
 if (nrow(bnia_import$data) > 0) {
   bnia_metric_cols <- setdiff(names(bnia_import$data), c("CSA", "CSA_key"))
 
@@ -849,22 +1002,35 @@ json_ready_data <- list(
     schema_version = 2,
     years = as.list(years),
     provisional = TRUE,
-    note = if (length(bnia_metric_cols)) {
-      paste0(
-        "Real BNIA longitudinal values imported for: ",
+    note = case_when(
+      length(bnia_metric_cols) > 0 && length(service_metric_cols) > 0 ~ paste0(
+        "Real BNIA longitudinal values imported from a local file for: ",
+        paste(sort(bnia_metric_cols), collapse = ", "),
+        ". BNIA ArcGIS services supplied: ",
+        paste(sort(service_metric_cols), collapse = ", "),
+        ". Missing metrics still fall back to existing data.json values and modeled series where needed."
+      ),
+      length(bnia_metric_cols) > 0 ~ paste0(
+        "Real BNIA longitudinal values imported from a local file for: ",
         paste(sort(bnia_metric_cols), collapse = ", "),
         ". Missing metrics still fall back to existing data.json values and modeled series where needed."
-      )
-    } else {
-      "No BNIA longitudinal file was imported. Neighborhood yearly records still fall back to existing data.json values and modeled series where needed."
-    },
+      ),
+      length(service_metric_cols) > 0 ~ paste0(
+        "BNIA ArcGIS services supplied: ",
+        paste(sort(service_metric_cols), collapse = ", "),
+        ". Missing metrics still fall back to existing data.json values and modeled series where needed."
+      ),
+      TRUE ~ "No BNIA longitudinal file or live BNIA service metrics were imported. Neighborhood yearly records still fall back to existing data.json values and modeled series where needed."
+    ),
     benchmark_note = "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected.",
     source_files = list(
       neighborhood = if (!is.na(bnia_import$source_path)) basename(bnia_import$source_path) else NULL,
+      neighborhood_services = if (length(bnia_service_import$sources)) unname(as.list(bnia_service_import$sources)) else NULL,
       hazards = if (has_311_data) "Open Baltimore 311 ArcGIS services" else NULL,
       poverty = if (nrow(csa_acs_summary) > 0) "ACS 2022 tract estimates weighted to CSA" else NULL
     ),
     imported_metrics = sort(unique(c(
+      service_metric_cols,
       bnia_metric_cols,
       if (nrow(csa_acs_summary) > 0) "pv",
       if (has_311_data) c("rt", "dp", "ws", "hz")

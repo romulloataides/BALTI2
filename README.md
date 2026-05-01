@@ -48,7 +48,7 @@ Notes:
 
 ## BNIA longitudinal input
 
-`update_data.R` now looks for a real BNIA Vital Signs file before it falls back to the existing modeled series.
+`update_data.R` now looks for a real BNIA Vital Signs file before it falls back to the existing modeled series. If no local BNIA file is present, it also tries to enrich the dashboard from BNIA's live ArcGIS indicator services.
 
 Supported file locations:
 
@@ -68,6 +68,16 @@ Supported table shapes:
 
 The importer maps common indicator names onto dashboard metric keys such as `hi`, `le`, `as`, `la`, `va`, `pv`, `un`, `hs`, `fd`, `gs`, `cr`, `rt`, `dp`, `ws`, and `hz`.
 If no BNIA file is found, the pipeline keeps using the current `data.json` values and only models the missing yearly series.
+
+Live BNIA service fallback currently supplements:
+
+- `le` from the `Lifexp` ArcGIS service
+- `la` from the `Ebll` ArcGIS service
+- `va` from the `Vacant` ArcGIS service
+- `un` from the `Unempr` ArcGIS service
+- `hs` as `100 - Lesshs` from the `Lesshs` ArcGIS service
+
+Those live services are helpful, but they are not fully complete for every dashboard metric or every year. The pipeline still keeps existing `data.json` values and modeled series for any missing gaps.
 
 ## Deployment
 
@@ -104,10 +114,10 @@ node scripts/migrate_data_schema.mjs data.json
 
 ## Next Build Steps
 
-- Drop the real BNIA Vital Signs longitudinal file into one of the supported locations so `update_data.R` can replace the modeled neighborhood series.
+- Drop the real BNIA Vital Signs longitudinal file into one of the supported locations so `update_data.R` can replace more of the modeled neighborhood series than the live service fallback can cover.
 - Add `CENSUS_API_KEY` to GitHub Actions secrets so `update_data.R` can run end to end.
 - Add real state and federal benchmarks through ACS/FRED inputs instead of the current provisional scaffolds.
-- Fix or replace the current 311 ingest in `update_data.R`.
+- Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
 - Add a real backend for community reports if submissions need persistence.
 
 ## Notes
