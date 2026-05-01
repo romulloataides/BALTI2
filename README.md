@@ -1,6 +1,10 @@
 # Baltimore Dashboard
 
-This folder is prepared for static hosting on GitHub Pages, Netlify, or Vercel.
+Public GitHub Pages deployment for the Baltimore neighborhood health dashboard.
+
+Live site: `https://romulloataides.github.io/Baltimore-Dashboard/`
+
+GitHub repo: `https://github.com/romulloataides/Baltimore-Dashboard`
 
 ## Current architecture
 
@@ -9,7 +13,19 @@ This folder is prepared for static hosting on GitHub Pages, Netlify, or Vercel.
 - `csa_boundaries.geojson` contains the 55 Baltimore CSA polygons used by the map.
 - `update_data.R` updates `data.json`, so pipeline runs now affect the deployed dashboard without rewriting `index.html`.
 
-## Publish on GitHub Pages
+## Deployment
+
+GitHub Pages is already enabled for this repository and serves the app from the repo root on the `main` branch.
+
+Published files:
+
+- `index.html`
+- `data.json`
+- `csa_boundaries.geojson`
+
+Because `index.html` now fetches `data.json` and `csa_boundaries.geojson` at runtime, future data updates can ship without rebuilding the HTML shell.
+
+## GitHub Pages Setup Reference
 
 1. Create a new public GitHub repository, for example `baltimore-dashboard`.
 2. Upload `index.html` from this folder to the root of the repo.
@@ -18,9 +34,16 @@ This folder is prepared for static hosting on GitHub Pages, Netlify, or Vercel.
 5. Select the `main` branch and the `/ (root)` folder.
 6. Save and wait for the site to build.
 
-Your site URL will look like:
+That kind of setup produces a site URL like:
 
 `https://YOUR_GITHUB_USERNAME.github.io/baltimore-dashboard/`
+
+## Next Build Steps
+
+- Replace the modeled values in `data.json` with real BNIA time-series data.
+- Add `CENSUS_API_KEY` to GitHub Actions secrets so `update_data.R` can run end to end.
+- Fix or replace the current 311 ingest in `update_data.R`.
+- Add a real backend for community reports if submissions need persistence.
 
 ## Notes
 
