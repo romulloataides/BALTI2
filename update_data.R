@@ -6,6 +6,8 @@ library(httr)
 
 print("Starting Baltimore Health Data Pipeline (CSA Architecture)...")
 
+years <- 2016:2023
+
 normalize_name <- function(x) {
   x %>%
     replace_na("") %>%
@@ -13,6 +15,302 @@ normalize_name <- function(x) {
     str_replace_all("[^[:alnum:]]+", " ") %>%
     str_squish() %>%
     str_to_lower()
+}
+
+parse_year_value <- function(x) {
+  suppressWarnings(as.integer(str_extract(as.character(x), "(19|20)\\d{2}")))
+}
+
+coerce_numeric_value <- function(x) {
+  txt <- as.character(x)
+  txt[is.na(txt)] <- NA_character_
+  txt <- str_squish(txt)
+  txt[txt %in% c("", "NA", "N/A", "null", "--", "suppressed", "Suppressed")] <- NA_character_
+  txt[str_detect(txt, "^<")] <- NA_character_
+  readr::parse_number(txt, locale = readr::locale(grouping_mark = ","))
+}
+
+dashboard_metric_aliases <- list(
+  hi = c("hi", "health index", "composite health index"),
+  le = c("le", "life expectancy", "life exp", "life expectancy at birth", "lifexp"),
+  as = c("as", "asthma ed", "asthma ed rate", "asthma ed visits", "asthma emergency department"),
+  la = c("la", "lead", "lead exp", "lead exposure", "children with elevated blood lead levels"),
+  va = c("va", "vacant", "vacant housing", "vacant properties", "vacant building notices"),
+  pv = c("pv", "poverty", "poverty rate"),
+  un = c("un", "unemployment", "unemployment rate"),
+  hs = c("hs", "hs grad", "high school graduation", "high school grad", "high school attainment"),
+  fd = c("fd", "food desert", "food access"),
+  gs = c("gs", "green space", "greenspace"),
+  cr = c("cr", "crime", "crime rate", "violent crime"),
+  rt = c("rt", "rat eradication", "rodent", "rodent complaints", "rats"),
+  dp = c("dp", "illegal dumping", "dumping"),
+  ws = c("ws", "water sewer", "water and sewer", "water/sewer"),
+  hz = c("hz", "hazards", "311 hazards", "total hazards")
+)
+
+metric_alias_lookup <- purrr::imap(
+  dashboard_metric_aliases,
+  ~ {
+    vals <- rep(.y, length(.x))
+    names(vals) <- normalize_name(.x)
+    vals
+  }
+) %>%
+  unname() %>%
+  do.call(c, .)
+
+resolve_dashboard_metric <- function(x) {
+  key <- normalize_name(x)
+  matched <- unname(metric_alias_lookup[key])
+  matched <- matched[!is.na(matched)]
+  if (!length(matched)) {
+    return(NA_character_)
+  }
+  matched[[1]]
+}
+
+detect_first_col <- function(df, patterns, exclude = character()) {
+  candidates <- setdiff(names(df), exclude)
+  match <- candidates[str_detect(str_to_lower(candidates), patterns)][1]
+  if (is.na(match)) NA_character_ else match
+}
+
+find_bnia_source <- function() {
+  env_path <- trimws(Sys.getenv("BNIA_VITAL_SIGNS_PATH"))
+  candidates <- c(
+    env_path,
+    "bnia_vital_signs.csv",
+    "bnia_vital_signs.xlsx",
+    "BNIA_Vital_Signs.csv",
+    "BNIA_Vital_Signs.xlsx",
+    "vital_signs.csv",
+    "vital_signs.xlsx",
+    "data_sources/bnia_vital_signs.csv",
+    "data_sources/bnia_vital_signs.xlsx",
+    "data_sources/BNIA_Vital_Signs.csv",
+    "data_sources/BNIA_Vital_Signs.xlsx"
+  )
+
+  existing <- candidates[nzchar(candidates) & file.exists(candidates)]
+  if (!length(existing)) return(NA_character_)
+  existing[[1]]
+}
+
+read_bnia_table <- function(path) {
+  ext <- str_to_lower(tools::file_ext(path))
+
+  if (ext %in% c("csv", "txt")) {
+    return(readr::read_csv(path, show_col_types = FALSE, progress = FALSE))
+  }
+
+  if (ext %in% c("tsv", "tab")) {
+    return(readr::read_tsv(path, show_col_types = FALSE, progress = FALSE))
+  }
+
+  if (ext %in% c("xlsx", "xls")) {
+    if (!requireNamespace("readxl", quietly = TRUE)) {
+      stop("BNIA spreadsheet input requires the readxl package. Install readxl or export the file to CSV.")
+    }
+    return(readxl::read_excel(path))
+  }
+
+  stop(paste("Unsupported BNIA file type:", ext))
+}
+
+series_from_long <- function(long_df, csa_lookup, years = 2016:2023) {
+  aligned <- long_df %>%
+    transmute(
+      CSA_input = as.character(CSA),
+      CSA_key = normalize_name(CSA_input),
+      metric = map_chr(metric, resolve_dashboard_metric),
+      Year = parse_year_value(Year),
+      value = coerce_numeric_value(value)
+    )
+
+  unmatched <- aligned %>%
+    distinct(CSA_input, CSA_key) %>%
+    anti_join(csa_lookup, by = "CSA_key") %>%
+    pull(CSA_input)
+
+  matched <- aligned %>%
+    filter(!is.na(metric), Year %in% years) %>%
+    inner_join(csa_lookup %>% rename(CSA_canonical = CSA), by = "CSA_key") %>%
+    transmute(CSA = CSA_canonical, CSA_key, metric, Year, value) %>%
+    group_by(CSA, CSA_key, metric, Year) %>%
+    summarize(
+      value = if (all(is.na(value))) NA_real_ else round(mean(value, na.rm = TRUE), 1),
+      .groups = "drop"
+    ) %>%
+    group_by(CSA, CSA_key, metric) %>%
+    tidyr::complete(Year = years) %>%
+    arrange(Year, .by_group = TRUE) %>%
+    summarize(series = list(as.numeric(value)), .groups = "drop") %>%
+    pivot_wider(names_from = metric, values_from = series)
+
+  list(
+    data = matched,
+    metrics = setdiff(names(matched), c("CSA", "CSA_key")),
+    unmatched = unmatched
+  )
+}
+
+extract_bnia_longitudinal <- function(df, csa_lookup, years = 2016:2023) {
+  name_col <- detect_first_col(df, "^community$|csa2010|csa2020|csa_name|^csa$|neigh|^name$")
+  if (is.na(name_col)) {
+    stop("Could not detect a CSA/neighborhood column in the BNIA file.")
+  }
+
+  year_cols <- intersect(as.character(years), names(df))
+  metric_col <- detect_first_col(df, "metric|indicator|measure|variable|series|metric_key", exclude = name_col)
+  year_col <- detect_first_col(df, "^year$|calendar.?year|fiscal.?year|period|time", exclude = c(name_col, metric_col))
+  value_col <- detect_first_col(
+    df,
+    "^value$|value$|estimate$|score$|pct$|percent$|percentage$|share$|count$|number$|amount$",
+    exclude = c(name_col, metric_col, year_col)
+  )
+
+  mapped_metric_cols <- tibble(source_col = names(df)) %>%
+    filter(!source_col %in% c(name_col, metric_col, year_col, value_col)) %>%
+    mutate(metric = map_chr(source_col, resolve_dashboard_metric)) %>%
+    filter(!is.na(metric))
+
+  if (length(year_cols) > 0 && !is.na(metric_col) && is.na(year_col)) {
+    long_df <- df %>%
+      transmute(
+        CSA = .data[[name_col]],
+        metric = .data[[metric_col]],
+        across(all_of(year_cols))
+      ) %>%
+      pivot_longer(cols = all_of(year_cols), names_to = "Year", values_to = "value")
+
+    parsed <- series_from_long(long_df, csa_lookup, years = years)
+    parsed$format <- "indicator-by-year"
+    return(parsed)
+  }
+
+  if (!is.na(year_col) && !is.na(metric_col) && !is.na(value_col)) {
+    long_df <- df %>%
+      transmute(
+        CSA = .data[[name_col]],
+        Year = .data[[year_col]],
+        metric = .data[[metric_col]],
+        value = .data[[value_col]]
+      )
+
+    parsed <- series_from_long(long_df, csa_lookup, years = years)
+    parsed$format <- "long"
+    return(parsed)
+  }
+
+  if (!is.na(year_col) && nrow(mapped_metric_cols) > 0) {
+    long_df <- df %>%
+      select(all_of(c(name_col, year_col, mapped_metric_cols$source_col))) %>%
+      pivot_longer(
+        cols = all_of(mapped_metric_cols$source_col),
+        names_to = "source_metric",
+        values_to = "value"
+      ) %>%
+      left_join(mapped_metric_cols, by = c("source_metric" = "source_col")) %>%
+      transmute(
+        CSA = .data[[name_col]],
+        Year = .data[[year_col]],
+        metric = metric,
+        value = value
+      )
+
+    parsed <- series_from_long(long_df, csa_lookup, years = years)
+    parsed$format <- "wide"
+    return(parsed)
+  }
+
+  stop(
+    paste(
+      "Could not parse the BNIA file.",
+      "Supported formats are:",
+      "1) CSA + Year + metric columns;",
+      "2) CSA + Year + Indicator + Value;",
+      "3) CSA + Indicator + 2016...2023 year columns."
+    )
+  )
+}
+
+load_bnia_longitudinal <- function(csa_lookup, years = 2016:2023) {
+  source_path <- find_bnia_source()
+
+  if (is.na(source_path)) {
+    print("No BNIA longitudinal file found. Keeping existing neighborhood data as the baseline.")
+    return(list(
+      data = tibble(CSA = character(), CSA_key = character()),
+      metrics = character(),
+      unmatched = character(),
+      format = NA_character_,
+      source_path = NA_character_
+    ))
+  }
+
+  print(paste("Loading BNIA longitudinal data from", source_path, "..."))
+
+  parsed <- tryCatch(
+    {
+      raw <- read_bnia_table(source_path)
+      extract_bnia_longitudinal(raw, csa_lookup, years = years)
+    },
+    error = function(e) {
+      warning(paste("BNIA import failed:", conditionMessage(e)))
+      NULL
+    }
+  )
+
+  if (is.null(parsed)) {
+    return(list(
+      data = tibble(CSA = character(), CSA_key = character()),
+      metrics = character(),
+      unmatched = character(),
+      format = NA_character_,
+      source_path = source_path
+    ))
+  }
+
+  if (length(parsed$unmatched)) {
+    warning(
+      paste(
+        "BNIA rows skipped because their CSA names did not match the dashboard boundary file:",
+        paste(unique(parsed$unmatched), collapse = "; ")
+      )
+    )
+  }
+
+  print(
+    paste(
+      "  Imported",
+      length(parsed$metrics),
+      "BNIA metrics across",
+      nrow(parsed$data),
+      "CSAs using",
+      parsed$format,
+      "format."
+    )
+  )
+
+  parsed$source_path <- source_path
+  parsed
+}
+
+has_series_data <- function(x) {
+  if (is.null(x)) return(FALSE)
+  values <- suppressWarnings(as.numeric(unlist(x, use.names = FALSE)))
+  length(values) > 0 && any(!is.na(values))
+}
+
+prefer_metric_input <- function(primary, fallback) {
+  if (has_series_data(primary)) primary else fallback
+}
+
+ensure_metric_column <- function(df, metric) {
+  if (!metric %in% names(df)) {
+    df[[metric]] <- rep(list(NA_real_), nrow(df))
+  }
+  df
 }
 
 empty_311_tbl <- tibble(
@@ -89,8 +387,12 @@ parse_arcgis_batch <- function(txt) {
 
 # 1. SETUP: Authenticate Census API
 census_key <- trimws(Sys.getenv("CENSUS_API_KEY"))
-if (identical(census_key, "")) stop("CENSUS_API_KEY is not set.")
-Sys.setenv(CENSUS_API_KEY = census_key)
+has_census_key <- !identical(census_key, "")
+if (has_census_key) {
+  Sys.setenv(CENSUS_API_KEY = census_key)
+} else {
+  warning("CENSUS_API_KEY is not set. ACS poverty refresh will be skipped.")
+}
 
 # 2. EXTRACT: Fetch Spatial Boundaries (CSAs)
 print("Loading Local CSA Boundaries...")
@@ -117,6 +419,12 @@ csa_boundaries <- csa_boundaries %>%
     CSA = trimws(CSA),
     CSA_key = normalize_name(CSA)
   )
+
+csa_lookup <- csa_boundaries %>%
+  st_drop_geometry() %>%
+  distinct(CSA, CSA_key)
+
+bnia_import <- load_bnia_longitudinal(csa_lookup, years = years)
 
 # 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
 print("Fetching historical 311 data with GPS coordinates...")
@@ -178,34 +486,51 @@ names(three11_batches) <- names(three11_sources)
 
 for (year_label in names(three11_sources)) {
   print(paste("  Downloading 311 records for", year_label, "..."))
-  three11_batches[[year_label]] <- fetch_arcgis_layer(
-    three11_sources[[year_label]],
-    out_fields = c("SRType", "SRStatus", "CreatedDate") # Removed Neighborhood string
+  three11_batches[[year_label]] <- tryCatch(
+    fetch_arcgis_layer(
+      three11_sources[[year_label]],
+      out_fields = c("SRType", "SRStatus", "CreatedDate")
+    ),
+    error = function(e) {
+      warning(paste("311 import failed for", year_label, ":", conditionMessage(e)))
+      empty_311_tbl
+    }
   )
 }
 
 raw_311 <- dplyr::bind_rows(three11_batches) %>% coerce_311_schema()
 
 # The Spatial Intersection: Map exact GPS points to BNIA CSA Polygons
-csa_311_clean <- raw_311 %>%
-  filter(!is.na(CreatedDate), !is.na(Longitude), !is.na(Latitude)) %>%
-  mutate(Year = lubridate::year(lubridate::as_datetime(CreatedDate / 1000, tz = "UTC"))) %>%
-  st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
-  st_join(csa_boundaries, join = st_intersects) %>%
-  st_drop_geometry() %>%
-  filter(!is.na(CSA), Year >= 2016, Year <= 2023, SRStatus != "Closed (Duplicate)") %>%
-  transmute(
-    CSA = CSA,
-    CSA_key = CSA_key,
-    Category = case_when(
-      str_detect(str_to_lower(SRType), "rat|rodent") ~ "rt",
-      str_detect(str_to_lower(SRType), "trash|dumping") ~ "dp",
-      str_detect(str_to_lower(SRType), "water|sewer") ~ "ws",
-      TRUE ~ "other"
-    ),
-    Year = Year
-  ) %>%
-  filter(Category != "other")
+if (nrow(raw_311) > 0) {
+  csa_311_clean <- raw_311 %>%
+    filter(!is.na(CreatedDate), !is.na(Longitude), !is.na(Latitude)) %>%
+    mutate(Year = lubridate::year(lubridate::as_datetime(CreatedDate / 1000, tz = "UTC"))) %>%
+    st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+    st_join(csa_boundaries, join = st_intersects) %>%
+    st_drop_geometry() %>%
+    filter(!is.na(CSA), Year >= min(years), Year <= max(years), SRStatus != "Closed (Duplicate)") %>%
+    transmute(
+      CSA = CSA,
+      CSA_key = CSA_key,
+      Category = case_when(
+        str_detect(str_to_lower(SRType), "rat|rodent") ~ "rt",
+        str_detect(str_to_lower(SRType), "trash|dumping") ~ "dp",
+        str_detect(str_to_lower(SRType), "water|sewer") ~ "ws",
+        TRUE ~ "other"
+      ),
+      Year = Year
+    ) %>%
+    filter(Category != "other")
+} else {
+  csa_311_clean <- tibble(
+    CSA = character(),
+    CSA_key = character(),
+    Category = character(),
+    Year = integer()
+  )
+}
+
+has_311_data <- nrow(csa_311_clean) > 0
 
 csa_311_yearly <- csa_311_clean %>%
   group_by(CSA, CSA_key, Category, Year) %>%
@@ -221,7 +546,7 @@ all_311_yearly <- bind_rows(csa_311_yearly, total_hazards)
 complete_grid <- tidyr::crossing(
   csa_boundaries %>% st_drop_geometry() %>% select(CSA, CSA_key),
   Category = c("rt", "dp", "ws", "hz"),
-  Year = 2016:2023
+  Year = years
 )
 
 csa_311_arrays <- complete_grid %>%
@@ -236,35 +561,46 @@ csa_311_arrays <- complete_grid %>%
 print("Fetching and processing Census data...")
 acs_vars <- c(Poverty = "B17001_002", Total_Pop = "B17001_001")
 
-baltimore_acs <- get_acs(
-  geography = "tract",
-  variables = acs_vars,
-  state = "MD",
-  county = "Baltimore city",
-  year = 2022,
-  geometry = TRUE,
-  output = "wide"
-) %>%
-  st_transform(crs = 4326) %>%
-  mutate(
-    pv = round((PovertyE / Total_PopE) * 100, 1),
-    pv = replace_na(pv, 0)
-  ) %>%
-  select(GEOID, pv, geometry)
+if (has_census_key) {
+  csa_acs_summary <- tryCatch(
+    {
+      baltimore_acs <- get_acs(
+        geography = "tract",
+        variables = acs_vars,
+        state = "MD",
+        county = "Baltimore city",
+        year = 2022,
+        geometry = TRUE,
+        output = "wide"
+      ) %>%
+        st_transform(crs = 4326) %>%
+        mutate(
+          pv = round((PovertyE / Total_PopE) * 100, 1),
+          pv = replace_na(pv, 0)
+        ) %>%
+        select(GEOID, pv, geometry)
 
-csa_acs_summary <- st_intersection(
-  csa_boundaries %>% select(CSA, CSA_key),
-  baltimore_acs
-) %>%
-  mutate(intersect_area = st_area(geometry)) %>%
-  st_drop_geometry() %>%
-  group_by(CSA, CSA_key) %>%
-  summarize(
-    pv = round(weighted.mean(pv, as.numeric(intersect_area), na.rm = TRUE), 1),
-    .groups = "drop"
+      st_intersection(
+        csa_boundaries %>% select(CSA, CSA_key),
+        baltimore_acs
+      ) %>%
+        mutate(intersect_area = st_area(geometry)) %>%
+        st_drop_geometry() %>%
+        group_by(CSA, CSA_key) %>%
+        summarize(
+          pv = round(weighted.mean(pv, as.numeric(intersect_area), na.rm = TRUE), 1),
+          .groups = "drop"
+        )
+    },
+    error = function(e) {
+      warning(paste("ACS poverty refresh failed:", conditionMessage(e)))
+      tibble(CSA = character(), CSA_key = character(), pv = numeric())
+    }
   )
+} else {
+  csa_acs_summary <- tibble(CSA = character(), CSA_key = character(), pv = numeric())
+}
 
-years <- 2016:2023
 legacy_rates <- c(
   hi = 0.4, le = 0.08, as = -0.6, la = -0.5, va = -0.2, pv = -0.3,
   un = -0.25, hs = 0.15, fd = 0.3, gs = 0.1, hw = -0.2, cr = -0.5,
@@ -402,11 +738,66 @@ if (!file.exists(base_data_path)) {
 current_data_raw <- read_json(base_data_path, simplifyVector = FALSE)
 current_data <- extract_current_data(current_data_raw, years = years)
 
-final_dashboard_data <- current_data %>%
-  select(-any_of(c("pv", "rt", "dp", "ws", "hz"))) %>%
-  left_join(csa_acs_summary %>% select(CSA_key, pv), by = "CSA_key") %>%
-  left_join(csa_311_arrays %>% select(CSA_key, rt, dp, ws, hz), by = "CSA_key") %>%
-  mutate(pv = replace_na(pv, 0))
+final_dashboard_data <- current_data
+
+if (nrow(csa_acs_summary) > 0) {
+  final_dashboard_data <- final_dashboard_data %>%
+    left_join(
+      csa_acs_summary %>% select(CSA_key, pv_acs = pv),
+      by = "CSA_key"
+    )
+
+  final_dashboard_data <- ensure_metric_column(final_dashboard_data, "pv")
+  final_dashboard_data$pv <- map2(final_dashboard_data$pv_acs, final_dashboard_data$pv, prefer_metric_input)
+  final_dashboard_data <- final_dashboard_data %>% select(-pv_acs)
+}
+
+if (has_311_data && nrow(csa_311_arrays) > 0) {
+  final_dashboard_data <- final_dashboard_data %>%
+    left_join(
+      csa_311_arrays %>% rename(rt_311 = rt, dp_311 = dp, ws_311 = ws, hz_311 = hz) %>%
+        select(CSA_key, rt_311, dp_311, ws_311, hz_311),
+      by = "CSA_key"
+    )
+
+  for (metric in c("rt", "dp", "ws", "hz")) {
+    final_dashboard_data <- ensure_metric_column(final_dashboard_data, metric)
+    override_col <- paste0(metric, "_311")
+    final_dashboard_data[[metric]] <- map2(
+      final_dashboard_data[[override_col]],
+      final_dashboard_data[[metric]],
+      prefer_metric_input
+    )
+  }
+
+  final_dashboard_data <- final_dashboard_data %>% select(-ends_with("_311"))
+}
+
+if (nrow(bnia_import$data) > 0) {
+  bnia_metric_cols <- setdiff(names(bnia_import$data), c("CSA", "CSA_key"))
+
+  final_dashboard_data <- final_dashboard_data %>%
+    left_join(
+      bnia_import$data %>%
+        rename_with(~ paste0(.x, "_bnia"), all_of(bnia_metric_cols)) %>%
+        select(CSA_key, ends_with("_bnia")),
+      by = "CSA_key"
+    )
+
+  for (metric in bnia_metric_cols) {
+    final_dashboard_data <- ensure_metric_column(final_dashboard_data, metric)
+    override_col <- paste0(metric, "_bnia")
+    final_dashboard_data[[metric]] <- map2(
+      final_dashboard_data[[override_col]],
+      final_dashboard_data[[metric]],
+      prefer_metric_input
+    )
+  }
+
+  final_dashboard_data <- final_dashboard_data %>% select(-ends_with("_bnia"))
+} else {
+  bnia_metric_cols <- character()
+}
 
 metric_cols <- setdiff(names(final_dashboard_data), c("CSA", "CSA_key"))
 
@@ -458,8 +849,26 @@ json_ready_data <- list(
     schema_version = 2,
     years = as.list(years),
     provisional = TRUE,
-    note = "Neighborhood yearly records remain modeled approximations unless supplied as real arrays by the pipeline.",
-    benchmark_note = "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected."
+    note = if (length(bnia_metric_cols)) {
+      paste0(
+        "Real BNIA longitudinal values imported for: ",
+        paste(sort(bnia_metric_cols), collapse = ", "),
+        ". Missing metrics still fall back to existing data.json values and modeled series where needed."
+      )
+    } else {
+      "No BNIA longitudinal file was imported. Neighborhood yearly records still fall back to existing data.json values and modeled series where needed."
+    },
+    benchmark_note = "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected.",
+    source_files = list(
+      neighborhood = if (!is.na(bnia_import$source_path)) basename(bnia_import$source_path) else NULL,
+      hazards = if (has_311_data) "Open Baltimore 311 ArcGIS services" else NULL,
+      poverty = if (nrow(csa_acs_summary) > 0) "ACS 2022 tract estimates weighted to CSA" else NULL
+    ),
+    imported_metrics = sort(unique(c(
+      bnia_metric_cols,
+      if (nrow(csa_acs_summary) > 0) "pv",
+      if (has_311_data) c("rt", "dp", "ws", "hz")
+    )))
   ),
   neighborhoods = neighborhoods_output,
   benchmarks = benchmarks_output

@@ -46,6 +46,29 @@ Notes:
 - `benchmarks.state` and `benchmarks.federal` are currently provisional scaffolds until real ACS/FRED benchmark imports are wired into the pipeline.
 - The current longitudinal values are still modeled where real year arrays are not yet available. That modeling now lives in the data layer instead of the frontend render path.
 
+## BNIA longitudinal input
+
+`update_data.R` now looks for a real BNIA Vital Signs file before it falls back to the existing modeled series.
+
+Supported file locations:
+
+- `BNIA_VITAL_SIGNS_PATH` environment variable
+- `bnia_vital_signs.csv`
+- `BNIA_Vital_Signs.csv`
+- `vital_signs.csv`
+- `data_sources/bnia_vital_signs.csv`
+
+Spreadsheet inputs (`.xlsx` / `.xls`) are also supported when `readxl` is installed.
+
+Supported table shapes:
+
+1. `CSA` + `Year` + one or more metric columns such as `health index`, `life expectancy`, `poverty rate`
+2. `CSA` + `Year` + `Indicator` + `Value`
+3. `CSA` + `Indicator` + year columns `2016` through `2023`
+
+The importer maps common indicator names onto dashboard metric keys such as `hi`, `le`, `as`, `la`, `va`, `pv`, `un`, `hs`, `fd`, `gs`, `cr`, `rt`, `dp`, `ws`, and `hz`.
+If no BNIA file is found, the pipeline keeps using the current `data.json` values and only models the missing yearly series.
+
 ## Deployment
 
 GitHub Pages was previously enabled on the predecessor repository and can be re-enabled here once BALTI2 is ready to publish.
@@ -81,7 +104,7 @@ node scripts/migrate_data_schema.mjs data.json
 
 ## Next Build Steps
 
-- Replace the modeled longitudinal values in `data.json` with real BNIA time-series data.
+- Drop the real BNIA Vital Signs longitudinal file into one of the supported locations so `update_data.R` can replace the modeled neighborhood series.
 - Add `CENSUS_API_KEY` to GitHub Actions secrets so `update_data.R` can run end to end.
 - Add real state and federal benchmarks through ACS/FRED inputs instead of the current provisional scaffolds.
 - Fix or replace the current 311 ingest in `update_data.R`.
