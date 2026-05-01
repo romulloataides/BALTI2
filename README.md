@@ -134,6 +134,8 @@ The prototype now supports three community-data layers through Supabase:
 
 The annotation UI is intentionally separate from official data. It stores the context target in the `annotations.metric` field using namespaced keys such as `metric:hi`, `gap:la`, and `report:BLT-1234ABCD`.
 
+For prototype moderation, opening the dashboard with `?admin=1` reveals an admin helper view. It does not perform destructive actions from the browser; instead it generates copy-ready SQL for status updates and cleanup in Supabase SQL Editor.
+
 If you rerun the Supabase SQL after pulling this repo, it now also adds:
 
 - an index for `annotations (nsa, metric, created_at desc)`

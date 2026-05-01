@@ -141,6 +141,28 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .annotation-form{display:flex;flex-direction:column;gap:6px;padding:8px 9px;border-radius:7px;background:var(--bg);border:0.5px solid var(--br)}
 .annotation-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .annotation-submit{align-self:flex-start}
+.admin-badge{display:none;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:var(--brand-lt);color:var(--brand);border:0.5px solid color-mix(in oklab,var(--brand2) 24%,var(--bg));font-size:9px;font-weight:500}
+.admin-panel{display:flex;flex-direction:column;gap:8px}
+.admin-note{font-size:9px;color:var(--t2);line-height:1.45;padding:8px 9px;border-radius:7px;background:var(--bg2);border:0.5px solid var(--br)}
+.admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.admin-stat{display:flex;flex-direction:column;gap:2px;padding:8px 9px;border-radius:7px;background:var(--bg2);border:0.5px solid var(--br)}
+.admin-stat-label{font-size:9px;color:var(--t3)}
+.admin-stat-value{font-size:15px;font-weight:500;color:var(--tx)}
+.admin-actions{display:flex;gap:5px;flex-wrap:wrap}
+.admin-btn{padding:4px 9px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg);color:var(--t2);font-size:9px;cursor:pointer;transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1)}
+.admin-btn:hover{background:var(--bg3)}
+.admin-btn.primary{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
+.admin-btn.warn{background:var(--accent-lt);color:var(--danger);border-color:color-mix(in oklab,var(--accent) 30%,var(--bg))}
+.admin-list{display:flex;flex-direction:column;gap:7px}
+.admin-card{display:flex;flex-direction:column;gap:7px;padding:9px 10px;border-radius:8px;background:var(--bg);border:0.5px solid var(--br)}
+.admin-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.admin-card-title{font-size:11px;font-weight:500;line-height:1.35}
+.admin-meta{display:flex;flex-wrap:wrap;gap:5px;font-size:9px;color:var(--t3)}
+.admin-pills{display:flex;flex-wrap:wrap;gap:5px}
+.admin-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:500;border:0.5px solid var(--br);background:var(--bg2);color:var(--t2)}
+.admin-pill.qa{background:var(--accent-lt);color:var(--danger);border-color:color-mix(in oklab,var(--accent) 30%,var(--bg))}
+.admin-empty{font-size:10px;color:var(--t3)}
+.admin-inline{font-family:var(--font-mono);font-size:9px;color:var(--t2);word-break:break-all}
 .bench-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:999px;font-size:9px;border:0.5px solid var(--br);background:var(--bg);color:var(--t2)}
 .bench-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0}
 .vs-row{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:10px}
@@ -194,6 +216,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .rf-row{grid-template-columns:1fr}
   .gap-pair{grid-template-columns:1fr}
   .annotation-grid{grid-template-columns:1fr}
+  .admin-grid{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion: reduce){
   .skip-link,.mtab,.ltog,#play-btn,.pt,.sb-btn,.chip,.ss-btn,.map-picker,.conf-fill,.rfb,.toast,.level-btn,.context-btn{transition:none!important}
@@ -208,6 +231,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">B</div>
     <div><div class="ttl">Baltimore Health Dashboard</div><div class="sub">Click map · Pin 2 neighborhoods · Share comparison</div></div>
+    <div class="admin-badge" id="admin-badge">Admin mode</div>
   </div>
   <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
     <div class="mtabs" id="mtabs">
@@ -294,6 +318,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div style="font-size:22px">📍</div>
         <div style="font-weight:500;font-size:12px;color:var(--t2)">Pin neighborhoods to compare</div>
         <div>Click any neighborhood on the map. Pin up to 2 to see side-by-side trends and share them.</div>
+        <div id="no-pin-admin" class="pane" style="display:none;width:100%;text-align:left;padding:12px 0 0"></div>
       </div>
       <div id="one-pin" style="display:none;flex-direction:column">
         <div class="pt-row">
@@ -304,6 +329,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button type="button" class="pt" onclick="swTab(this,'rp1')">Reports</button>
           <button type="button" class="pt" onclick="swTab(this,'vl1')">Validate</button>
           <button type="button" class="pt" onclick="swTab(this,'sb1')">Submit</button>
+          <button type="button" class="pt" id="tab-ad1" onclick="swTab(this,'ad1')" style="display:none">Admin</button>
         </div>
         <div class="pane" id="t-ov1"></div>
         <div class="pane" id="t-tr1" style="display:none"></div>
@@ -312,6 +338,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div class="pane" id="t-rp1" style="display:none"></div>
         <div class="pane" id="t-vl1" style="display:none"></div>
         <div class="pane" id="t-sb1" style="display:none"></div>
+        <div class="pane" id="t-ad1" style="display:none"></div>
       </div>
       <div id="two-pin" style="display:none;flex-direction:column">
         <div class="pt-row">
@@ -322,6 +349,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button type="button" class="pt" onclick="swTab(this,'rp2')">Reports</button>
           <button type="button" class="pt" onclick="swTab(this,'vl2')">Validate</button>
           <button type="button" class="pt" onclick="swTab(this,'sb2')">Submit</button>
+          <button type="button" class="pt" id="tab-ad2" onclick="swTab(this,'ad2')" style="display:none">Admin</button>
         </div>
         <div class="pane" id="t-cmp"></div>
         <div class="pane" id="t-tra" style="display:none"></div>
@@ -330,6 +358,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div class="pane" id="t-rp2" style="display:none"></div>
         <div class="pane" id="t-vl2" style="display:none"></div>
         <div class="pane" id="t-sb2" style="display:none"></div>
+        <div class="pane" id="t-ad2" style="display:none"></div>
       </div>
     </div>
   </div>
@@ -394,6 +423,9 @@ function escapeHtml(value){
 }
 function escapeHtmlWithBreaks(value){
   return escapeHtml(value).replace(/\n/g,'<br>');
+}
+function quoteJsArg(value){
+  return `'${String(value??'').replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/\r/g,'\\r').replace(/\n/g,'\\n')}'`;
 }
 // Simple anonymous fingerprint to prevent obvious double-votes (not auth)
 function getVoterFp(){
@@ -689,11 +721,13 @@ const draftReportLocations={};
 let ANNOTATIONS=[];
 const OPEN_ANNOTATION_PANELS=new Set();
 const LOCAL_ANNOTATION_KEY='blt_annotations_local';
+let adminMode=false;
 const REDUCED_MOTION=window.matchMedia('(prefers-reduced-motion: reduce)');
 function buildURL(){const base=`${window.location.origin}${window.location.pathname}`;const params=new URLSearchParams();if(pinA) params.set('a',encodeNSA(pinA));if(pinB) params.set('b',encodeNSA(pinB));params.set('m',curM);params.set('y',YEARS[curYI]);params.set('lvl',benchMode);if(gapMode)params.set('gap','1');if(blindSpotsOnly)params.set('blind','1');return `${base}?${params.toString()}`;}
 function encodeNSA(name){return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');}
 function decodeNSA(slug){if(!slug)return null;const lower=slug.replace(/-/g,' ');for(const k of Object.keys(BASE)){if(k.toLowerCase()===lower)return k;if(k.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()===lower)return k;}return null;}
-function loadFromURL(){try{const p=new URLSearchParams(window.location.search);const a=p.get('a'),b=p.get('b'),m=p.get('m'),y=p.get('y'),lvl=p.get('lvl');if(a){const k=decodeNSA(a);if(k)pinA=k;}if(b){const k=decodeNSA(b);if(k)pinB=k;}if(m&&MCFG[m])curM=m;if(y){const yi=YEARS.indexOf(parseInt(y));if(yi>=0)curYI=yi;}if(lvl&&LEVEL_META[lvl])benchMode=lvl;gapMode=p.get('gap')==='1';blindSpotsOnly=p.get('blind')==='1';if(blindSpotsOnly)gapMode=true;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();if(pinA||pinB){updatePinBar();updatePinStyles();refreshSide();const btn=document.querySelector(`.mtab[data-m="${curM}"]`);if(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}document.getElementById('yr-slider').value=curYI;document.getElementById('cur-yr').textContent=YEARS[curYI];}}catch(e){}}
+function updateAdminUI(){const badge=document.getElementById('admin-badge');if(badge)badge.style.display=adminMode?'inline-flex':'none';['tab-ad1','tab-ad2'].forEach(id=>{const tab=document.getElementById(id);if(tab)tab.style.display=adminMode?'inline-flex':'none';});const noPinAdmin=document.getElementById('no-pin-admin');if(noPinAdmin)noPinAdmin.style.display=adminMode?'flex':'none';}
+function loadFromURL(){try{const p=new URLSearchParams(window.location.search);const a=p.get('a'),b=p.get('b'),m=p.get('m'),y=p.get('y'),lvl=p.get('lvl');adminMode=p.get('admin')==='1';if(a){const k=decodeNSA(a);if(k)pinA=k;}if(b){const k=decodeNSA(b);if(k)pinB=k;}if(m&&MCFG[m])curM=m;if(y){const yi=YEARS.indexOf(parseInt(y));if(yi>=0)curYI=yi;}if(lvl&&LEVEL_META[lvl])benchMode=lvl;gapMode=p.get('gap')==='1';blindSpotsOnly=p.get('blind')==='1';if(blindSpotsOnly)gapMode=true;updateAdminUI();updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();if(pinA||pinB){updatePinBar();updatePinStyles();refreshSide();const btn=document.querySelector(`.mtab[data-m="${curM}"]`);if(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}document.getElementById('yr-slider').value=curYI;document.getElementById('cur-yr').textContent=YEARS[curYI];}}catch(e){}}
 function updateShareStrip(){const url=buildURL();document.getElementById('share-url-inline').textContent=url;document.getElementById('share-url-inline').title=url;if(pinA||pinB){document.getElementById('share-strip').classList.add('visible');}else{document.getElementById('share-strip').classList.remove('visible');}}
 function copyURL(){const url=buildURL();navigator.clipboard.writeText(url).then(()=>{const b=document.getElementById('copied-badge');b.style.display='block';setTimeout(()=>b.style.display='none',2000);}).catch(()=>toast('URL: '+url));}
 function openShare(){const url=buildURL();document.getElementById('share-url-box').textContent=url;const parts=[];if(pinA) parts.push(pinA.split('/')[0]);if(pinB) parts.push(pinB.split('/')[0]);const levelBits=benchMode==='neighborhood'?'Local context':LEVEL_META[benchMode].short;const viewBits=gapMode?`Gap view${blindSpotsOnly?' · blind spots only':''}`:MCFG[curM].label;const desc=parts.length===2?`Comparing ${parts[0]} vs ${parts[1]} · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`:parts.length===1?`${parts[0]} · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`:`Baltimore health map · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`;document.getElementById('share-desc').textContent=desc;document.getElementById('share-modal').setAttribute('aria-hidden','false');document.getElementById('share-modal').classList.add('open');}
@@ -730,8 +764,8 @@ function updatePinStyles(){if(!geo)return;geo.eachLayer(l=>{const name=geoName(l
 function unpin(s){if(s==='a'){pinA=null;activeSlot='a';}else{pinB=null;activeSlot='b';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
 function clearPin(evt,s){if(evt)evt.stopPropagation();unpin(s);}
 function focusSlot(s){activeSlot=s;updatePinBar();}
-function refreshSide(){updatePinBar();if(!pinA&&!pinB){document.getElementById('no-pin').style.display='flex';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='none';return;}if(pinA&&!pinB){document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='flex';document.getElementById('two-pin').style.display='none';renderOne();}else{document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='flex';renderTwo();}}
-function swTab(btn,tab){const group=btn.closest('.pt-row');group.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const allPanes=['t-ov1','t-tr1','t-dt1','t-gap1','t-rp1','t-vl1','t-sb1','t-cmp','t-tra','t-det','t-gap2','t-rp2','t-vl2','t-sb2'];allPanes.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});const el=document.getElementById('t-'+tab);if(el){el.style.display='flex';el.style.flexDirection='column';}if(tab==='tra')drawTrajChart();}
+function refreshSide(){updatePinBar();if(!pinA&&!pinB){document.getElementById('no-pin').style.display='flex';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='none';if(adminMode)renderAdminPanel([], 'no-pin-admin');return;}if(pinA&&!pinB){document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='flex';document.getElementById('two-pin').style.display='none';renderOne();}else{document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='flex';renderTwo();}}
+function swTab(btn,tab){const group=btn.closest('.pt-row');group.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const allPanes=['t-ov1','t-tr1','t-dt1','t-gap1','t-rp1','t-vl1','t-sb1','t-ad1','t-cmp','t-tra','t-det','t-gap2','t-rp2','t-vl2','t-sb2','t-ad2'];allPanes.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});const el=document.getElementById('t-'+tab);if(el){el.style.display='flex';el.style.flexDirection='column';}if(tab==='tra')drawTrajChart();}
 function normalizeNeighborhood(name){return String(name||'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/[^a-z0-9]+/g,' ').trim();}
 function matchNeighborhoodKey(name){if(!name)return null;const direct=findK(name);if(direct)return direct;const target=normalizeNeighborhood(name);for(const k of Object.keys(BASE)){const norm=normalizeNeighborhood(k);if(norm===target||norm.includes(target)||target.includes(norm))return k;}return null;}
 function shortNeighborhood(name){const key=matchNeighborhoodKey(name)||name||'Baltimore neighborhood';return key.split('/')[0];}
@@ -845,7 +879,7 @@ function renderAnnotationPanel(nsa,context,title){
   const isOpen=OPEN_ANNOTATION_PANELS.has(stateKey);
   const notes=annotationsForContext(nsa,context);
   const defaultDate=new Date().toISOString().slice(0,10);
-  return `<div class="context-shell"><button type="button" class="context-btn" onclick="toggleAnnotationPanel(${JSON.stringify(nsa)},${JSON.stringify(context)})" aria-expanded="${isOpen?'true':'false'}" aria-controls="${domId}" aria-label="${annotationButtonLabel(context)}"><span>Add context</span>${notes.length?`<span class="context-count">${notes.length}</span>`:''}</button>${isOpen?`<div class="context-panel" id="${domId}"><div class="context-copy">${annotationIntro(context,title)}</div>${notes.length?`<div class="annotation-list">${notes.map(note=>`<div class="annotation-card"><div class="annotation-kicker">Human insight — not official data</div><div class="annotation-body">${escapeHtmlWithBreaks(note.body)}</div><div class="annotation-meta">${annotationRoleMarkup(note.authorRole)}<span>${escapeHtml(formatAnnotationDate(note.createdAt))}</span></div></div>`).join('')}</div>`:`<div class="annotation-empty">No local context has been added yet.</div>`}<form class="annotation-form" id="${domId}-form" data-nsa="${escapeHtml(nsa)}" data-context="${escapeHtml(context)}" onsubmit="submitAnnotation('${domId}-form');return false;"><div><label class="rfl" for="${domId}-body">Context note</label><textarea class="rft" id="${domId}-body" name="annotation_body" placeholder="${escapeHtml(annotationPlaceholder(context))}" required></textarea></div><div class="annotation-grid"><div><label class="rfl" for="${domId}-role">Your role</label><select class="rfs" id="${domId}-role" name="annotation_role" autocomplete="off"><option>Resident</option><option>Community organization</option><option>Digital Navigator</option><option>Business owner</option><option>City staff</option><option>Anonymous</option></select></div><div><label class="rfl" for="${domId}-date">Date observed</label><input class="rfs" id="${domId}-date" name="annotation_date" type="date" value="${defaultDate}"></div></div><button type="submit" class="rfb annotation-submit">Save context</button></form></div>`:''}</div>`;
+  return `<div class="context-shell"><button type="button" class="context-btn" onclick="toggleAnnotationPanel(${quoteJsArg(nsa)},${quoteJsArg(context)})" aria-expanded="${isOpen?'true':'false'}" aria-controls="${domId}" aria-label="${annotationButtonLabel(context)}"><span>Add context</span>${notes.length?`<span class="context-count">${notes.length}</span>`:''}</button>${isOpen?`<div class="context-panel" id="${domId}"><div class="context-copy">${annotationIntro(context,title)}</div>${notes.length?`<div class="annotation-list">${notes.map(note=>`<div class="annotation-card"><div class="annotation-kicker">Human insight — not official data</div><div class="annotation-body">${escapeHtmlWithBreaks(note.body)}</div><div class="annotation-meta">${annotationRoleMarkup(note.authorRole)}<span>${escapeHtml(formatAnnotationDate(note.createdAt))}</span></div></div>`).join('')}</div>`:`<div class="annotation-empty">No local context has been added yet.</div>`}<form class="annotation-form" id="${domId}-form" data-nsa="${escapeHtml(nsa)}" data-context="${escapeHtml(context)}" onsubmit="submitAnnotation('${domId}-form');return false;"><div><label class="rfl" for="${domId}-body">Context note</label><textarea class="rft" id="${domId}-body" name="annotation_body" placeholder="${escapeHtml(annotationPlaceholder(context))}" required></textarea></div><div class="annotation-grid"><div><label class="rfl" for="${domId}-role">Your role</label><select class="rfs" id="${domId}-role" name="annotation_role" autocomplete="off"><option>Resident</option><option>Community organization</option><option>Digital Navigator</option><option>Business owner</option><option>City staff</option><option>Anonymous</option></select></div><div><label class="rfl" for="${domId}-date">Date observed</label><input class="rfs" id="${domId}-date" name="annotation_date" type="date" value="${defaultDate}"></div></div><button type="submit" class="rfb annotation-submit">Save context</button></form></div>`:''}</div>`;
 }
 async function submitAnnotation(formId){
   const form=document.getElementById(formId);
@@ -878,6 +912,76 @@ async function submitAnnotation(formId){
   toast('Context note saved.');
   return false;
 }
+function reportAnnotationCount(report){return annotationsForContext(report.nsa,annotationContext('report',report.trackingId||String(report.id))).length;}
+function isQaArtifactText(text){return /\bqa\b|\btest\b|\bcodex\b/i.test(String(text||''));}
+function isQaReport(report){return String(report.trackingId||'')==='BLT-55AE169F'||isQaArtifactText(report.title)||isQaArtifactText(report.description);}
+function isQaAnnotation(note){return isQaArtifactText(note.body)||String(note.metric||'').includes('BLT-55AE169F');}
+function sqlLiteral(value){return `'${String(value??'').replace(/'/g,"''")}'`;}
+function copyAdminSql(sql,message='SQL copied to clipboard.'){
+  navigator.clipboard.writeText(sql).then(()=>toast(message)).catch(()=>toast(sql));
+}
+function scopedReports(neighborhoods=[]){
+  if(!neighborhoods.length)return [...REPORTS];
+  const selected=new Set(neighborhoods.map(name=>matchNeighborhoodKey(name)||name).filter(Boolean));
+  return REPORTS.filter(report=>selected.has(matchNeighborhoodKey(report.nsa)||report.nsa));
+}
+function scopedAnnotations(neighborhoods=[]){
+  if(!neighborhoods.length)return [...ANNOTATIONS];
+  const selected=new Set(neighborhoods.map(name=>matchNeighborhoodKey(name)||name).filter(Boolean));
+  return ANNOTATIONS.filter(note=>selected.has(matchNeighborhoodKey(note.nsa)||note.nsa));
+}
+function reportCleanupSql(report){
+  if(!isUuid(report.id))return '-- This report only exists in local demo mode.\n-- There is nothing to clean up in Supabase for this record.';
+  return `begin;\ndelete from public.votes where report_id = ${sqlLiteral(report.id)};\ndelete from public.annotations where metric = ${sqlLiteral(annotationContext('report',report.trackingId||String(report.id)))};\ndelete from public.reports where id = ${sqlLiteral(report.id)};\ncommit;`;
+}
+function reportStatusSql(report,status){
+  if(!isUuid(report.id))return '-- This report only exists in local demo mode.\n-- Status changes only apply to live Supabase records.';
+  return `update public.reports\nset status = ${sqlLiteral(status)}\nwhere id = ${sqlLiteral(report.id)};`;
+}
+function annotationCleanupSql(note){
+  if(!isUuid(note.id))return '-- This annotation only exists in local demo mode.\n-- There is nothing to delete in Supabase for this note.';
+  return `delete from public.annotations where id = ${sqlLiteral(note.id)};`;
+}
+function qaCleanupSql(neighborhoods=[]){
+  const reports=scopedReports(neighborhoods).filter(isQaReport).filter(report=>isUuid(report.id));
+  const annotations=scopedAnnotations(neighborhoods).filter(isQaAnnotation).filter(note=>isUuid(note.id));
+  if(!reports.length&&!annotations.length)return '-- No QA-tagged live artifacts were detected in this scope.';
+  const reportIds=reports.map(report=>sqlLiteral(report.id));
+  const reportContexts=reports.map(report=>sqlLiteral(annotationContext('report',report.trackingId||String(report.id))));
+  const annotationIds=annotations.map(note=>sqlLiteral(note.id));
+  const steps=['begin;'];
+  if(reportIds.length)steps.push(`delete from public.votes where report_id in (${reportIds.join(', ')});`);
+  if(reportContexts.length||annotationIds.length){
+    const clauses=[];
+    if(annotationIds.length)clauses.push(`id in (${annotationIds.join(', ')})`);
+    if(reportContexts.length)clauses.push(`metric in (${reportContexts.join(', ')})`);
+    steps.push(`delete from public.annotations where ${clauses.join(' or ')};`);
+  }
+  if(reportIds.length)steps.push(`delete from public.reports where id in (${reportIds.join(', ')});`);
+  steps.push('commit;');
+  return steps.join('\n');
+}
+function renderAdminPanel(neighborhoods,targetId){
+  const target=document.getElementById(targetId);
+  if(!target)return;
+  const reports=scopedReports(neighborhoods).sort((a,b)=>new Date(b.createdAt||0).getTime()-new Date(a.createdAt||0).getTime());
+  const annotations=scopedAnnotations(neighborhoods).sort((a,b)=>new Date(b.createdAt||0).getTime()-new Date(a.createdAt||0).getTime());
+  const scopeLabel=neighborhoods.length===2?`${shortNeighborhood(neighborhoods[0])} and ${shortNeighborhood(neighborhoods[1])}`:neighborhoods.length===1?shortNeighborhood(neighborhoods[0]):'All neighborhoods';
+  const qaReports=reports.filter(isQaReport);
+  const qaNotes=annotations.filter(isQaAnnotation);
+  const statusCounts={open:0,review:0,verified:0,closed:0};
+  reports.forEach(report=>{statusCounts[report.status]=(statusCounts[report.status]||0)+1;});
+  const liveMode=db?'Live Supabase connected':'Browser-local demo data';
+  const globalActions=`<div class="admin-actions"><button type="button" class="admin-btn primary" onclick="copyAdminSql(${quoteJsArg(qaCleanupSql(neighborhoods))},${quoteJsArg('QA cleanup SQL copied.')})">Copy QA cleanup SQL</button><button type="button" class="admin-btn" onclick="copyAdminSql(${quoteJsArg(reports.map(report=>`${report.trackingId} · ${report.nsa} · ${report.status}`).join('\n')||'-- No reports in this scope.')},${quoteJsArg('Report list copied.')})">Copy report list</button></div>`;
+  const reportCards=reports.length?reports.map(report=>{
+    const annotationCount=reportAnnotationCount(report);
+    const pills=[`<span class="admin-pill">${escapeHtml(report.status)}</span>`, annotationCount?`<span class="admin-pill">${annotationCount} notes</span>`:'', isQaReport(report)?`<span class="admin-pill qa">QA artifact</span>`:''].filter(Boolean).join('');
+    const moderationActions=`<div class="admin-actions"><button type="button" class="admin-btn" onclick="copyAdminSql(${quoteJsArg(reportStatusSql(report,'review'))},${quoteJsArg('Review SQL copied.')})">Copy review SQL</button><button type="button" class="admin-btn" onclick="copyAdminSql(${quoteJsArg(reportStatusSql(report,'verified'))},${quoteJsArg('Verify SQL copied.')})">Copy verify SQL</button><button type="button" class="admin-btn" onclick="copyAdminSql(${quoteJsArg(reportStatusSql(report,'closed'))},${quoteJsArg('Close SQL copied.')})">Copy close SQL</button><button type="button" class="admin-btn warn" onclick="copyAdminSql(${quoteJsArg(reportCleanupSql(report))},${quoteJsArg('Cleanup SQL copied.')})">Copy cleanup SQL</button></div>`;
+    return `<div class="admin-card"><div class="admin-card-top"><div><div class="admin-card-title">${escapeHtml(report.title)}</div><div class="admin-meta"><span>${escapeHtml(report.trackingId)}</span><span>${escapeHtml(report.nsa)}</span><span>${escapeHtml(report.submitted)}</span></div></div><div class="admin-pills">${pills}</div></div><div class="admin-note">${escapeHtml(report.description)}</div><div class="admin-inline">${escapeHtml(String(report.id))}</div>${moderationActions}</div>`;
+  }).join(''):`<div class="admin-empty">No reports in this scope yet.</div>`;
+  const annotationCards=qaNotes.length?`<div class="admin-card"><div class="admin-card-title">QA annotations detected</div><div class="admin-note">These notes look like test artifacts and can be cleaned up separately if you want to keep the live demo tidy.</div><div class="admin-actions">${qaNotes.slice(0,4).map(note=>`<button type="button" class="admin-btn warn" onclick="copyAdminSql(${quoteJsArg(annotationCleanupSql(note))},${quoteJsArg('Annotation cleanup SQL copied.')})">Delete ${escapeHtml(formatAnnotationDate(note.createdAt))}</button>`).join('')}</div></div>`:'';
+  target.innerHTML=`<div class="admin-panel"><div class="shd">Admin</div><div class="admin-note"><strong style="color:var(--tx)">Moderation helper only.</strong> This public prototype does not expose destructive database actions from the browser. Use these copy buttons to paste vetted SQL into Supabase SQL Editor. Scope: <strong style="color:var(--tx)">${escapeHtml(scopeLabel)}</strong>. Backend: <strong style="color:var(--tx)">${escapeHtml(liveMode)}</strong>.</div><div class="admin-grid"><div class="admin-stat"><div class="admin-stat-label">Reports</div><div class="admin-stat-value">${reports.length}</div></div><div class="admin-stat"><div class="admin-stat-label">Annotations</div><div class="admin-stat-value">${annotations.length}</div></div><div class="admin-stat"><div class="admin-stat-label">Open / review</div><div class="admin-stat-value">${(statusCounts.open||0)+(statusCounts.review||0)}</div></div><div class="admin-stat"><div class="admin-stat-label">QA artifacts</div><div class="admin-stat-value">${qaReports.length+qaNotes.length}</div></div></div>${globalActions}<div class="admin-list">${reportCards}${annotationCards}</div></div>`;
+}
 loadLocalAnnotations();
 resetFallbackReports();
 function setBenchMode(mode){if(!LEVEL_META[mode]||benchMode===mode)return;benchMode=mode;refreshSide();updateShareStrip();}
@@ -906,6 +1010,7 @@ function renderOne(){
   renderReportsFor(p,'t-rp1');
   document.getElementById('t-vl1').innerHTML=makeValidationPanel([p],'vl1');
   document.getElementById('t-sb1').innerHTML=makeSubmitForm('sb1',p);
+  if(adminMode)renderAdminPanel([p],'t-ad1');
 }
 function renderTwo(){
   const p1=pinA,p2=pinB,yi=curYI,v1=yv(p1,'hi',yi),v2=yv(p2,'hi',yi),gap=Math.abs(v1-v2),compHi=benchComparison('hi',yi),compText=benchLabel();
@@ -917,6 +1022,7 @@ function renderTwo(){
   renderReportsFor2(p1,p2,'t-rp2');
   document.getElementById('t-vl2').innerHTML=makeValidationPanel([p1,p2],'vl2');
   document.getElementById('t-sb2').innerHTML=makeSubmitForm('sb2',p1,p2);
+  if(adminMode)renderAdminPanel([p1,p2],'t-ad2');
   requestAnimationFrame(drawTrajChart);
 }
 function drawTrajChart(){
