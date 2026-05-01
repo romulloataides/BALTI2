@@ -46,6 +46,13 @@ alter table public.reports     enable row level security;
 alter table public.votes       enable row level security;
 alter table public.annotations enable row level security;
 
+drop policy if exists "public read reports" on public.reports;
+drop policy if exists "public insert reports" on public.reports;
+drop policy if exists "public read votes" on public.votes;
+drop policy if exists "public insert votes" on public.votes;
+drop policy if exists "public read annotations" on public.annotations;
+drop policy if exists "public insert annotations" on public.annotations;
+
 create policy "public read reports"           on public.reports     for select using (true);
 create policy "public insert reports"         on public.reports     for insert with check (true);
 create policy "public read votes"             on public.votes       for select using (true);
