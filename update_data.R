@@ -979,62 +979,78 @@ load_cdc_life_expectancy_benchmark_series <- function(years = 2016:2023) {
 
 load_cdc_lead_benchmark_series <- function(years = 2016:2023) {
   workbook_url <- "https://www.cdc.gov/lead-prevention/media/files/2025/08/2017-2022-cbls-national-data-508-1.xlsx"
+  maryland_annual_report_backfill <- tibble(
+    Year = c(2016L, 2023L),
+    la = c(1.8, 1.2)
+  ) %>%
+    filter(Year %in% years)
+  maryland_backfill_note <- paste(
+    "Official Maryland annual-report backfills for `la`: 2016 = 1.8% and",
+    "2023 = 1.2%, derived from statewide counts of children age 0-72 months",
+    "with BLL >=5 µg/dL divided by children tested."
+  )
+  maryland_tbl <- maryland_annual_report_backfill
+  state_source_parts <- maryland_backfill_note
 
   if (!requireNamespace("readxl", quietly = TRUE)) {
-    warning("readxl is required for CDC lead benchmark imports. Install readxl to enable Maryland `la` benchmarks.")
-    return(empty_benchmark_import())
-  }
+    warning("readxl is required for CDC lead benchmark workbook imports. Proceeding with Maryland annual-report `la` backfills only.")
+  } else {
+    tmp_path <- tempfile(fileext = ".xlsx")
+    on.exit(unlink(tmp_path), add = TRUE)
 
-  tmp_path <- tempfile(fileext = ".xlsx")
-  on.exit(unlink(tmp_path), add = TRUE)
+    raw <- tryCatch(
+      {
+        response <- GET(workbook_url, write_disk(tmp_path, overwrite = TRUE), timeout(120))
+        stop_for_status(response)
+        readxl::read_excel(tmp_path, skip = 2)
+      },
+      error = function(e) {
+        warning(paste("CDC lead benchmark refresh failed:", conditionMessage(e)))
+        tibble()
+      }
+    )
 
-  raw <- tryCatch(
-    {
-      response <- GET(workbook_url, write_disk(tmp_path, overwrite = TRUE), timeout(120))
-      stop_for_status(response)
-      readxl::read_excel(tmp_path, skip = 2)
-    },
-    error = function(e) {
-      warning(paste("CDC lead benchmark refresh failed:", conditionMessage(e)))
-      tibble()
+    if (nrow(raw)) {
+      normalized_cols <- tibble(
+        source_col = names(raw),
+        normalized = normalize_name(names(raw))
+      )
+
+      year_col <- normalized_cols$source_col[normalized_cols$normalized == "year"][1]
+      state_col <- normalized_cols$source_col[normalized_cols$normalized == "state"][1]
+      pct5_col <- normalized_cols$source_col[
+        normalized_cols$normalized == normalize_name("Percent of Children with Confirmed BLLs ≥5 µg/dL")
+      ][1]
+
+      if (any(is.na(c(year_col, state_col, pct5_col)))) {
+        warning("CDC lead benchmark workbook schema changed unexpectedly; using Maryland annual-report `la` backfills for unsupported years.")
+      } else {
+        workbook_tbl <- raw %>%
+          transmute(
+            Year = parse_year_value(.data[[year_col]]),
+            State = str_squish(as.character(.data[[state_col]])),
+            pct5 = as.character(.data[[pct5_col]])
+          ) %>%
+          filter(
+            State == "Maryland",
+            Year %in% years
+          ) %>%
+          transmute(
+            Year,
+            la = coerce_numeric_value(pct5)
+          ) %>%
+          filter(!is.na(la))
+
+        maryland_tbl <- bind_rows(workbook_tbl, maryland_annual_report_backfill) %>%
+          arrange(Year) %>%
+          distinct(Year, .keep_all = TRUE)
+        state_source_parts <- c(
+          paste("CDC Childhood Blood Lead Surveillance workbook:", workbook_url),
+          maryland_backfill_note
+        )
+      }
     }
-  )
-
-  if (!nrow(raw)) {
-    return(empty_benchmark_import())
   }
-
-  normalized_cols <- tibble(
-    source_col = names(raw),
-    normalized = normalize_name(names(raw))
-  )
-
-  year_col <- normalized_cols$source_col[normalized_cols$normalized == "year"][1]
-  state_col <- normalized_cols$source_col[normalized_cols$normalized == "state"][1]
-  pct5_col <- normalized_cols$source_col[
-    normalized_cols$normalized == normalize_name("Percent of Children with Confirmed BLLs ≥5 µg/dL")
-  ][1]
-
-  if (any(is.na(c(year_col, state_col, pct5_col)))) {
-    warning("CDC lead benchmark workbook schema changed unexpectedly; skipping Maryland `la` benchmark refresh.")
-    return(empty_benchmark_import())
-  }
-
-  maryland_tbl <- raw %>%
-    transmute(
-      Year = parse_year_value(.data[[year_col]]),
-      State = str_squish(as.character(.data[[state_col]])),
-      pct5 = as.character(.data[[pct5_col]])
-    ) %>%
-    filter(
-      State == "Maryland",
-      Year %in% years
-    ) %>%
-    transmute(
-      Year,
-      la = coerce_numeric_value(pct5)
-    ) %>%
-    filter(!is.na(la))
 
   # CDC's public NHANES lead tables do not provide an annual national surveillance
   # percentage that is method-matched to the Maryland tested-children series. We
@@ -1051,7 +1067,7 @@ load_cdc_lead_benchmark_series <- function(years = 2016:2023) {
     federal = federal_proxy_tbl,
     metrics = "la",
     sources = c(
-      state = workbook_url,
+      state = paste(state_source_parts, collapse = " "),
       federal = paste(
         "NHANES cycle-level proxy inferred from the CDC blood lead reference value",
         "(97.5th percentile of U.S. children ages 1-5 in NHANES 2015-2018)"
@@ -1877,6 +1893,13 @@ json_ready_data <- list(
               "State-only official benchmark coverage is available for: ",
               paste(state_only_real_benchmark_metrics, collapse = ", "),
               "."
+            )
+          },
+          if ("la" %in% state_real_benchmark_metrics) {
+            paste(
+              "State `la` combines the CDC childhood blood lead workbook for",
+              "2017-2022 with official Maryland annual-report backfills for",
+              "2016 and 2023."
             )
           },
           if (length(federal_only_real_benchmark_metrics) > 0) {

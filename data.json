@@ -13,7 +13,7 @@
     ],
     "provisional": true,
     "note": "BNIA ArcGIS services supplied: hs, la, le, un, va. CDC 500 Cities / PLACES tract releases supplied `as` as an adult current asthma prevalence proxy, aggregated to CSAs using tract centroid assignment and population weighting. The dashboard `hi` series is derived from official component metrics (le, as, la, va, pv, un, hs) using yearly min-max normalization and equal weighting. Missing metrics still fall back to existing data.json values and modeled series where needed.",
-    "benchmark_note": "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks use real official series for: as, hs, le, pv, un, va. State-only official benchmark coverage is available for: la. Federal `la` uses a clearly labeled NHANES cycle-level proxy: 2.5% of U.S. children ages 1-5 above the current CDC blood lead reference value, inferred from the BLRV being defined as the 97.5th percentile of NHANES 2015-2018. It is not an annual surveillance rate and is not directly method-matched to Maryland's tested-children series. Remaining benchmark cells still fall back to the provisional scaffold. Benchmark `hi` is derived from available real benchmark components when enough official inputs are present.",
+    "benchmark_note": "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks use real official series for: as, hs, le, pv, un, va. State-only official benchmark coverage is available for: la. State `la` combines the CDC childhood blood lead workbook for 2017-2022 with official Maryland annual-report backfills for 2016 and 2023. Federal `la` uses a clearly labeled NHANES cycle-level proxy: 2.5% of U.S. children ages 1-5 above the current CDC blood lead reference value, inferred from the BLRV being defined as the 97.5th percentile of NHANES 2015-2018. It is not an annual surveillance rate and is not directly method-matched to Maryland's tested-children series. Remaining benchmark cells still fall back to the provisional scaffold. Benchmark `hi` is derived from available real benchmark components when enough official inputs are present.",
     "source_files": {
       "neighborhood": {},
       "neighborhood_services": [
@@ -38,7 +38,7 @@
         "fred": "https://fred.stlouisfed.org/series/MDUR",
         "cdc_asthma": "CDC PLACES / 500 Cities aggregate queries (2018-2023)",
         "cdc_life_expectancy": "https://www.cdc.gov/nchs/data-visualization/state-life-expectancy/data/USLT-2018-2022.csv",
-        "cdc_lead": "https://www.cdc.gov/lead-prevention/media/files/2025/08/2017-2022-cbls-national-data-508-1.xlsx"
+        "cdc_lead": "CDC Childhood Blood Lead Surveillance workbook: https://www.cdc.gov/lead-prevention/media/files/2025/08/2017-2022-cbls-national-data-508-1.xlsx Official Maryland annual-report backfills for `la`: 2016 = 1.8% and 2023 = 1.2%, derived from statewide counts of children age 0-72 months with BLL >=5 µg/dL divided by children tested."
       },
       "federal_benchmarks": {
         "acs": "ACS 5-year United States estimates",
@@ -7299,10 +7299,10 @@
     },
     "state": {
       "2016": {
-        "hi": 75.2,
+        "hi": 71.1,
         "le": 73.9,
         "as": 11.6,
-        "la": 0,
+        "la": 1.8,
         "va": 10.1,
         "pv": 9.9,
         "un": 4.2,
@@ -7398,7 +7398,8 @@
         "hs": 91,
         "fd": 51.3,
         "gs": 23.7,
-        "cr": 55.2
+        "cr": 55.2,
+        "la": 1.2
       }
     },
     "federal": {
