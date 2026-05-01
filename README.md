@@ -1,10 +1,10 @@
-# Baltimore Dashboard
+# BALTI2
 
-Public GitHub Pages deployment for the Baltimore neighborhood health dashboard.
+BALTI2 is the new home for the Baltimore neighborhood health dashboard.
 
-Live site: `https://romulloataides.github.io/Baltimore-Dashboard/`
+Previous GitHub Pages site: `https://romulloataides.github.io/Baltimore-Dashboard/`
 
-GitHub repo: `https://github.com/romulloataides/Baltimore-Dashboard`
+GitHub repo: `https://github.com/romulloataides/BALTI2`
 
 ## Current architecture
 
@@ -15,7 +15,7 @@ GitHub repo: `https://github.com/romulloataides/Baltimore-Dashboard`
 
 ## Deployment
 
-GitHub Pages is already enabled for this repository and serves the app from the repo root on the `main` branch.
+GitHub Pages was previously enabled on the predecessor repository and can be re-enabled here once BALTI2 is ready to publish.
 
 Published files:
 
@@ -27,7 +27,7 @@ Because `index.html` now fetches `data.json` and `csa_boundaries.geojson` at run
 
 ## GitHub Pages Setup Reference
 
-1. Create a new public GitHub repository, for example `baltimore-dashboard`.
+1. Create a public GitHub repository, for example `BALTI2`.
 2. Upload `index.html` from this folder to the root of the repo.
 3. In GitHub, open `Settings` -> `Pages`.
 4. Set `Source` to `Deploy from a branch`.
@@ -36,7 +36,7 @@ Because `index.html` now fetches `data.json` and `csa_boundaries.geojson` at run
 
 That kind of setup produces a site URL like:
 
-`https://YOUR_GITHUB_USERNAME.github.io/baltimore-dashboard/`
+`https://YOUR_GITHUB_USERNAME.github.io/BALTI2/`
 
 ## Next Build Steps
 
