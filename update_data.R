@@ -915,6 +915,12 @@ load_cdc_asthma_benchmark_series <- function(years = 2016:2023) {
 
 load_cdc_life_expectancy_benchmark_series <- function(years = 2016:2023) {
   csv_url <- "https://www.cdc.gov/nchs/data-visualization/state-life-expectancy/data/USLT-2018-2022.csv"
+  federal_fill_values <- tribble(
+    ~Year, ~le,
+    2016L, 78.7,
+    2017L, 78.6,
+    2023L, 78.4
+  )
 
   raw <- tryCatch(
     {
@@ -946,17 +952,27 @@ load_cdc_life_expectancy_benchmark_series <- function(years = 2016:2023) {
       !is.na(le)
     )
 
+  federal_tbl <- bind_rows(
+    cleaned %>%
+      filter(State == "United States") %>%
+      transmute(Year, le),
+    federal_fill_values %>% filter(Year %in% years)
+  ) %>%
+    arrange(Year) %>%
+    distinct(Year, .keep_all = TRUE)
+
   list(
     state = cleaned %>%
       filter(State == "Maryland") %>%
       transmute(Year, le),
-    federal = cleaned %>%
-      filter(State == "United States") %>%
-      transmute(Year, le),
+    federal = federal_tbl,
     metrics = "le",
     sources = c(
       state = csv_url,
-      federal = csv_url
+      federal = paste(
+        "CDC U.S. State Life Expectancy by Sex, 2018-2022 CSV plus",
+        "United States Life Tables 2016, 2017, and 2023 official totals"
+      )
     )
   )
 }

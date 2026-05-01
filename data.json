@@ -44,7 +44,7 @@
         "acs": "ACS 5-year United States estimates",
         "fred": "https://fred.stlouisfed.org/series/UNRATE",
         "cdc_asthma": "CDC PLACES aggregate queries (2018-2023)",
-        "cdc_life_expectancy": "https://www.cdc.gov/nchs/data-visualization/state-life-expectancy/data/USLT-2018-2022.csv"
+        "cdc_life_expectancy": "CDC U.S. State Life Expectancy by Sex, 2018-2022 CSV plus United States Life Tables 2016, 2017, and 2023 official totals"
       },
       "hazards": {},
       "poverty": "ACS 2022 tract estimates weighted to CSA"
@@ -7399,8 +7399,8 @@
     },
     "federal": {
       "2016": {
-        "hi": 73.5,
-        "le": 74.7,
+        "hi": 76.6,
+        "le": 78.7,
         "as": 10.8,
         "la": 0,
         "va": 12.2,
@@ -7412,8 +7412,8 @@
         "cr": 57.9
       },
       "2017": {
-        "hi": 74.6,
-        "le": 74.4,
+        "hi": 77.7,
+        "le": 78.6,
         "as": 9.8,
         "la": 0,
         "va": 12.2,
@@ -7495,7 +7495,8 @@
         "hs": 89.4,
         "fd": 52.1,
         "gs": 24.5,
-        "cr": 54.4
+        "cr": 54.4,
+        "le": 78.4
       }
     }
   }
