@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carrollton Ridge Pilot Submit</title>
+<meta name="description" content="Offline-friendly field intake form for the BALTI2 Carrollton Ridge pilot.">
+<style>
+:root{--bg:oklch(99% 0.004 255);--bg2:oklch(96.8% 0.008 255);--bg3:oklch(93.5% 0.012 255);--tx:oklch(20% 0.015 255);--t2:oklch(42% 0.012 255);--t3:oklch(58% 0.009 255);--br:oklch(88% 0.01 255);--brand:oklch(32% 0.09 255);--brand2:oklch(52% 0.11 255);--brandLt:oklch(95% 0.02 255);--accent:oklch(54% 0.14 35);--accentLt:oklch(96% 0.02 35);--success:oklch(58% 0.13 162);--successLt:oklch(96% 0.02 162);--warn:oklch(57% 0.11 68);--warnLt:oklch(97% 0.02 68)}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--tx);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body{padding:18px}
+a{color:inherit}
+button,input,select,textarea{font:inherit}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--brand2);outline-offset:2px}
+.shell{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.hero{padding:18px;border-radius:18px;background:linear-gradient(180deg,var(--accentLt),var(--bg));border:1px solid color-mix(in oklab,var(--accent) 20%,var(--bg))}
+.kicker{font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.title{font-size:30px;font-weight:700;line-height:1.1;margin-top:8px}
+.copy{font-size:15px;line-height:1.55;color:var(--t2);margin-top:10px;max-width:58ch}
+.status{display:flex;flex-wrap:wrap;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--bg);border:1px solid var(--br);font-size:12px;color:var(--t2)}
+.card{padding:16px;border-radius:16px;background:var(--bg);border:1px solid var(--br);display:flex;flex-direction:column;gap:12px}
+.card-title{font-size:18px;font-weight:600}
+.field{display:flex;flex-direction:column;gap:6px}
+.label{font-size:13px;font-weight:600;color:var(--t2)}
+.hint{font-size:12px;color:var(--t3);line-height:1.45}
+.input,.select,.textarea{width:100%;padding:12px 13px;border-radius:12px;border:1px solid var(--br);background:var(--bg2);color:var(--tx)}
+.textarea{min-height:110px;resize:vertical}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.focus-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.focus-btn{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:12px;border-radius:14px;border:1px solid var(--br);background:var(--bg2);color:var(--tx);cursor:pointer;text-align:left}
+.focus-btn strong{font-size:14px}
+.focus-btn span{font-size:12px;color:var(--t2);line-height:1.4}
+.focus-btn.active{background:var(--brandLt);border-color:color-mix(in oklab,var(--brand2) 24%,var(--bg));color:var(--brand)}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{padding:11px 14px;border-radius:999px;border:1px solid var(--br);background:var(--bg2);color:var(--tx);cursor:pointer}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--bg)}
+.btn.ghost{background:transparent}
+.sync-box{padding:14px;border-radius:14px;background:var(--bg2);border:1px solid var(--br);display:flex;flex-direction:column;gap:8px}
+.sync-line{font-size:13px;color:var(--t2);line-height:1.5}
+.success{padding:14px;border-radius:14px;background:var(--successLt);border:1px solid color-mix(in oklab,var(--success) 26%,var(--bg));display:none;flex-direction:column;gap:6px}
+.success strong{font-size:18px;color:var(--success)}
+.small{font-size:12px;color:var(--t3);line-height:1.45}
+@media (max-width: 720px){
+  body{padding:14px}
+  .title{font-size:24px}
+  .grid,.focus-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <div class="hero">
+    <div class="kicker">BALTI2 pilot intake</div>
+    <div class="title" id="hero-title">Carrollton Ridge field submit</div>
+    <div class="copy" id="hero-copy">This form is designed for quick phone-based intake. It keeps working after the first load, stores entries locally when you are offline, and syncs them to Supabase when the connection comes back.</div>
+  </div>
+
+  <div class="status">
+    <div class="pill" id="scope-pill">Scope: Carrollton Ridge / Franklin Square</div>
+    <div class="pill" id="network-pill">Checking connection…</div>
+    <div class="pill" id="queue-pill">Queued drafts: 0</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What issue are you documenting?</div>
+    <div class="focus-grid" id="focus-grid">
+      <button type="button" class="focus-btn active" data-focus="Illegal dumping">
+        <strong>Illegal dumping</strong>
+        <span>Trash, dumping, sanitation problems, or hazard build-up.</span>
+      </button>
+      <button type="button" class="focus-btn" data-focus="Broadband access">
+        <strong>Broadband access</strong>
+        <span>Internet reliability, Wi-Fi, hotspots, devices, or digital access gaps.</span>
+      </button>
+      <button type="button" class="focus-btn" data-focus="Other">
+        <strong>Other</strong>
+        <span>Anything else the pilot team needs to capture during the walk-through.</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Submit a pilot report</div>
+    <form id="pilot-form">
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="pilot-neighborhood">Neighborhood scope</label>
+          <input class="input" id="pilot-neighborhood" name="neighborhood" value="Southwest Baltimore" readonly>
+          <div class="hint">This pilot view is currently mapped to the BNIA CSA used in the dashboard data.</div>
+        </div>
+        <div class="field">
+          <label class="label" for="pilot-role">Your role</label>
+          <select class="select" id="pilot-role" name="role">
+            <option>Resident</option>
+            <option selected>Digital Navigator</option>
+            <option>Community organization</option>
+            <option>City staff</option>
+            <option>Anonymous</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field">
+          <label class="label" for="pilot-block">Approximate block or landmark</label>
+          <input class="input" id="pilot-block" name="block" placeholder="Example: 1800 block of West Pratt near the bus stop" autocomplete="street-address">
+        </div>
+        <div class="field">
+          <label class="label" for="pilot-severity">Urgency</label>
+          <select class="select" id="pilot-severity" name="severity">
+            <option>Low</option>
+            <option selected>Medium</option>
+            <option>High</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label" for="pilot-description">What happened?</label>
+        <textarea class="textarea" id="pilot-description" name="description" placeholder="Describe what you saw, who it affected, and what would make the issue feel resolved." required></textarea>
+      </div>
+
+      <div class="field">
+        <label class="label" for="pilot-observed">When was this observed?</label>
+        <input class="input" id="pilot-observed" name="observed" type="date">
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn primary">Save report</button>
+        <button type="button" class="btn" id="sync-btn">Sync queued drafts</button>
+        <a class="btn ghost" id="return-link" href="../?pilot=carrollton">Back to dashboard</a>
+      </div>
+    </form>
+
+    <div class="success" id="success-box">
+      <strong>Report captured</strong>
+      <div id="success-copy">The report was saved.</div>
+      <div class="small">If you were offline, this item will sync automatically when the connection returns.</div>
+    </div>
+  </div>
+
+  <div class="sync-box">
+    <div class="card-title" style="font-size:16px">How the prototype handles offline intake</div>
+    <div class="sync-line">If the network is unavailable, the form stores your report locally in the browser queue and gives you a temporary queue ID.</div>
+    <div class="sync-line">As soon as the page comes back online, the queue tries to post each report to Supabase and replaces the local draft with a real tracking ID.</div>
+    <div class="small">This is a prototype convenience layer, not a full audited offline sync engine yet.</div>
+  </div>
+</div>
+
+<script src="../supabase/config.js"></script>
+<script>
+const PILOT_QUEUE_KEY='balti2_submit_queue_v1';
+const PILOT_META={
+  carrollton:{
+    title:'Carrollton Ridge field submit',
+    scopeLabel:'Carrollton Ridge / Franklin Square',
+    nsa:'Southwest Baltimore'
+  }
+};
+let currentFocus='Illegal dumping';
+
+function byId(id){return document.getElementById(id);}
+function nowIsoDate(){return new Date().toISOString().slice(0,10);}
+function readQueue(){
+  try{
+    const parsed=JSON.parse(localStorage.getItem(PILOT_QUEUE_KEY)||'[]');
+    return Array.isArray(parsed)?parsed:[];
+  }catch(e){
+    return [];
+  }
+}
+function writeQueue(queue){localStorage.setItem(PILOT_QUEUE_KEY,JSON.stringify(queue));}
+function queueCount(){return readQueue().length;}
+function updateQueuePill(){byId('queue-pill').textContent=`Queued drafts: ${queueCount()}`;}
+function updateNetworkPill(){byId('network-pill').textContent=navigator.onLine?'Connection: online':'Connection: offline';}
+function activePilot(){
+  const params=new URLSearchParams(window.location.search);
+  const pilot=params.get('pilot');
+  return PILOT_META[pilot]||PILOT_META.carrollton;
+}
+function applyPilotCopy(){
+  const pilot=activePilot();
+  byId('hero-title').textContent=pilot.title;
+  byId('scope-pill').textContent=`Scope: ${pilot.scopeLabel}`;
+  byId('pilot-neighborhood').value=pilot.nsa;
+  byId('return-link').href=`../?pilot=${encodeURIComponent(new URLSearchParams(window.location.search).get('pilot')||'carrollton')}`;
+}
+function setFocus(focus){
+  currentFocus=focus;
+  document.querySelectorAll('.focus-btn').forEach(button=>button.classList.toggle('active',button.dataset.focus===focus));
+}
+function normalizeSeverity(raw){
+  const value=String(raw||'medium').toLowerCase();
+  if(value.startsWith('low'))return'low';
+  if(value.startsWith('high'))return'high';
+  return'medium';
+}
+function payloadFromForm(form){
+  const pilot=activePilot();
+  const formData=new FormData(form);
+  const block=formData.get('block')?.toString().trim()||'Approximate block not provided';
+  const description=formData.get('description')?.toString().trim()||'';
+  const observed=formData.get('observed')?.toString().trim()||'Undated';
+  const role=formData.get('role')?.toString().trim()||'Digital Navigator';
+  const severity=normalizeSeverity(formData.get('severity'));
+  const category=currentFocus==='Illegal dumping'?'Sanitation / trash':currentFocus==='Broadband access'?'Broadband access':'General';
+  return{
+    nsa:pilot.nsa,
+    category,
+    description:`[Pilot ${pilot.scopeLabel}] Focus: ${currentFocus}. Observed: ${observed}. Location: ${block}. ${description}`.trim(),
+    severity,
+    author_role:role.toLowerCase()
+  };
+}
+async function postReport(payload){
+  if(!window.SUPABASE_URL||!window.SUPABASE_ANON_KEY)throw new Error('Supabase config is missing.');
+  const response=await fetch(`${window.SUPABASE_URL}/rest/v1/reports`,{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      apikey:window.SUPABASE_ANON_KEY,
+      Authorization:`Bearer ${window.SUPABASE_ANON_KEY}`,
+      Prefer:'return=representation'
+    },
+    body:JSON.stringify(payload)
+  });
+  if(!response.ok){
+    const body=await response.text();
+    throw new Error(body||`Supabase error ${response.status}`);
+  }
+  const rows=await response.json();
+  return rows?.[0]||null;
+}
+function showSuccess(message){
+  const box=byId('success-box');
+  byId('success-copy').textContent=message;
+  box.style.display='flex';
+}
+async function flushQueue(){
+  if(!navigator.onLine||!queueCount())return;
+  const queue=readQueue();
+  const remaining=[];
+  for(const entry of queue){
+    try{
+      await postReport(entry.payload);
+    }catch(error){
+      remaining.push(entry);
+    }
+  }
+  writeQueue(remaining);
+  updateQueuePill();
+}
+async function handleSubmit(event){
+  event.preventDefault();
+  const form=event.currentTarget;
+  const payload=payloadFromForm(form);
+  if(!payload.description.trim()){
+    showSuccess('Please add a description before saving this report.');
+    return;
+  }
+  if(navigator.onLine){
+    try{
+      const row=await postReport(payload);
+      form.reset();
+      byId('pilot-observed').value=nowIsoDate();
+      showSuccess(`Saved to Supabase with tracking ID ${row?.tracking_id||'pending'}.`);
+      await flushQueue();
+      return;
+    }catch(error){}
+  }
+  const queue=readQueue();
+  const draftId=`QUEUE-${Date.now().toString(36).toUpperCase()}`;
+  queue.push({id:draftId,payload,queued_at:new Date().toISOString()});
+  writeQueue(queue);
+  updateQueuePill();
+  form.reset();
+  byId('pilot-observed').value=nowIsoDate();
+  showSuccess(`Saved offline as ${draftId}. It will sync when the connection returns.`);
+}
+async function init(){
+  applyPilotCopy();
+  updateNetworkPill();
+  updateQueuePill();
+  byId('pilot-observed').value=nowIsoDate();
+  document.querySelectorAll('.focus-btn').forEach(button=>button.addEventListener('click',()=>setFocus(button.dataset.focus)));
+  byId('pilot-form').addEventListener('submit',handleSubmit);
+  byId('sync-btn').addEventListener('click',async()=>{
+    await flushQueue();
+    showSuccess(queueCount()?`Still holding ${queueCount()} queued draft(s).`:'Queue sync complete.');
+  });
+  window.addEventListener('online',async()=>{updateNetworkPill();await flushQueue();});
+  window.addEventListener('offline',updateNetworkPill);
+  if('serviceWorker'in navigator){
+    try{await navigator.serviceWorker.register('./sw.js');}catch(error){}
+  }
+  await flushQueue();
+}
+init();
+</script>
+</body>
+</html>

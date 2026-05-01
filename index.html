@@ -142,6 +142,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .annotation-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .annotation-submit{align-self:flex-start}
 .admin-badge{display:none;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:var(--brand-lt);color:var(--brand);border:0.5px solid color-mix(in oklab,var(--brand2) 24%,var(--bg));font-size:9px;font-weight:500}
+.pilot-badge{display:none;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:var(--accent-lt);color:var(--accent);border:0.5px solid color-mix(in oklab,var(--accent) 24%,var(--bg));font-size:9px;font-weight:500}
 .admin-panel{display:flex;flex-direction:column;gap:8px}
 .admin-note{font-size:9px;color:var(--t2);line-height:1.45;padding:8px 9px;border-radius:7px;background:var(--bg2);border:0.5px solid var(--br)}
 .admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -163,6 +164,59 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .admin-pill.qa{background:var(--accent-lt);color:var(--danger);border-color:color-mix(in oklab,var(--accent) 30%,var(--bg))}
 .admin-empty{font-size:10px;color:var(--t3)}
 .admin-inline{font-family:var(--font-mono);font-size:9px;color:var(--t2);word-break:break-all}
+.pilot-shell{display:flex;flex-direction:column;gap:8px}
+.pilot-hero{display:flex;flex-direction:column;gap:7px;padding:10px 11px;border-radius:9px;background:linear-gradient(180deg,var(--accent-lt),var(--bg2));border:0.5px solid color-mix(in oklab,var(--accent) 20%,var(--bg))}
+.pilot-kicker{font-size:9px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+.pilot-title{font-size:14px;font-weight:500;line-height:1.3}
+.pilot-copy{font-size:10px;color:var(--t2);line-height:1.5}
+.pilot-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.pilot-card{display:flex;flex-direction:column;gap:7px;padding:9px 10px;border-radius:8px;background:var(--bg);border:0.5px solid var(--br)}
+.pilot-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.pilot-card-title{font-size:11px;font-weight:500;line-height:1.35}
+.pilot-card-value{font-size:18px;font-weight:500;color:var(--tx)}
+.pilot-card-meta{font-size:9px;color:var(--t3);line-height:1.45}
+.pilot-card-copy{font-size:9px;color:var(--t2);line-height:1.45}
+.pilot-actions{display:flex;gap:5px;flex-wrap:wrap}
+.pilot-vote-row{display:flex;gap:5px;flex-wrap:wrap}
+.pilot-vote{padding:3px 8px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg2);color:var(--t2);font-size:9px;cursor:pointer;transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1)}
+.pilot-vote:hover{background:var(--bg3)}
+.pilot-vote.active{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
+.pilot-submit-link{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;border:0.5px solid var(--br);background:var(--brand);color:var(--neutral-inverse);text-decoration:none;font-size:9px;font-weight:500}
+.efficacy-grid{display:grid;grid-template-columns:1fr;gap:6px}
+.efficacy-card{display:flex;flex-direction:column;gap:6px;padding:8px 9px;border-radius:8px;background:var(--bg2);border:0.5px solid var(--br)}
+.efficacy-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.efficacy-title{font-size:10px;font-weight:500}
+.efficacy-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:500}
+.efficacy-pill.low{background:var(--brand-lt);color:var(--brand)}
+.efficacy-pill.medium{background:var(--warn-lt);color:var(--warn)}
+.efficacy-pill.high{background:var(--accent-lt);color:var(--danger)}
+.efficacy-pill.pending{background:var(--bg3);color:var(--t3)}
+.efficacy-copy{font-size:9px;color:var(--t2);line-height:1.45}
+.efficacy-meta{display:flex;gap:5px;flex-wrap:wrap;font-size:9px;color:var(--t3)}
+.desk-launch{display:none}
+.desk-shell{position:fixed;left:12px;right:12px;bottom:12px;z-index:1700;display:none;pointer-events:none}
+.desk-shell.open{display:flex}
+.desk-toggle{margin-left:auto;pointer-events:auto;display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;border:0.5px solid var(--br);background:var(--brand);color:var(--neutral-inverse);font-size:10px;font-weight:500;cursor:pointer}
+.desk-panel{pointer-events:auto;margin-top:8px;border-radius:14px;border:0.5px solid var(--br);background:var(--bg);display:none;flex-direction:column;gap:9px;padding:14px;max-height:min(52vh,430px);overflow:auto;box-shadow:0 10px 30px rgba(15,23,42,.12)}
+.desk-shell.open .desk-panel{display:flex}
+.desk-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.desk-title{font-size:13px;font-weight:500}
+.desk-copy{font-size:10px;color:var(--t2);line-height:1.5}
+.desk-templates{display:flex;gap:6px;flex-wrap:wrap}
+.desk-chip{padding:4px 9px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg2);color:var(--t2);font-size:9px;cursor:pointer;transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1)}
+.desk-chip:hover{background:var(--bg3)}
+.desk-form{display:flex;flex-direction:column;gap:6px}
+.desk-input{width:100%;padding:7px 9px;border-radius:8px;border:0.5px solid var(--br);background:var(--bg2);color:var(--tx);font-size:11px;resize:vertical;min-height:62px}
+.desk-actions{display:flex;gap:6px;flex-wrap:wrap}
+.desk-btn{padding:5px 10px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg2);color:var(--t2);font-size:9px;cursor:pointer}
+.desk-btn.primary{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
+.desk-answer{display:flex;flex-direction:column;gap:7px;padding:10px 11px;border-radius:9px;background:var(--bg2);border:0.5px solid var(--br)}
+.desk-answer-title{font-size:11px;font-weight:500}
+.desk-answer-copy{font-size:10px;color:var(--t2);line-height:1.5}
+.desk-list{display:flex;flex-direction:column;gap:6px}
+.desk-item{display:flex;flex-direction:column;gap:3px;padding:8px 9px;border-radius:8px;background:var(--bg);border:0.5px solid var(--br)}
+.desk-item-title{font-size:10px;font-weight:500}
+.desk-item-copy{font-size:9px;color:var(--t2);line-height:1.45}
 .bench-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 6px;border-radius:999px;font-size:9px;border:0.5px solid var(--br);background:var(--bg);color:var(--t2)}
 .bench-dot{width:6px;height:6px;border-radius:50%;background:var(--t3);flex-shrink:0}
 .vs-row{display:flex;align-items:center;gap:4px;padding:3px 0;font-size:10px}
@@ -217,9 +271,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .gap-pair{grid-template-columns:1fr}
   .annotation-grid{grid-template-columns:1fr}
   .admin-grid{grid-template-columns:1fr}
+  .pilot-grid{grid-template-columns:1fr}
+  .desk-shell{left:8px;right:8px;bottom:8px}
 }
 @media (prefers-reduced-motion: reduce){
-  .skip-link,.mtab,.ltog,#play-btn,.pt,.sb-btn,.chip,.ss-btn,.map-picker,.conf-fill,.rfb,.toast,.level-btn,.context-btn{transition:none!important}
+  .skip-link,.mtab,.ltog,#play-btn,.pt,.sb-btn,.chip,.ss-btn,.map-picker,.conf-fill,.rfb,.toast,.level-btn,.context-btn,.pilot-vote,.desk-chip{transition:none!important}
   .spin{animation:none}
 }
 </style>
@@ -230,8 +286,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 <div id="hdr">
   <div style="display:flex;align-items:center;gap:8px">
     <div class="logo">B</div>
-    <div><div class="ttl">Baltimore Health Dashboard</div><div class="sub">Click map · Pin 2 neighborhoods · Share comparison</div></div>
+    <div><div class="ttl">Baltimore Health Dashboard</div><div class="sub" id="hdr-sub">Click map · Pin 2 neighborhoods · Share comparison</div></div>
     <div class="admin-badge" id="admin-badge">Admin mode</div>
+    <div class="pilot-badge" id="pilot-badge">Pilot mode</div>
   </div>
   <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
     <div class="mtabs" id="mtabs">
@@ -263,6 +320,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       </button>
       <button type="button" class="ltog share-launch" id="lt-share" onclick="openShare()" aria-haspopup="dialog" aria-label="Open share options">
         <span class="ldot" style="background:var(--brand2)"></span><span>Share</span>
+      </button>
+      <button type="button" class="ltog desk-launch" id="lt-desk" onclick="toggleDesk()" aria-pressed="false" aria-label="Toggle analysis desk">
+        <span class="ldot" style="background:var(--brand)"></span><span>Desk</span>
       </button>
     </div>
   </div>
@@ -399,6 +459,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     </div>
     <div class="src-n">Link encodes: neighborhoods A & B, metric, and year. Anyone with the link sees the same view.</div>
   </div>
+</div>
+
+<div class="desk-shell" id="desk-shell" aria-hidden="true">
+  <button type="button" class="desk-toggle" id="desk-toggle" onclick="toggleDesk()" aria-expanded="false" aria-controls="desk-panel">Analysis desk</button>
+  <div class="desk-panel" id="desk-panel"></div>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -652,10 +717,10 @@ function renderGapMetricCompare(metric,p1,p2){
 }
 function renderGapPanelOne(nsa,tid){
   const topMetrics=gapMetricsForPanel().map(metric=>({metric,snapshot:gapSnapshot(nsa,metric,curYI)})).filter(entry=>entry.snapshot.available).sort((a,b)=>b.snapshot.delta-a.snapshot.delta).slice(0,3);
-  document.getElementById(tid).innerHTML=`${metricAccuracyBox(curM,'Current map metric')}${gapSummaryCard(nsa,curM,`${shortNeighborhood(nsa)} · current map metric`)}<div class="gap-card"><div class="gap-title">Community signal proxy</div><div class="gap-mini-copy">This Gap view is intentionally labeled as a demo proxy until the Baltimore Area Survey feed is integrated. The community side blends resident-generated 311 patterns with validated local report activity, then compares that signal with the official neighborhood burden on a shared 0–100 concern scale.</div></div>${topMetrics.length?`<div class="shd">Biggest blind spots</div><div class="gap-grid">${topMetrics.map(({metric})=>renderGapMetricMini(nsa,metric)).join('')}</div>`:''}<div class="shd">Matched metrics</div><div class="gap-grid">${gapMetricsForPanel().map(metric=>renderGapMetricMini(nsa,metric)).join('')}</div><div class="src-n">${gapSourceLine()}</div>`;
+  document.getElementById(tid).innerHTML=`${metricAccuracyBox(curM,'Current map metric')}${gapSummaryCard(nsa,curM,`${shortNeighborhood(nsa)} · current map metric`)}<div class="gap-card"><div class="gap-title">Community signal proxy</div><div class="gap-mini-copy">This Gap view is intentionally labeled as a demo proxy until the Baltimore Area Survey feed is integrated. The community side blends resident-generated 311 patterns with validated local report activity, then compares that signal with the official neighborhood burden on a shared 0–100 concern scale.</div></div>${topMetrics.length?`<div class="shd">Biggest blind spots</div><div class="gap-grid">${topMetrics.map(({metric})=>renderGapMetricMini(nsa,metric)).join('')}</div>`:''}<div class="shd">Matched metrics</div><div class="gap-grid">${gapMetricsForPanel().map(metric=>renderGapMetricMini(nsa,metric)).join('')}</div>${renderEfficacySectionOne(nsa)}<div class="src-n">${gapSourceLine()}</div>`;
 }
 function renderGapPanelTwo(p1,p2,tid){
-  document.getElementById(tid).innerHTML=`${metricAccuracyBox(curM,'Current map metric')}<div class="gap-card"><div class="gap-title">Blind spot comparison</div><div class="gap-mini-copy">Each neighborhood is scored separately on the same 0–100 concern scale. The official side comes from the dashboard metric, while the community side is a proxy built from resident-generated 311 patterns and local report activity until the Baltimore Area Survey feed is connected.</div></div><div class="gap-pair">${gapSummaryCard(p1,curM,shortNeighborhood(p1))}${gapSummaryCard(p2,curM,shortNeighborhood(p2))}</div><div class="shd">Matched metrics</div><div class="gap-grid">${gapMetricsForPanel().map(metric=>renderGapMetricCompare(metric,p1,p2)).join('')}</div><div class="src-n">${gapSourceLine()}</div>`;
+  document.getElementById(tid).innerHTML=`${metricAccuracyBox(curM,'Current map metric')}<div class="gap-card"><div class="gap-title">Blind spot comparison</div><div class="gap-mini-copy">Each neighborhood is scored separately on the same 0–100 concern scale. The official side comes from the dashboard metric, while the community side is a proxy built from resident-generated 311 patterns and local report activity until the Baltimore Area Survey feed is connected.</div></div><div class="gap-pair">${gapSummaryCard(p1,curM,shortNeighborhood(p1))}${gapSummaryCard(p2,curM,shortNeighborhood(p2))}</div><div class="shd">Matched metrics</div><div class="gap-grid">${gapMetricsForPanel().map(metric=>renderGapMetricCompare(metric,p1,p2)).join('')}</div>${renderEfficacySectionTwo(p1,p2)}<div class="src-n">${gapSourceLine()}</div>`;
 }
 function yearRecordFor(store,name,yi){const yearKey=String(YEARS[yi]);return store?.[name]?.[yearKey]||store?.[name]?.[YEARS[yi]]||null;}
 function yv(nsa,k,yi){const record=yearRecordFor(BASE,nsa,yi);if(!record||record[k]===undefined||record[k]===null)return null;return round1(record[k]);}
@@ -722,12 +787,112 @@ let ANNOTATIONS=[];
 const OPEN_ANNOTATION_PANELS=new Set();
 const LOCAL_ANNOTATION_KEY='blt_annotations_local';
 let adminMode=false;
+let pilotMode=null,deskOpen=false;
+const PILOT_META={
+  carrollton:{
+    label:'Carrollton Ridge pilot',
+    csa:'Southwest Baltimore',
+    scopeLabel:'Carrollton Ridge / Franklin Square',
+    submitPath:'submit/',
+    focus:['dumping','broadband']
+  }
+};
+const PILOT_VOTE_KEY='blt_pilot_accuracy_votes';
+let PILOT_VOTES={};
+let deskAnswerState={title:'Analysis desk',copy:'Choose a template or ask a question to generate a local prototype briefing.',items:[]};
+const DIGITAL_KEYWORDS=/\bbroadband\b|\binternet\b|\bwi[- ]?fi\b|\bwifi\b|\bhotspot\b|\bdevice\b|\bconnection\b|\bconnectivity\b|\bdigital\b/i;
+const EFFICACY_TRACKS=[
+  {id:'sanitation',label:'Sanitation recurrence',metric:'hz',reportFamilies:['sanitation','environmental'],metricLabel:'311 hazards proxy'},
+  {id:'infrastructure',label:'Infrastructure recurrence',metric:'hz',reportFamilies:['infrastructure','lighting','safety'],metricLabel:'311 hazards proxy'},
+  {id:'vacancy',label:'Vacancy recurrence',metric:'va',reportFamilies:['vacant','data_challenge'],metricLabel:'Vacant housing'}
+];
 const REDUCED_MOTION=window.matchMedia('(prefers-reduced-motion: reduce)');
-function buildURL(){const base=`${window.location.origin}${window.location.pathname}`;const params=new URLSearchParams();if(pinA) params.set('a',encodeNSA(pinA));if(pinB) params.set('b',encodeNSA(pinB));params.set('m',curM);params.set('y',YEARS[curYI]);params.set('lvl',benchMode);if(gapMode)params.set('gap','1');if(blindSpotsOnly)params.set('blind','1');return `${base}?${params.toString()}`;}
+function buildURL(){const base=`${window.location.origin}${window.location.pathname}`;const params=new URLSearchParams();if(pinA) params.set('a',encodeNSA(pinA));if(pinB) params.set('b',encodeNSA(pinB));params.set('m',curM);params.set('y',YEARS[curYI]);params.set('lvl',benchMode);if(gapMode)params.set('gap','1');if(blindSpotsOnly)params.set('blind','1');if(adminMode)params.set('admin','1');if(pilotMode)params.set('pilot',pilotMode);return `${base}?${params.toString()}`;}
 function encodeNSA(name){return name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');}
 function decodeNSA(slug){if(!slug)return null;const lower=slug.replace(/-/g,' ');for(const k of Object.keys(BASE)){if(k.toLowerCase()===lower)return k;if(k.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()===lower)return k;}return null;}
-function updateAdminUI(){const badge=document.getElementById('admin-badge');if(badge)badge.style.display=adminMode?'inline-flex':'none';['tab-ad1','tab-ad2'].forEach(id=>{const tab=document.getElementById(id);if(tab)tab.style.display=adminMode?'inline-flex':'none';});const noPinAdmin=document.getElementById('no-pin-admin');if(noPinAdmin)noPinAdmin.style.display=adminMode?'flex':'none';}
-function loadFromURL(){try{const p=new URLSearchParams(window.location.search);const a=p.get('a'),b=p.get('b'),m=p.get('m'),y=p.get('y'),lvl=p.get('lvl');adminMode=p.get('admin')==='1';if(a){const k=decodeNSA(a);if(k)pinA=k;}if(b){const k=decodeNSA(b);if(k)pinB=k;}if(m&&MCFG[m])curM=m;if(y){const yi=YEARS.indexOf(parseInt(y));if(yi>=0)curYI=yi;}if(lvl&&LEVEL_META[lvl])benchMode=lvl;gapMode=p.get('gap')==='1';blindSpotsOnly=p.get('blind')==='1';if(blindSpotsOnly)gapMode=true;updateAdminUI();updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();if(pinA||pinB){updatePinBar();updatePinStyles();refreshSide();const btn=document.querySelector(`.mtab[data-m="${curM}"]`);if(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}document.getElementById('yr-slider').value=curYI;document.getElementById('cur-yr').textContent=YEARS[curYI];}}catch(e){}}
+function currentPilotConfig(){return pilotMode&&PILOT_META[pilotMode]?PILOT_META[pilotMode]:null;}
+function resolvePilotNeighborhood(mode=pilotMode){const cfg=mode&&PILOT_META[mode]?PILOT_META[mode]:null;return cfg?matchNeighborhoodKey(cfg.csa)||cfg.csa:null;}
+function pilotSubmitUrl(){const cfg=currentPilotConfig();if(!cfg)return'submit/';const target=resolvePilotNeighborhood()||cfg.csa;return `${cfg.submitPath}?pilot=${encodeURIComponent(pilotMode)}&nsa=${encodeURIComponent(target)}`;}
+function loadPilotVotes(){try{const parsed=JSON.parse(localStorage.getItem(PILOT_VOTE_KEY)||'{}');PILOT_VOTES=parsed&&typeof parsed==='object'?parsed:{};}catch(e){PILOT_VOTES={};}}
+function persistPilotVotes(){try{localStorage.setItem(PILOT_VOTE_KEY,JSON.stringify(PILOT_VOTES));}catch(e){}}
+function pilotVoteKey(issue){return `${pilotMode||'default'}:${issue}`;}
+function pilotVoteState(issue){return PILOT_VOTES[pilotVoteKey(issue)]||null;}
+function setPilotVote(issue,value){if(!currentPilotConfig())return;PILOT_VOTES[pilotVoteKey(issue)]=value;persistPilotVotes();refreshSide();toast(`Saved pilot feedback: ${value.replace('_',' ')} for ${issue}.`);}
+function enforcePilotSelection(){const target=resolvePilotNeighborhood();if(!target)return;if(pinA!==target)pinA=target;pinB=null;activeSlot='a';}
+function updateModeUI(){
+  const badge=document.getElementById('admin-badge');
+  if(badge)badge.style.display=adminMode?'inline-flex':'none';
+  ['tab-ad1','tab-ad2'].forEach(id=>{const tab=document.getElementById(id);if(tab)tab.style.display=adminMode?'inline-flex':'none';});
+  const noPinAdmin=document.getElementById('no-pin-admin');
+  if(noPinAdmin)noPinAdmin.style.display=adminMode?'flex':'none';
+  const cfg=currentPilotConfig();
+  const pilotBadge=document.getElementById('pilot-badge');
+  if(pilotBadge){pilotBadge.style.display=cfg?'inline-flex':'none';pilotBadge.textContent=cfg?cfg.label:'Pilot mode';}
+  const subtitle=document.getElementById('hdr-sub');
+  if(subtitle)subtitle.textContent=cfg?`${cfg.scopeLabel} pilot · illegal dumping and broadband access`:'Click map · Pin 2 neighborhoods · Share comparison';
+  const deskLaunch=document.getElementById('lt-desk');
+  if(deskLaunch)deskLaunch.style.display=adminMode?'inline-flex':'none';
+  const deskShell=document.getElementById('desk-shell');
+  if(!adminMode&&deskShell){
+    deskOpen=false;
+    deskShell.classList.remove('open');
+    deskShell.setAttribute('aria-hidden','true');
+    const deskToggle=document.getElementById('desk-toggle');
+    if(deskToggle)deskToggle.setAttribute('aria-expanded','false');
+  }
+  const slotB=document.getElementById('slot-b');
+  if(slotB)slotB.style.display=cfg?'none':'flex';
+  const slotA=document.getElementById('slot-a');
+  if(slotA)slotA.style.flex=cfg?'1 1 100%':'1';
+  const onePinTabs=document.querySelectorAll('#one-pin .pt-row .pt');
+  if(onePinTabs.length){
+    const pilotAllowed=new Set(['Overview','Gap','Reports','Submit','Admin']);
+    onePinTabs.forEach(tab=>{
+      if(tab.id==='tab-ad1'){tab.style.display=adminMode?'inline-flex':'none';return;}
+      tab.style.display=cfg?(pilotAllowed.has(tab.textContent.trim())?'inline-flex':'none'):'inline-flex';
+    });
+    if(cfg){
+      const active=document.querySelector('#one-pin .pt-row .pt.active');
+      if(active&&!pilotAllowed.has(active.textContent.trim())){
+        const fallback=document.querySelector('#one-pin .pt-row .pt');
+        if(fallback)swTab(fallback,'ov1');
+      }
+    }
+  }
+}
+function loadFromURL(){
+  try{
+    const p=new URLSearchParams(window.location.search);
+    const a=p.get('a'),b=p.get('b'),m=p.get('m'),y=p.get('y'),lvl=p.get('lvl'),pilot=p.get('pilot');
+    adminMode=p.get('admin')==='1';
+    pilotMode=pilot&&PILOT_META[pilot]?pilot:null;
+    if(a){const k=decodeNSA(a);if(k)pinA=k;}
+    if(b){const k=decodeNSA(b);if(k)pinB=k;}
+    if(m&&MCFG[m])curM=m;
+    if(y){const yi=YEARS.indexOf(parseInt(y,10));if(yi>=0)curYI=yi;}
+    if(lvl&&LEVEL_META[lvl])benchMode=lvl;
+    gapMode=p.get('gap')==='1';
+    blindSpotsOnly=p.get('blind')==='1';
+    if(blindSpotsOnly)gapMode=true;
+    if(pilotMode)enforcePilotSelection();
+    updateModeUI();
+    updateGapToggleUI();
+    if(geo)geo.setStyle(getStyle);
+    buildLeg();
+    if(pinA||pinB){
+      updatePinBar();
+      updatePinStyles();
+      refreshSide();
+      const btn=document.querySelector(`.mtab[data-m="${curM}"]`);
+      if(btn){
+        document.querySelectorAll('.mtab').forEach(bttn=>bttn.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      document.getElementById('yr-slider').value=curYI;
+      document.getElementById('cur-yr').textContent=YEARS[curYI];
+    }
+  }catch(e){}
+}
 function updateShareStrip(){const url=buildURL();document.getElementById('share-url-inline').textContent=url;document.getElementById('share-url-inline').title=url;if(pinA||pinB){document.getElementById('share-strip').classList.add('visible');}else{document.getElementById('share-strip').classList.remove('visible');}}
 function copyURL(){const url=buildURL();navigator.clipboard.writeText(url).then(()=>{const b=document.getElementById('copied-badge');b.style.display='block';setTimeout(()=>b.style.display='none',2000);}).catch(()=>toast('URL: '+url));}
 function openShare(){const url=buildURL();document.getElementById('share-url-box').textContent=url;const parts=[];if(pinA) parts.push(pinA.split('/')[0]);if(pinB) parts.push(pinB.split('/')[0]);const levelBits=benchMode==='neighborhood'?'Local context':LEVEL_META[benchMode].short;const viewBits=gapMode?`Gap view${blindSpotsOnly?' · blind spots only':''}`:MCFG[curM].label;const desc=parts.length===2?`Comparing ${parts[0]} vs ${parts[1]} · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`:parts.length===1?`${parts[0]} · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`:`Baltimore health map · ${viewBits} · ${YEARS[curYI]} · ${levelBits}`;document.getElementById('share-desc').textContent=desc;document.getElementById('share-modal').setAttribute('aria-hidden','false');document.getElementById('share-modal').classList.add('open');}
@@ -758,13 +923,13 @@ function togL(l){ls[l]=!ls[l];const toggle=document.getElementById('lt-'+l);togg
 function updateGapToggleUI(){const gapBtn=document.getElementById('lt-gap');const blindBtn=document.getElementById('lt-blind');if(gapBtn){gapBtn.classList.toggle('on',gapMode);gapBtn.setAttribute('aria-pressed',String(gapMode));}if(blindBtn){blindBtn.classList.toggle('on',blindSpotsOnly);blindBtn.setAttribute('aria-pressed',String(blindSpotsOnly));}}
 function toggleGapMode(){gapMode=!gapMode;if(!gapMode)blindSpotsOnly=false;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
 function toggleBlindSpots(){blindSpotsOnly=!blindSpotsOnly;if(blindSpotsOnly)gapMode=true;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
-function onNSAClick(e){const name=geoName(e.target.feature.properties);const k=findK(name);if(!k)return;if(activeReportPinForm){captureReportLocation(activeReportPinForm,e.latlng,k);return;}if(activeSlot==='a'||!pinA){pinA=k;activeSlot='b';}else if(activeSlot==='b'||!pinB){if(k===pinA){toast('Pin a different neighborhood for B');return;}pinB=k;activeSlot='a';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
-function updatePinBar(){(['a','b']).forEach((s)=>{const p=s==='a'?pinA:pinB;const btn=document.getElementById('slot-btn-'+s);const clear=document.getElementById('clear-'+s);if(p){document.getElementById('empty-'+s).style.display='none';document.getElementById('dot-'+s).style.display='block';document.getElementById('info-'+s).style.display='flex';document.getElementById('name-'+s).textContent=p.split('/')[0];document.getElementById('score-'+s).textContent=yv(p,'hi',curYI);clear.style.display='inline-flex';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active. Current neighborhood ${p.split('/')[0]}`);}else{document.getElementById('empty-'+s).style.display='block';document.getElementById('dot-'+s).style.display='none';document.getElementById('info-'+s).style.display='none';clear.style.display='none';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active`);}btn.setAttribute('aria-pressed',String(activeSlot===s));});}
+function onNSAClick(e){const name=geoName(e.target.feature.properties);const k=findK(name);if(!k)return;if(activeReportPinForm){captureReportLocation(activeReportPinForm,e.latlng,k);return;}const pilotTarget=resolvePilotNeighborhood();if(pilotTarget){if(k!==pilotTarget){toast('Pilot mode is locked to Carrollton Ridge / Franklin Square for this demo.');return;}pinA=pilotTarget;pinB=null;activeSlot='a';updatePinBar();updatePinStyles();refreshSide();updateShareStrip();return;}if(activeSlot==='a'||!pinA){pinA=k;activeSlot='b';}else if(activeSlot==='b'||!pinB){if(k===pinA){toast('Pin a different neighborhood for B');return;}pinB=k;activeSlot='a';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
+function updatePinBar(){const pilotTarget=resolvePilotNeighborhood();(['a','b']).forEach((s)=>{const p=s==='a'?pinA:pinB;const btn=document.getElementById('slot-btn-'+s);const clear=document.getElementById('clear-'+s);if(p){document.getElementById('empty-'+s).style.display='none';document.getElementById('dot-'+s).style.display='block';document.getElementById('info-'+s).style.display='flex';document.getElementById('name-'+s).textContent=pilotTarget&&s==='a'?(currentPilotConfig()?.scopeLabel||p.split('/')[0]):p.split('/')[0];document.getElementById('score-'+s).textContent=yv(p,'hi',curYI);clear.style.display=pilotTarget?'none':'inline-flex';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active. Current neighborhood ${p.split('/')[0]}`);}else{document.getElementById('empty-'+s).style.display='block';document.getElementById('dot-'+s).style.display='none';document.getElementById('info-'+s).style.display='none';clear.style.display='none';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active`);}btn.setAttribute('aria-pressed',String(activeSlot===s));});}
 function updatePinStyles(){if(!geo)return;geo.eachLayer(l=>{const name=geoName(l.feature?.properties);const k=findK(name);if(k===pinA)l.setStyle({weight:3,color:COL_A,fillOpacity:.9});else if(k===pinB)l.setStyle({weight:3,color:COL_B,fillOpacity:.9});else geo.resetStyle(l);});}
 function unpin(s){if(s==='a'){pinA=null;activeSlot='a';}else{pinB=null;activeSlot='b';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
 function clearPin(evt,s){if(evt)evt.stopPropagation();unpin(s);}
-function focusSlot(s){activeSlot=s;updatePinBar();}
-function refreshSide(){updatePinBar();if(!pinA&&!pinB){document.getElementById('no-pin').style.display='flex';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='none';if(adminMode)renderAdminPanel([], 'no-pin-admin');return;}if(pinA&&!pinB){document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='flex';document.getElementById('two-pin').style.display='none';renderOne();}else{document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='flex';renderTwo();}}
+function focusSlot(s){if(resolvePilotNeighborhood()&&s==='b')return;activeSlot=s;updatePinBar();}
+function refreshSide(){if(pilotMode)enforcePilotSelection();updateModeUI();updatePinBar();if(!pinA&&!pinB){document.getElementById('no-pin').style.display='flex';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='none';if(adminMode)renderAdminPanel([], 'no-pin-admin');if(adminMode&&deskOpen)renderDeskPanel();return;}if(pinA&&!pinB){document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='flex';document.getElementById('two-pin').style.display='none';renderOne();}else{document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='flex';renderTwo();}if(adminMode&&deskOpen)renderDeskPanel();}
 function swTab(btn,tab){const group=btn.closest('.pt-row');group.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const allPanes=['t-ov1','t-tr1','t-dt1','t-gap1','t-rp1','t-vl1','t-sb1','t-ad1','t-cmp','t-tra','t-det','t-gap2','t-rp2','t-vl2','t-sb2','t-ad2'];allPanes.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});const el=document.getElementById('t-'+tab);if(el){el.style.display='flex';el.style.flexDirection='column';}if(tab==='tra')drawTrajChart();}
 function normalizeNeighborhood(name){return String(name||'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/[^a-z0-9]+/g,' ').trim();}
 function matchNeighborhoodKey(name){if(!name)return null;const direct=findK(name);if(direct)return direct;const target=normalizeNeighborhood(name);for(const k of Object.keys(BASE)){const norm=normalizeNeighborhood(k);if(norm===target||norm.includes(target)||target.includes(norm))return k;}return null;}
@@ -983,6 +1148,7 @@ function renderAdminPanel(neighborhoods,targetId){
   target.innerHTML=`<div class="admin-panel"><div class="shd">Admin</div><div class="admin-note"><strong style="color:var(--tx)">Moderation helper only.</strong> This public prototype does not expose destructive database actions from the browser. Use these copy buttons to paste vetted SQL into Supabase SQL Editor. Scope: <strong style="color:var(--tx)">${escapeHtml(scopeLabel)}</strong>. Backend: <strong style="color:var(--tx)">${escapeHtml(liveMode)}</strong>.</div><div class="admin-grid"><div class="admin-stat"><div class="admin-stat-label">Reports</div><div class="admin-stat-value">${reports.length}</div></div><div class="admin-stat"><div class="admin-stat-label">Annotations</div><div class="admin-stat-value">${annotations.length}</div></div><div class="admin-stat"><div class="admin-stat-label">Open / review</div><div class="admin-stat-value">${(statusCounts.open||0)+(statusCounts.review||0)}</div></div><div class="admin-stat"><div class="admin-stat-label">QA artifacts</div><div class="admin-stat-value">${qaReports.length+qaNotes.length}</div></div></div>${globalActions}<div class="admin-list">${reportCards}${annotationCards}</div></div>`;
 }
 loadLocalAnnotations();
+loadPilotVotes();
 resetFallbackReports();
 function setBenchMode(mode){if(!LEVEL_META[mode]||benchMode===mode)return;benchMode=mode;refreshSide();updateShareStrip();}
 function benchComparison(metric,yi){if(benchMode==='neighborhood')return null;return bench(benchMode,metric,yi);}
@@ -993,6 +1159,258 @@ function renderContextMetricCard(nsa,metric,value,contextText,color=COL_A){
   const displayValue=value===null||value===undefined?'N/A':`${value}${MCFG[metric]?.unit||''}`;
   return `<div style="background:var(--bg2);border-radius:5px;padding:6px 8px"><div style="font-size:13px;font-weight:500;color:${color}">${escapeHtml(displayValue)}</div><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><div style="font-size:9px;color:var(--t2)">${escapeHtml(MCFG[metric]?.label||metric)}</div>${metricAccuracyInline(metric)}</div><div class="metric-note">${escapeHtml(contextText)}</div>${renderAnnotationPanel(nsa,annotationContext('metric',metric),MCFG[metric]?.label||metric)}</div>`;
 }
+function recentReportsForFamilies(nsa,families,maxDays=120){
+  const target=matchNeighborhoodKey(nsa)||nsa;
+  return REPORTS.filter(report=>{
+    if((matchNeighborhoodKey(report.nsa)||report.nsa)!==target)return false;
+    if(Array.isArray(families)&&families.length&&!families.includes(gapCategoryFamily(report.category)))return false;
+    return (report.days??999)<=maxDays;
+  });
+}
+function efficacySnapshot(nsa,track,yi=curYI){
+  const service=latestNeighborhoodMetric(nsa,track.metric,yi);
+  const previous=yi>0?latestNeighborhoodMetric(nsa,track.metric,yi-1):{value:null};
+  const serviceConcern=metricConcernScore(track.metric,service.value);
+  const previousConcern=metricConcernScore(track.metric,previous.value);
+  const reports=recentReportsForFamilies(nsa,track.reportFamilies,120);
+  const activeReports=reports.filter(report=>!['verified','closed'].includes(report.status));
+  const verifiedReports=reports.filter(report=>['verified','closed'].includes(report.status));
+  const recurrenceScore=round1(Math.min(100,(reports.length*15)+(activeReports.length*12)+Math.max(0,(serviceConcern??0)-35)+(serviceConcern!==null&&previousConcern!==null?Math.max(0,serviceConcern-previousConcern):0)));
+  let severity='low';
+  if(serviceConcern===null&&!reports.length)severity='pending';
+  else if(recurrenceScore>=78||(activeReports.length>=2&&(serviceConcern??0)>=55))severity='high';
+  else if(recurrenceScore>=48||activeReports.length>=1||reports.length>=2)severity='medium';
+  return{
+    ...track,
+    nsa,
+    service,
+    serviceConcern,
+    previousConcern,
+    reports,
+    activeCount:activeReports.length,
+    verifiedCount:verifiedReports.length,
+    recurrenceScore,
+    severity
+  };
+}
+function efficacySummaryCopy(snapshot){
+  if(snapshot.severity==='pending')return'No matched efficacy signal is available yet for this track. This stays clearly labeled as a proxy until expenditure records are connected.';
+  const serviceYear=snapshot.service.year||YEARS[curYI];
+  const serviceValue=snapshot.service.value===null?'No live service reading':`${snapshot.service.value}${MCFG[snapshot.metric]?.unit||''} in ${serviceYear}`;
+  if(snapshot.severity==='high')return`${serviceValue}. Repeat local reports are still active, so this area looks like an efficacy watch candidate rather than a resolved issue.`;
+  if(snapshot.severity==='medium')return`${serviceValue}. There is some repeat local signal here, so the issue is worth monitoring even without linked spending records yet.`;
+  return`${serviceValue}. Current resident signal is lighter here, so this track looks comparatively calmer right now.`;
+}
+function renderEfficacyCard(snapshot,color=COL_A){
+  const severity=gapSeverityMeta({available:snapshot.severity!=='pending',severity:snapshot.severity});
+  return `<div class="efficacy-card"><div class="efficacy-top"><div><div class="efficacy-title">${escapeHtml(snapshot.label)}</div><div class="gap-meta">${escapeHtml(snapshot.metricLabel)}</div></div><span class="efficacy-pill ${severity.level}">${severity.label}</span></div><div class="efficacy-copy">${escapeHtml(efficacySummaryCopy(snapshot))}</div><div class="efficacy-meta"><span>Recent reports: ${snapshot.reports.length}</span><span>Still active: ${snapshot.activeCount}</span><span>Watch score: ${snapshot.recurrenceScore||0}</span></div>${renderAnnotationPanel(snapshot.nsa,annotationContext('gap',`efficacy-${snapshot.id}`),`${snapshot.label} efficacy watch`)}</div>`;
+}
+function renderEfficacySectionOne(nsa){
+  const cards=EFFICACY_TRACKS.map(track=>renderEfficacyCard(efficacySnapshot(nsa,track),COL_A)).join('');
+  return `<div class="shd">Efficacy watch</div><div class="efficacy-grid">${cards}</div><div class="src-n">Prototype proxy only: repeat resident signal after existing burden. Spending and work-order records are not wired yet.</div>`;
+}
+function renderEfficacySectionTwo(p1,p2){
+  const cards=EFFICACY_TRACKS.map(track=>{
+    const a=efficacySnapshot(p1,track),b=efficacySnapshot(p2,track);
+    return `<div class="gap-mini"><div class="gap-mini-top"><div class="gap-mini-title">${escapeHtml(track.label)}</div><span class="gap-meta">${escapeHtml(track.metricLabel)}</span></div><div class="gap-pair">${renderEfficacyCard(a,COL_A)}${renderEfficacyCard(b,COL_B)}</div></div>`;
+  }).join('');
+  return `<div class="shd">Efficacy watch</div><div class="gap-grid">${cards}</div><div class="src-n">Prototype proxy only: repeat resident signal after existing burden. Spending and work-order records are not wired yet.</div>`;
+}
+function pilotKeywordSignal(nsa){
+  const reports=scopedReports([nsa]).filter(report=>DIGITAL_KEYWORDS.test(`${report.title} ${report.description}`));
+  const notes=scopedAnnotations([nsa]).filter(note=>DIGITAL_KEYWORDS.test(`${note.body} ${note.metric}`));
+  const confirmations=reports.reduce((sum,report)=>sum+(report.confirms||0),0);
+  return{
+    reports,
+    notes,
+    confirmations,
+    score:round1(Math.min(100,(reports.length*22)+(notes.length*12)+(confirmations*1.8)))
+  };
+}
+function pilotIssueSnapshot(nsa,issue,yi=curYI){
+  if(issue==='dumping'){
+    const hazard=latestNeighborhoodMetric(nsa,'hz',yi);
+    const dumping=latestNeighborhoodMetric(nsa,'dp',yi);
+    const reports=recentReportsForFamilies(nsa,['sanitation','environmental','infrastructure'],120);
+    const baseConcern=metricConcernScore('hz',hazard.value);
+    const dumpingConcern=dumping.value!==null?metricConcernScore('dp',dumping.value):null;
+    const score=round1(Math.min(100,((baseConcern??0)*0.7)+((dumpingConcern??baseConcern??0)*0.15)+(reports.length*6)));
+    const severity=score>=70?'high':score>=40?'medium':score===0?'pending':'low';
+    return{
+      issue,
+      title:'Illegal dumping',
+      valueLabel:score?`${score}/100`:'Pending',
+      meta:hazard.value!==null?`311 hazards proxy: ${hazard.value}${MCFG.hz.unit}`:'Direct dumping metric not wired',
+      copy:'Uses the 311 hazards proxy plus sanitation-related report activity because a dedicated live illegal-dumping series is not wired into the dashboard yet.',
+      severity,
+      score,
+      context:annotationContext('metric','pilot-dumping'),
+      nsa
+    };
+  }
+  const digital=pilotKeywordSignal(nsa);
+  const severity=digital.score>=65?'high':digital.score>=30?'medium':digital.score===0?'pending':'low';
+  return{
+    issue,
+    title:'Broadband access',
+    valueLabel:digital.score?`${digital.score}/100`:'Signal pending',
+    meta:digital.reports.length||digital.notes.length?`${digital.reports.length} reports · ${digital.notes.length} notes mentioning connectivity`:'No direct official broadband series connected yet',
+    copy:'This pilot card is community-signal only for now. It watches reports and inline notes mentioning broadband, Wi-Fi, connectivity, hotspots, or devices until a real access dataset is connected.',
+    severity,
+    score:digital.score,
+    context:annotationContext('metric','pilot-broadband'),
+    nsa
+  };
+}
+function renderPilotVoteButtons(issue){
+  const options=[['yes','Yes'],['no','No'],['not_sure','Not sure']];
+  return `<div class="pilot-vote-row">${options.map(([value,label])=>`<button type="button" class="pilot-vote ${pilotVoteState(issue)===value?'active':''}" onclick="setPilotVote('${issue}','${value}')">${label}</button>`).join('')}</div>`;
+}
+function renderPilotIssueCard(nsa,issue){
+  const snapshot=pilotIssueSnapshot(nsa,issue,curYI);
+  const severity=gapSeverityMeta({available:snapshot.severity!=='pending',severity:snapshot.severity});
+  return `<div class="pilot-card"><div class="pilot-card-head"><div><div class="pilot-card-title">${escapeHtml(snapshot.title)}</div><div class="pilot-card-value">${escapeHtml(snapshot.valueLabel)}</div></div><span class="gap-pill ${severity.level}">${severity.label}</span></div><div class="pilot-card-meta">${escapeHtml(snapshot.meta)}</div><div class="pilot-card-copy">${escapeHtml(snapshot.copy)}</div><div class="pilot-card-copy"><strong style="color:var(--tx)">Is this accurate for your block?</strong></div>${renderPilotVoteButtons(issue)}${renderAnnotationPanel(nsa,snapshot.context,snapshot.title)}</div>`;
+}
+function renderPilotOverview(nsa){
+  const cfg=currentPilotConfig();
+  if(!cfg)return'';
+  return `<div class="pilot-shell"><div class="pilot-hero"><div class="pilot-kicker">Community pilot</div><div class="pilot-title">${escapeHtml(cfg.label)}</div><div class="pilot-copy">This prototype narrows the view to ${escapeHtml(cfg.scopeLabel)} and foregrounds the two issues we can demonstrate most honestly today: illegal dumping and broadband access. Both cards stay explicit about whether they are official series or community-signal proxies.</div><div class="pilot-actions"><a class="pilot-submit-link" href="${escapeHtml(pilotSubmitUrl())}">Digital Navigator submit</a></div></div><div class="pilot-grid">${cfg.focus.map(issue=>renderPilotIssueCard(nsa,issue)).join('')}</div></div>`;
+}
+function renderPilotSubmitIntro(){
+  const cfg=currentPilotConfig();
+  if(!cfg)return'';
+  return `<div class="pilot-hero" style="margin-bottom:8px"><div class="pilot-kicker">Pilot submit flow</div><div class="pilot-title">${escapeHtml(cfg.scopeLabel)} field intake</div><div class="pilot-copy">Use the lightweight mobile submit flow when you want a cleaner Carrollton Ridge pilot demonstration or when a Digital Navigator is entering issues on a phone in the field.</div><div class="pilot-actions"><a class="pilot-submit-link" href="${escapeHtml(pilotSubmitUrl())}">Open focused submit page</a></div></div>`;
+}
+function deskScopeNeighborhoods(){
+  if(currentPilotConfig()){const target=resolvePilotNeighborhood();return target?[target]:[];}
+  if(pinA&&pinB)return[pinA,pinB];
+  if(pinA)return[pinA];
+  return Object.keys(BASE);
+}
+function deskScopeLabel(){
+  const scope=deskScopeNeighborhoods();
+  if(currentPilotConfig())return currentPilotConfig().scopeLabel;
+  if(scope.length===2)return `${shortNeighborhood(scope[0])} and ${shortNeighborhood(scope[1])}`;
+  if(scope.length===1)return shortNeighborhood(scope[0]);
+  return 'all neighborhoods';
+}
+function deskMetricDelta(nsa,metric,startIndex=Math.max(0,curYI-3),endIndex=curYI){
+  const start=latestNeighborhoodMetric(nsa,metric,startIndex).value;
+  const end=latestNeighborhoodMetric(nsa,metric,endIndex).value;
+  if(start===null||end===null)return null;
+  return round1(end-start);
+}
+function deskCommunityDelta(nsa,metric,startIndex=Math.max(0,curYI-3),endIndex=curYI){
+  const start=communitySignalForMetric(nsa,metric,startIndex);
+  const end=communitySignalForMetric(nsa,metric,endIndex);
+  if(start===null||end===null)return null;
+  return round1(end-start);
+}
+function deskTemplateList(){
+  const base=[
+    {id:'efficacy',label:'Efficacy check'},
+    {id:'blind_spots',label:'Blind spot scan'},
+    {id:'vacancy',label:'Vacancy pattern'}
+  ];
+  if(currentPilotConfig())base.unshift({id:'pilot',label:'Pilot snapshot'});
+  return base;
+}
+function setDeskAnswer(state){deskAnswerState=state;if(deskOpen)renderDeskPanel();}
+function runDeskTemplate(templateId,question=''){
+  const scope=deskScopeNeighborhoods();
+  if(templateId==='pilot'){
+    const target=scope[0];
+    const dumping=pilotIssueSnapshot(target,'dumping',curYI);
+    const broadband=pilotIssueSnapshot(target,'broadband',curYI);
+    setDeskAnswer({
+      title:'Pilot snapshot',
+      copy:`Focused prototype brief for ${deskScopeLabel()}. These cards mix an official hazards proxy with community-signal-only broadband context.`,
+      items:[
+        {title:dumping.title,copy:`${dumping.meta}. ${dumping.copy}`},
+        {title:broadband.title,copy:`${broadband.meta}. ${broadband.copy}`}
+      ]
+    });
+    return;
+  }
+  if(templateId==='efficacy'){
+    const ranked=scope.flatMap(nsa=>EFFICACY_TRACKS.map(track=>efficacySnapshot(nsa,track))).filter(item=>item.severity!=='pending').sort((a,b)=>(b.recurrenceScore||0)-(a.recurrenceScore||0)).slice(0,6);
+    setDeskAnswer({
+      title:'Efficacy proxy watchlist',
+      copy:`Prototype proxy for ${deskScopeLabel()}. This looks for repeat resident signal after service burden stays elevated. It is useful for demos, but it is not the final spending-linked efficacy model yet.`,
+      items:ranked.length?ranked.map(item=>({title:`${shortNeighborhood(item.nsa)} · ${item.label}`,copy:`${efficacySummaryCopy(item)} Recent reports: ${item.reports.length}, still active: ${item.activeCount}, watch score: ${item.recurrenceScore||0}.`})): [{title:'No proxy watch items yet',copy:'The current scope does not have enough matched burden and report activity to generate a watchlist.'}]
+    });
+    return;
+  }
+  if(templateId==='blind_spots'){
+    const startIndex=Math.max(0,curYI-3);
+    const ranked=scope.map(nsa=>{
+      const officialDelta=deskMetricDelta(nsa,'hi',startIndex,curYI);
+      const communityDelta=deskCommunityDelta(nsa,'hi',startIndex,curYI);
+      const gapNow=gapSnapshot(nsa,'hi',curYI);
+      return{nsa,officialDelta,communityDelta,gapNow,score:round1((communityDelta??-999)-(officialDelta??0))};
+    }).filter(item=>item.officialDelta!==null&&item.communityDelta!==null&&item.officialDelta>=1.5&&item.communityDelta>=8).sort((a,b)=>(b.score||0)-(a.score||0)).slice(0,6);
+    setDeskAnswer({
+      title:'Official improvement vs community worsening',
+      copy:`Screening ${deskScopeLabel()} for neighborhoods where the health index improved while resident-generated concern kept getting worse. This is the closest local stand-in for the future sentiment blind-spot query.`,
+      items:ranked.length?ranked.map(item=>({title:shortNeighborhood(item.nsa),copy:`Health index improved ${item.officialDelta} points since ${YEARS[startIndex]}, but community signal worsened ${item.communityDelta} points. Current gap severity: ${gapSeverityMeta(item.gapNow).label.toLowerCase()}.`})): [{title:'No strong blind-spot reversals in scope',copy:'Nothing in the current scope crossed the prototype threshold for official improvement paired with worsening community signal.'}]
+    });
+    return;
+  }
+  if(templateId==='vacancy'){
+    const startIndex=Math.max(0,curYI-3);
+    const ranked=scope.map(nsa=>{
+      const vacancyStart=latestNeighborhoodMetric(nsa,'va',startIndex).value;
+      const vacancyEnd=latestNeighborhoodMetric(nsa,'va',curYI).value;
+      const hazardStart=latestNeighborhoodMetric(nsa,'hz',startIndex).value;
+      const hazardEnd=latestNeighborhoodMetric(nsa,'hz',curYI).value;
+      const unemploymentDelta=deskMetricDelta(nsa,'un',startIndex,curYI);
+      const vacancyChange=vacancyStart!==null&&vacancyEnd!==null?round1(vacancyStart-vacancyEnd):null;
+      const hazardChange=hazardStart!==null&&hazardEnd!==null?round1(hazardStart-hazardEnd):null;
+      return{nsa,vacancyChange,hazardChange,unemploymentDelta};
+    }).filter(item=>item.vacancyChange!==null).sort((a,b)=>(b.vacancyChange||0)-(a.vacancyChange||0)).slice(0,6);
+    setDeskAnswer({
+      title:'Vacancy reduction pattern scan',
+      copy:`Directional scan for ${deskScopeLabel()}. This is not causal inference yet; it is a fast admin briefing that lines vacancy reduction up against hazard and unemployment movement.`,
+      items:ranked.length?ranked.map(item=>({title:shortNeighborhood(item.nsa),copy:`Vacant housing fell ${item.vacancyChange} points since ${YEARS[startIndex]}. 311 hazards ${item.hazardChange===null?'are unavailable':item.hazardChange>0?`fell ${item.hazardChange} calls`:`rose ${Math.abs(item.hazardChange)} calls`}, and unemployment ${item.unemploymentDelta===null?'is unavailable':item.unemploymentDelta<=0?`improved ${Math.abs(item.unemploymentDelta)} points`:`worsened ${item.unemploymentDelta} points`}.`})): [{title:'No vacancy trend found',copy:'The current scope did not have enough matched vacancy data to summarize.'}]
+    });
+    return;
+  }
+  const genericScope=scope.slice(0,6).map(nsa=>({title:shortNeighborhood(nsa),copy:`Health index ${yv(nsa,'hi',curYI)} · gap severity ${gapSeverityMeta(gapSnapshot(nsa,'hi',curYI)).label.toLowerCase()} · reports ${scopedReports([nsa]).length}.`}));
+  setDeskAnswer({
+    title:'Scope snapshot',
+    copy:question?`Mapped your question to a general scope snapshot for ${deskScopeLabel()}.`:`Quick snapshot for ${deskScopeLabel()}.`,
+    items:genericScope
+  });
+}
+function inferDeskTemplate(question){
+  const q=String(question||'').toLowerCase();
+  if(currentPilotConfig()&&(/pilot|carroll|dump|broadband|wifi|internet/.test(q)))return'pilot';
+  if(/spent|effic|complaint|came back|returned|repeat|recurr/.test(q))return'efficacy';
+  if(/blind|sentiment|perception|official|worsened|worse/.test(q))return'blind_spots';
+  if(/vacan|property reduction|vacant/.test(q))return'vacancy';
+  return'scope';
+}
+function submitDeskQuestion(){
+  const input=document.getElementById('desk-question');
+  const question=input?.value?.trim()||'';
+  runDeskTemplate(inferDeskTemplate(question),question);
+}
+function renderDeskPanel(){
+  const shell=document.getElementById('desk-shell');
+  const panel=document.getElementById('desk-panel');
+  const toggle=document.getElementById('desk-toggle');
+  if(!shell||!panel||!toggle)return;
+  shell.classList.toggle('open',deskOpen);
+  shell.setAttribute('aria-hidden',String(!deskOpen));
+  toggle.setAttribute('aria-expanded',String(deskOpen));
+  panel.innerHTML=`<div class="desk-top"><div><div class="desk-title">${escapeHtml(deskAnswerState.title||'Analysis desk')}</div><div class="desk-copy">${escapeHtml(deskAnswerState.copy||'Choose a template or ask a question to generate a local prototype briefing.')}</div></div><button type="button" class="desk-btn" onclick="toggleDesk(false)">Close</button></div><div class="desk-templates">${deskTemplateList().map(template=>`<button type="button" class="desk-chip" onclick="runDeskTemplate('${template.id}')">${escapeHtml(template.label)}</button>`).join('')}</div><div class="desk-form"><label class="rfl" for="desk-question">Prototype question</label><textarea class="desk-input" id="desk-question" placeholder="Ask about complaint recurrence, blind spots, vacancy trends, or the Carrollton pilot."></textarea><div class="desk-actions"><button type="button" class="desk-btn primary" onclick="submitDeskQuestion()">Generate briefing</button><button type="button" class="desk-btn" onclick="runDeskTemplate('scope')">Scope snapshot</button></div></div><div class="desk-answer"><div class="desk-answer-title">${escapeHtml(deskAnswerState.title||'Analysis desk')}</div><div class="desk-answer-copy">${escapeHtml(deskAnswerState.copy||'Choose a template or ask a question to generate a local prototype briefing.')}</div><div class="desk-list">${(deskAnswerState.items||[]).map(item=>`<div class="desk-item"><div class="desk-item-title">${escapeHtml(item.title||'Insight')}</div><div class="desk-item-copy">${escapeHtml(item.copy||'')}</div></div>`).join('')}</div></div>`;
+}
+function toggleDesk(force){
+  if(!adminMode){toast('Analysis desk is available in admin mode only.');return;}
+  deskOpen=typeof force==='boolean'?force:!deskOpen;
+  if(deskOpen&&!(deskAnswerState.items||[]).length)runDeskTemplate(currentPilotConfig()?'pilot':'efficacy');
+  renderDeskPanel();
+}
 function renderOne(){
   const p=pinA,yi=curYI,hiV=yv(p,'hi',yi),compHi=benchComparison('hi',yi),compText=benchLabel();
   const prev=yi>0?yv(p,'hi',yi-1):null,delta=prev!==null?Math.round((hiV-prev)*10)/10:null;
@@ -1001,7 +1419,7 @@ function renderOne(){
   const badgeFg=comparisonDelta===null?(hiV>=65?TOKENS.success:hiV<45?TOKENS.danger:TOKENS.warn):comparisonDelta>1?TOKENS.success:comparisonDelta<-1?TOKENS.danger:TOKENS.warn;
   const badgeLabel=comparisonDelta===null?(hiV>=65?'Above avg':hiV<45?'Below avg':'Near avg'):comparisonDelta>1?`Above ${compText.toLowerCase()}`:comparisonDelta<-1?`Below ${compText.toLowerCase()}`:`Near ${compText.toLowerCase()}`;
   const deltaColor=delta===null?TOKENS.t2:delta>=0?TOKENS.success:TOKENS.danger;
-  document.getElementById('t-ov1').innerHTML=`${makeLevelSwitcher('ov1')}${metricAccuracyBox(curM,'Current map metric')}<div style="font-size:13px;font-weight:500">${shortNeighborhood(p)}</div><div style="font-size:9px;color:var(--t3)">${p} · ${YEARS[yi]}</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:26px;font-weight:500;color:${COL_A}">${hiV}</div><div style="font-size:10px;color:var(--t2)">health index<br><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${badgeBg};color:${badgeFg}">${badgeLabel}</span>${delta!==null?`<span style="color:${deltaColor};margin-left:4px">${delta>=0?'▲':'▼'}${Math.abs(delta)}</span>`:''}</div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t2)"><span style="color:${COL_A}">${shortNeighborhood(p)}: ${hiV}</span><span>${compHi!==null?`${compText}: ${compHi}`:'Local view only'}</span></div><div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;position:relative;margin-bottom:2px"><div style="height:100%;width:${pctForMetric(hiV,'hi')}%;background:${COL_A};border-radius:2px"></div>${compHi!==null?`<div style="position:absolute;top:0;left:${pctForMetric(compHi,'hi')}%;width:2px;height:100%;background:var(--t3)"></div>`:''}</div>${renderAnnotationPanel(p,annotationContext('metric','hi'),'Health index')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${['le','as','la','va','pv','hs'].map(k=>{const local=yv(p,k,yi),comp=benchComparison(k,yi);return renderContextMetricCard(p,k,local,comp!==null?`${compText}: ${comp}${MCFG[k].unit}`:'Local neighborhood value');}).join('')}</div><div style="margin-top:4px;background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this view</strong><br><span id="one-url" style="font-family:var(--font-mono);word-break:break-all">${buildURL()}</span><br><button type="button" onclick="copyURL()" aria-label="Copy shareable link for ${shortNeighborhood(p)}" style="margin-top:5px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for ${shortNeighborhood(p)}" style="margin-top:5px;margin-left:4px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">More options</button></div><div class="src-n">${sourceLine()}</div>`;
+  document.getElementById('t-ov1').innerHTML=`${currentPilotConfig()?renderPilotOverview(p):''}${makeLevelSwitcher('ov1')}${metricAccuracyBox(curM,'Current map metric')}<div style="font-size:13px;font-weight:500">${shortNeighborhood(p)}</div><div style="font-size:9px;color:var(--t3)">${p} · ${YEARS[yi]}</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:26px;font-weight:500;color:${COL_A}">${hiV}</div><div style="font-size:10px;color:var(--t2)">health index<br><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${badgeBg};color:${badgeFg}">${badgeLabel}</span>${delta!==null?`<span style="color:${deltaColor};margin-left:4px">${delta>=0?'▲':'▼'}${Math.abs(delta)}</span>`:''}</div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t2)"><span style="color:${COL_A}">${shortNeighborhood(p)}: ${hiV}</span><span>${compHi!==null?`${compText}: ${compHi}`:'Local view only'}</span></div><div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;position:relative;margin-bottom:2px"><div style="height:100%;width:${pctForMetric(hiV,'hi')}%;background:${COL_A};border-radius:2px"></div>${compHi!==null?`<div style="position:absolute;top:0;left:${pctForMetric(compHi,'hi')}%;width:2px;height:100%;background:var(--t3)"></div>`:''}</div>${renderAnnotationPanel(p,annotationContext('metric','hi'),'Health index')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${['le','as','la','va','pv','hs'].map(k=>{const local=yv(p,k,yi),comp=benchComparison(k,yi);return renderContextMetricCard(p,k,local,comp!==null?`${compText}: ${comp}${MCFG[k].unit}`:'Local neighborhood value');}).join('')}</div><div style="margin-top:4px;background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this view</strong><br><span id="one-url" style="font-family:var(--font-mono);word-break:break-all">${buildURL()}</span><br><button type="button" onclick="copyURL()" aria-label="Copy shareable link for ${shortNeighborhood(p)}" style="margin-top:5px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for ${shortNeighborhood(p)}" style="margin-top:5px;margin-left:4px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">More options</button></div><div class="src-n">${sourceLine()}</div>`;
   const keys=[{k:'hi',l:'Health idx'},{k:'le',l:'Life exp.'},{k:'as',l:'Asthma'},{k:'la',l:'Lead'},{k:'pv',l:'Poverty'},{k:'un',l:'Unemploy.'}];
   document.getElementById('t-tr1').innerHTML=`<div class="src-n" style="margin-bottom:4px">2016–${YEARS[yi]}</div>`+keys.map((kv,i)=>{const vals=allY(p,kv.k),cur=vals[yi],chg=Math.round((cur-vals[0])*10)/10;const improving=MCFG[kv.k].inv?chg<0:chg>0;const tone=improving?TOKENS.success:TOKENS.danger;const sign=chg>=0?'+':'';return`<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:0.5px solid var(--br)"><div style="flex:1;font-size:10px;color:var(--t2)">${kv.l}</div><canvas id="spk1-${i}" width="60" height="18" style="flex-shrink:0"></canvas><div style="min-width:26px;font-size:11px;font-weight:500">${cur}${MCFG[kv.k].unit}</div><div style="font-size:9px;min-width:24px;text-align:right;color:${tone}">${sign}${chg}</div></div>`;}).join('');
   requestAnimationFrame(()=>keys.forEach((kv,i)=>drawSpk('spk1-'+i,allY(p,kv.k),yi,COL_A)));
@@ -1009,7 +1427,7 @@ function renderOne(){
   renderGapPanelOne(p,'t-gap1');
   renderReportsFor(p,'t-rp1');
   document.getElementById('t-vl1').innerHTML=makeValidationPanel([p],'vl1');
-  document.getElementById('t-sb1').innerHTML=makeSubmitForm('sb1',p);
+  document.getElementById('t-sb1').innerHTML=`${renderPilotSubmitIntro()}${makeSubmitForm('sb1',p)}`;
   if(adminMode)renderAdminPanel([p],'t-ad1');
 }
 function renderTwo(){
@@ -1054,7 +1472,7 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function rebuildReportMarkers(){if(!map)return;rMks.forEach(marker=>{if(map.hasLayer(marker))map.removeLayer(marker);});rMks=[];REPORTS.forEach(report=>{const location=reportLocation(report);if(!location)return;const ic=L.divIcon({className:'',html:`<div style="width:10px;height:10px;border-radius:50%;background:${report.color};border:2px solid ${TOKENS.bg};cursor:pointer"></div>`,iconSize:[10,10],iconAnchor:[5,5]});const mk=L.marker(location,{icon:ic});mk.bindPopup(`<div style="font-size:11px;font-family:sans-serif;min-width:130px"><strong>${escapeHtml(report.title)}</strong><br><span style="color:${TOKENS.t3};font-size:10px">${escapeHtml(report.nsa)}</span><br><span style="color:${TOKENS.t3};font-size:10px">${escapeHtml(report.trackingId)}</span></div>`,{closeButton:false});rMks.push(mk);if(ls.r)mk.addTo(map);});}
 function initMks(){rebuildReportMarkers();THREE11.forEach(c=>{const r=Math.max(8,Math.min(22,c.cnt/7));const ic=L.divIcon({className:'',html:`<div style="width:${r*2}px;height:${r*2}px;border-radius:50%;background:${TOKENS.warnLt};border:1.5px solid ${TOKENS.warn};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:${TOKENS.warn}">${c.cnt}</div>`,iconSize:[r*2,r*2],iconAnchor:[r,r]});cMks.push(L.marker([c.lat,c.lng],{icon:ic}));});}
 document.getElementById('share-modal').addEventListener('click',closeModal);
-document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();if(deskOpen)toggleDesk(false);}});
 async function initMap(){document.getElementById('ylabels').innerHTML=YEARS.map(y=>`<span>${y}</span>`).join('');map=L.map('balt-map',{zoomControl:true,attributionControl:false}).setView([39.29,-76.62],11);map.on('click',e=>{if(activeReportPinForm)captureReportLocation(activeReportPinForm,e.latlng);});L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);try{const [baseResp, geoResp] = await Promise.all([fetch('data.json',{cache:'no-store'}),fetch('csa_boundaries.geojson',{cache:'no-store'})]);if(!baseResp.ok) throw new Error(`Failed to load data.json (${baseResp.status})`);if(!geoResp.ok) throw new Error(`Failed to load csa_boundaries.geojson (${geoResp.status})`);const normalizedData=normalizeDataset(await baseResp.json());DATA_META=normalizedData.meta||{};BASE=normalizedData.neighborhoods||{};BENCHMARKS=normalizedData.benchmarks||{city:{},state:{},federal:{}};applyMetricMetadata();const geoData = await geoResp.json();geo=L.geoJSON(geoData,{style:getStyle,onEachFeature:(feature,layer)=>{const name=geoName(feature.properties);const key=findK(name);layer.on({click:onNSAClick,mouseover:()=>{const label=key||name||'Neighborhood';const tooltip=gapMode&&key?gapTooltipHtml(key,name):`${label}<br>${MCFG[curM].label}: ${key?yv(key,curM,curYI):'N/A'}${key&&yv(key,curM,curYI)!==null?MCFG[curM].unit:''}`;layer.bindTooltip(tooltip,{sticky:true,direction:'top',opacity:0.95}).openTooltip();if(key!==pinA&&key!==pinB) layer.setStyle({weight:2,color:TOKENS.neutralInverse,fillOpacity:gapMode?0.92:0.9});},mouseout:()=>{if(key===pinA||key===pinB) updatePinStyles();else geo.resetStyle(layer);}});}}).addTo(map);updateGapToggleUI();buildLeg();if(db){const loaded=await syncReportsFromSupabase();if(!loaded)resetFallbackReports();await syncAnnotationsFromSupabase();subscribeToReports();subscribeToAnnotations();}initMks();if(ls['3']) cMks.forEach(m=>m.addTo(map));map.fitBounds(geo.getBounds(),{padding:[12,12]});document.getElementById('ml').style.display='none';loadFromURL();updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}catch(err){console.error(err);document.getElementById('ml').innerHTML='<div style="max-width:280px;text-align:center;line-height:1.5"><strong>Dashboard data failed to load.</strong><br>Make sure <code>data.json</code> and <code>csa_boundaries.geojson</code> are published in the repo root.</div>';}}
 initSupabase();
 initMap();

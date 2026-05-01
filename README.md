@@ -142,6 +142,29 @@ If you rerun the Supabase SQL after pulling this repo, it now also adds:
 - explicit anon/authenticated grants for `reports`, `votes`, and `annotations`
 - realtime publication coverage for `annotations`
 
+## Phase 3, 6, and 7 prototype coverage
+
+The current repo now covers the next three product phases as honest prototype layers:
+
+- **Phase 3 — Gap View**
+  - Gap mode now includes an **Efficacy watch** section.
+  - The efficacy layer is clearly labeled as a proxy built from repeat resident signal plus current burden, not linked city spending data yet.
+  - Blind-spot filtering and gap-severity map mode remain URL-shareable.
+
+- **Phase 6 — Admin analysis desk**
+  - Opening the dashboard with `?admin=1` now reveals the moderation helper **and** an **Analysis desk** drawer.
+  - The desk is intentionally deterministic right now. It answers local prototype templates such as complaint recurrence, blind-spot reversals, vacancy-pattern scans, and pilot snapshots without pretending a live Claude integration already exists.
+  - This keeps the admin workflow demoable while leaving a clean slot for a future real LLM-backed tool layer.
+
+- **Phase 7 — Carrollton Ridge pilot**
+  - Opening the dashboard with `?pilot=carrollton` locks the prototype to `Southwest Baltimore`, which is the current CSA stand-in for `Carrollton Ridge / Franklin Square`.
+  - Pilot mode foregrounds two focal issues:
+    - illegal dumping, using the current `311 hazards` and sanitation-signal proxy
+    - broadband access, using reports and annotations that mention connectivity-related terms
+  - Each pilot card includes a local browser-stored **Yes / No / Not sure** accuracy vote.
+  - `submit/index.html` provides a focused mobile field-intake page for the pilot.
+  - `submit/sw.js` caches that flow after first load and stores drafts locally when the device is offline, then retries sync to Supabase later.
+
 ## GitHub Pages Setup Reference
 
 1. Create a public GitHub repository, for example `BALTI2`.
