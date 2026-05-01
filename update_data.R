@@ -1036,12 +1036,26 @@ load_cdc_lead_benchmark_series <- function(years = 2016:2023) {
     ) %>%
     filter(!is.na(la))
 
+  # CDC's public NHANES lead tables do not provide an annual national surveillance
+  # percentage that is method-matched to the Maryland tested-children series. We
+  # use a clearly labeled federal proxy instead: 2.5% of children ages 1-5 are
+  # above the CDC blood lead reference value by definition because the BLRV is set
+  # at the 97.5th percentile of the 2015-2018 NHANES distribution.
+  federal_proxy_tbl <- tibble(
+    Year = years,
+    la = rep(2.5, length(years))
+  )
+
   list(
     state = maryland_tbl,
-    federal = tibble(Year = integer()),
+    federal = federal_proxy_tbl,
     metrics = "la",
     sources = c(
-      state = workbook_url
+      state = workbook_url,
+      federal = paste(
+        "NHANES cycle-level proxy inferred from the CDC blood lead reference value",
+        "(97.5th percentile of U.S. children ages 1-5 in NHANES 2015-2018)"
+      )
     )
   )
 }
@@ -1738,8 +1752,11 @@ for (row_idx in seq_len(nrow(final_dashboard_data))) {
 }
 
 benchmarks_output <- list(city = list(), state = list(), federal = list())
-state_real_benchmark_metrics <- sort(setdiff(names(state_benchmark_series), "Year"))
-federal_real_benchmark_metrics <- sort(setdiff(names(federal_benchmark_series), "Year"))
+state_proxy_benchmark_metrics <- character()
+federal_proxy_benchmark_metrics <- if (nrow(cdc_lead_benchmark_import$federal) > 0) "la" else character()
+state_real_benchmark_metrics <- sort(setdiff(setdiff(names(state_benchmark_series), "Year"), state_proxy_benchmark_metrics))
+federal_real_benchmark_metrics <- sort(setdiff(setdiff(names(federal_benchmark_series), "Year"), federal_proxy_benchmark_metrics))
+benchmark_proxy_metrics <- sort(unique(c(state_proxy_benchmark_metrics, federal_proxy_benchmark_metrics)))
 shared_real_benchmark_metrics <- intersect(state_real_benchmark_metrics, federal_real_benchmark_metrics)
 state_only_real_benchmark_metrics <- setdiff(state_real_benchmark_metrics, federal_real_benchmark_metrics)
 federal_only_real_benchmark_metrics <- setdiff(federal_real_benchmark_metrics, state_real_benchmark_metrics)
@@ -1869,6 +1886,16 @@ json_ready_data <- list(
               "."
             )
           },
+          if ("la" %in% federal_proxy_benchmark_metrics) {
+            paste(
+              "Federal `la` uses a clearly labeled NHANES cycle-level proxy:",
+              "2.5% of U.S. children ages 1-5 above the current CDC blood lead",
+              "reference value, inferred from the BLRV being defined as the",
+              "97.5th percentile of NHANES 2015-2018. It is not an annual",
+              "surveillance rate and is not directly method-matched to Maryland's",
+              "tested-children series."
+            )
+          },
           "Remaining benchmark cells still fall back to the provisional scaffold.",
           "Benchmark `hi` is derived from available real benchmark components when enough official inputs are present."
         ),
@@ -1892,13 +1919,15 @@ json_ready_data <- list(
         acs = if (length(acs_benchmark_import$sources)) acs_benchmark_import$sources[["federal"]] else NULL,
         fred = if (length(fred_benchmark_import$sources)) fred_benchmark_import$sources[["federal"]] else NULL,
         cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES aggregate queries (2018-2023)" else NULL,
-        cdc_life_expectancy = if (length(cdc_life_expectancy_benchmark_import$sources)) cdc_life_expectancy_benchmark_import$sources[["federal"]] else NULL
+        cdc_life_expectancy = if (length(cdc_life_expectancy_benchmark_import$sources)) cdc_life_expectancy_benchmark_import$sources[["federal"]] else NULL,
+        nhanes_lead_proxy = if ("la" %in% federal_proxy_benchmark_metrics) cdc_lead_benchmark_import$sources[["federal"]] else NULL
       )),
       hazards = if (has_311_data) "Open Baltimore 311 ArcGIS services" else NULL,
       poverty = if (nrow(csa_acs_summary) > 0) "ACS 2022 tract estimates weighted to CSA" else NULL
     ),
     derived_metrics = if (derive_hi_from_components) as.list("hi") else NULL,
     proxy_metrics = if ("as" %in% cdc_metric_cols) as.list("as") else NULL,
+    benchmark_proxy_metrics = if (length(benchmark_proxy_metrics)) as.list(benchmark_proxy_metrics) else NULL,
     real_benchmark_metrics = if (length(real_benchmark_metrics)) as.list(real_benchmark_metrics) else NULL,
     state_benchmark_metrics = if (length(state_real_benchmark_metrics)) as.list(state_real_benchmark_metrics) else NULL,
     federal_benchmark_metrics = if (length(federal_real_benchmark_metrics)) as.list(federal_real_benchmark_metrics) else NULL,

@@ -101,11 +101,15 @@ Current real benchmark coverage:
 - `le` from the official CDC `U.S. Life Expectancy by State and Sex, 2018-2022` CSV for Maryland, plus official United States life-table totals for the federal layer in `2016`, `2017`, and `2023`
 - `la` from the official CDC Childhood Blood Lead Surveillance workbook for Maryland only, using the consistent `>=5 µg/dL` series for `2017` through `2022`
 
+Current clearly labeled benchmark proxies:
+
+- federal `la` uses a cycle-level NHANES proxy of `2.5%`, representing the share of U.S. children ages `1-5` above the CDC blood lead reference value. This is inferred from CDC's definition of the BLRV as the `97.5th` percentile of the `2015-2018` NHANES distribution, so it is not an annual surveillance rate and is not directly method-matched to Maryland's tested-children series.
+
 Current benchmark gaps that still depend on the old scaffold until more sources are connected:
 
 - `pv`, `hs`, and `va` are implemented in the pipeline through ACS 5-year series, but they only activate when `CENSUS_API_KEY` is available
 - `le` still falls back for Maryland `2016`, `2017`, and `2023`, because the official CDC state-life table feed currently covers only `2018` through `2022`
-- `la` still falls back for the federal benchmark and for `2016` / `2023`, because CDC's lead surveillance workbook does not provide a defensible national prevalence row and only covers `2017` through `2022`
+- `la` still falls back for Maryland `2016` / `2023`, because CDC's lead surveillance workbook only covers `2017` through `2022`
 - benchmark `hi` is derived only when enough real benchmark components are present; otherwise it falls back
 
 ## Deployment

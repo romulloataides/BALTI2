@@ -13,7 +13,7 @@
     ],
     "provisional": true,
     "note": "BNIA ArcGIS services supplied: hs, la, le, un, va. CDC 500 Cities / PLACES tract releases supplied `as` as an adult current asthma prevalence proxy, aggregated to CSAs using tract centroid assignment and population weighting. The dashboard `hi` series is derived from official component metrics (le, as, la, va, pv, un, hs) using yearly min-max normalization and equal weighting. Missing metrics still fall back to existing data.json values and modeled series where needed.",
-    "benchmark_note": "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks use real official series for: as, hs, le, pv, un, va. State-only official benchmark coverage is available for: la. Remaining benchmark cells still fall back to the provisional scaffold. Benchmark `hi` is derived from available real benchmark components when enough official inputs are present.",
+    "benchmark_note": "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks use real official series for: as, hs, le, pv, un, va. State-only official benchmark coverage is available for: la. Federal `la` uses a clearly labeled NHANES cycle-level proxy: 2.5% of U.S. children ages 1-5 above the current CDC blood lead reference value, inferred from the BLRV being defined as the 97.5th percentile of NHANES 2015-2018. It is not an annual surveillance rate and is not directly method-matched to Maryland's tested-children series. Remaining benchmark cells still fall back to the provisional scaffold. Benchmark `hi` is derived from available real benchmark components when enough official inputs are present.",
     "source_files": {
       "neighborhood": {},
       "neighborhood_services": [
@@ -44,7 +44,8 @@
         "acs": "ACS 5-year United States estimates",
         "fred": "https://fred.stlouisfed.org/series/UNRATE",
         "cdc_asthma": "CDC PLACES aggregate queries (2018-2023)",
-        "cdc_life_expectancy": "CDC U.S. State Life Expectancy by Sex, 2018-2022 CSV plus United States Life Tables 2016, 2017, and 2023 official totals"
+        "cdc_life_expectancy": "CDC U.S. State Life Expectancy by Sex, 2018-2022 CSV plus United States Life Tables 2016, 2017, and 2023 official totals",
+        "nhanes_lead_proxy": "NHANES cycle-level proxy inferred from the CDC blood lead reference value (97.5th percentile of U.S. children ages 1-5 in NHANES 2015-2018)"
       },
       "hazards": {},
       "poverty": "ACS 2022 tract estimates weighted to CSA"
@@ -54,6 +55,9 @@
     ],
     "proxy_metrics": [
       "as"
+    ],
+    "benchmark_proxy_metrics": [
+      "la"
     ],
     "real_benchmark_metrics": [
       "as",
@@ -7399,10 +7403,10 @@
     },
     "federal": {
       "2016": {
-        "hi": 76.6,
+        "hi": 70.8,
         "le": 78.7,
         "as": 10.8,
-        "la": 0,
+        "la": 2.5,
         "va": 12.2,
         "pv": 15.1,
         "un": 4.9,
@@ -7412,10 +7416,10 @@
         "cr": 57.9
       },
       "2017": {
-        "hi": 77.7,
+        "hi": 68.9,
         "le": 78.6,
         "as": 9.8,
-        "la": 0,
+        "la": 2.5,
         "va": 12.2,
         "pv": 14.6,
         "un": 4.4,
@@ -7425,10 +7429,10 @@
         "cr": 57.5
       },
       "2018": {
-        "hi": 79.4,
+        "hi": 74.6,
         "le": 78.7,
         "as": 9.8,
-        "la": 0,
+        "la": 2.5,
         "va": 12.2,
         "pv": 14.1,
         "un": 3.9,
@@ -7438,9 +7442,9 @@
         "cr": 56.9
       },
       "2019": {
-        "hi": 82.1,
+        "hi": 75.1,
         "as": 9.6,
-        "la": 0,
+        "la": 2.5,
         "va": 12.1,
         "pv": 13.4,
         "un": 3.7,
@@ -7460,7 +7464,8 @@
         "fd": 51.2,
         "gs": 24.1,
         "cr": 56,
-        "le": 77
+        "le": 77,
+        "la": 2.5
       },
       "2021": {
         "hi": 76.9,
@@ -7472,7 +7477,8 @@
         "fd": 51.4,
         "gs": 24.3,
         "cr": 55.5,
-        "le": 77
+        "le": 77,
+        "la": 2.5
       },
       "2022": {
         "hi": 78.9,
@@ -7484,7 +7490,8 @@
         "fd": 51.7,
         "gs": 24.4,
         "cr": 54.9,
-        "le": 77.5
+        "le": 77.5,
+        "la": 2.5
       },
       "2023": {
         "hi": 80.8,
@@ -7496,7 +7503,8 @@
         "fd": 52.1,
         "gs": 24.5,
         "cr": 54.4,
-        "le": 78.4
+        "le": 78.4,
+        "la": 2.5
       }
     }
   }
