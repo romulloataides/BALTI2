@@ -6,7 +6,7 @@
 <title>Carrollton Ridge Pilot Submit</title>
 <meta name="description" content="Offline-friendly field intake form for the BALTI2 Carrollton Ridge pilot.">
 <style>
-:root{--bg:oklch(99% 0.004 255);--bg2:oklch(96.8% 0.008 255);--bg3:oklch(93.5% 0.012 255);--tx:oklch(20% 0.015 255);--t2:oklch(42% 0.012 255);--t3:oklch(58% 0.009 255);--br:oklch(88% 0.01 255);--brand:oklch(32% 0.09 255);--brand2:oklch(52% 0.11 255);--brandLt:oklch(95% 0.02 255);--accent:oklch(54% 0.14 35);--accentLt:oklch(96% 0.02 35);--success:oklch(58% 0.13 162);--successLt:oklch(96% 0.02 162);--warn:oklch(57% 0.11 68);--warnLt:oklch(97% 0.02 68)}
+:root{--bg:oklch(99% 0.004 255);--bg2:oklch(96.8% 0.008 255);--bg3:oklch(93.5% 0.012 255);--tx:oklch(20% 0.015 255);--t2:oklch(42% 0.012 255);--t3:oklch(58% 0.009 255);--br:oklch(88% 0.01 255);--brand:oklch(32% 0.09 255);--brand2:oklch(52% 0.11 255);--brandLt:oklch(95% 0.02 255);--accent:oklch(54% 0.14 35);--accentLt:oklch(96% 0.02 35);--success:oklch(58% 0.13 162);--successLt:oklch(96% 0.02 162);--warn:oklch(57% 0.11 68);--warnLt:oklch(97% 0.02 68);--err:oklch(54% 0.14 28);--errLt:oklch(97% 0.02 28)}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--tx);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 body{padding:18px}
@@ -25,7 +25,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .field{display:flex;flex-direction:column;gap:6px}
 .label{font-size:13px;font-weight:600;color:var(--t2)}
 .hint{font-size:12px;color:var(--t3);line-height:1.45}
-.input,.select,.textarea{width:100%;padding:12px 13px;border-radius:12px;border:1px solid var(--br);background:var(--bg2);color:var(--tx)}
+/* font-size:16px prevents iOS Safari from auto-zooming on input focus */
+.input,.select,.textarea{width:100%;padding:12px 13px;border-radius:12px;border:1px solid var(--br);background:var(--bg2);color:var(--tx);font-size:16px}
 .textarea{min-height:110px;resize:vertical}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .focus-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
@@ -38,10 +39,16 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .btn.primary{background:var(--brand);border-color:var(--brand);color:var(--bg)}
 .btn.ghost{background:transparent}
 .btn.small{padding:7px 11px;font-size:12px}
-.sync-box{padding:14px;border-radius:14px;background:var(--bg2);border:1px solid var(--br);display:flex;flex-direction:column;gap:8px}
+.sync-box{padding:14px;border-radius:14px;background:var(--bg2);border:1px solid var(--br);display:flex;flex-direction:column;gap:6px}
 .sync-line{font-size:13px;color:var(--t2);line-height:1.5}
-.success{padding:14px;border-radius:14px;background:var(--successLt);border:1px solid color-mix(in oklab,var(--success) 26%,var(--bg));display:none;flex-direction:column;gap:6px}
-.success strong{font-size:18px;color:var(--success)}
+/* .notice replaces old .success — supports success and warn variants, auto-dismisses */
+.notice{padding:14px;border-radius:14px;display:none;flex-direction:column;gap:6px;animation:fadeNotice .18s ease-out}
+.notice.success{background:var(--successLt);border:1px solid color-mix(in oklab,var(--success) 26%,var(--bg))}
+.notice.warn{background:var(--warnLt);border:1px solid color-mix(in oklab,var(--warn) 30%,var(--bg))}
+.notice strong{font-size:16px}
+.notice.success strong{color:var(--success)}
+.notice.warn strong{color:var(--warn)}
+@keyframes fadeNotice{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .small{font-size:12px;color:var(--t3);line-height:1.45}
 .queue-list{display:flex;flex-direction:column;gap:10px}
 .queue-item{padding:12px;border-radius:14px;border:1px solid var(--br);background:var(--bg2);display:flex;flex-direction:column;gap:8px}
@@ -62,7 +69,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <div class="hero">
     <div class="kicker">BALTI2 pilot intake</div>
     <div class="title" id="hero-title">Carrollton Ridge field submit</div>
-    <div class="copy" id="hero-copy">This form is designed for quick phone-based intake. It keeps working after the first load, stores entries locally when you are offline, and syncs them to Supabase when the connection comes back.</div>
+    <div class="copy" id="hero-copy">Quick phone-based intake form. Works offline and syncs to Supabase when the connection returns.</div>
   </div>
 
   <div class="status">
@@ -92,7 +99,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
   <div class="card">
     <div class="card-title">Submit a pilot report</div>
-    <form id="pilot-form">
+
+    <!-- notice appears here so it's visible before/above the form on mobile -->
+    <div class="notice success" id="notice-box" role="status" aria-live="polite">
+      <strong id="notice-heading">Report captured</strong>
+      <div id="notice-copy">The report was saved.</div>
+      <div class="small">If you were offline, this item will sync automatically when the connection returns.</div>
+    </div>
+
+    <form id="pilot-form" style="display:flex;flex-direction:column;gap:14px">
       <div class="grid">
         <div class="field">
           <label class="label" for="pilot-neighborhood">Neighborhood scope</label>
@@ -149,19 +164,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <a class="btn ghost" id="return-link" href="../?pilot=carrollton">Back to dashboard</a>
       </div>
     </form>
-
-    <div class="success" id="success-box">
-      <strong>Report captured</strong>
-      <div id="success-copy">The report was saved.</div>
-      <div class="small">If you were offline, this item will sync automatically when the connection returns.</div>
-    </div>
   </div>
 
   <div class="sync-box">
-    <div class="card-title" style="font-size:16px">How the prototype handles offline intake</div>
-    <div class="sync-line">If the network is unavailable, the form stores your report locally in the browser queue and gives you a temporary queue ID.</div>
-    <div class="sync-line">As soon as the page comes back online, the queue tries to post each report to Supabase and replaces the local draft with a real tracking ID.</div>
-    <div class="small">This is a prototype convenience layer, not a full audited offline sync engine yet.</div>
+    <div class="card-title" style="font-size:16px">Offline-first intake</div>
+    <div class="sync-line">Reports saved while offline are held in the browser queue and posted to Supabase automatically when the connection returns. This is a prototype layer, not a full audited sync engine.</div>
   </div>
 
   <div class="card">
@@ -185,6 +192,7 @@ const PILOT_META={
 };
 let currentFocus='Illegal dumping';
 let capturedLocation=null;
+let noticeDismissTimer=null;
 
 function byId(id){return document.getElementById(id);}
 function nowIsoDate(){return new Date().toISOString().slice(0,10);}
@@ -290,11 +298,18 @@ async function postReport(payload){
     return await send(legacyPayload(payload));
   }
 }
-function showSuccess(message){
-  const box=byId('success-box');
-  byId('success-copy').textContent=message;
+function showNotice(message,type='success'){
+  if(noticeDismissTimer)clearTimeout(noticeDismissTimer);
+  const box=byId('notice-box');
+  const heading=byId('notice-heading');
+  box.className=`notice ${type}`;
+  heading.textContent=type==='success'?'Report captured':'Note';
+  byId('notice-copy').textContent=message;
   box.style.display='flex';
+  box.scrollIntoView({behavior:'smooth',block:'nearest'});
+  noticeDismissTimer=setTimeout(()=>{box.style.display='none';},4000);
 }
+function showSuccess(message){showNotice(message,'success');}
 function setGeoCopy(){
   if(!capturedLocation){
     byId('geo-copy').textContent='Optional. Helps the pilot team place the report more precisely when a navigator is in the field.';
@@ -304,7 +319,7 @@ function setGeoCopy(){
 }
 async function captureLocation(){
   if(!navigator.geolocation){
-    showSuccess('This browser does not support geolocation.');
+    showNotice('This browser does not support geolocation.','warn');
     return;
   }
   byId('geo-btn').disabled=true;
@@ -364,7 +379,7 @@ async function handleSubmit(event){
   const form=event.currentTarget;
   const payload=payloadFromForm(form);
   if(!payload.description.trim()){
-    showSuccess('Please add a description before saving this report.');
+    showNotice('Please add a description before saving this report.','warn');
     return;
   }
   if(navigator.onLine){
@@ -386,7 +401,7 @@ async function handleSubmit(event){
       capturedLocation=null;
       byId('geo-btn').textContent='Capture current location';
       setGeoCopy();
-      showSuccess(`Live save failed, so the report was queued locally as ${draftId}.`);
+      showNotice(`Live save failed — queued locally as ${draftId}.`,'warn');
       return;
     }
   }
@@ -396,7 +411,7 @@ async function handleSubmit(event){
   capturedLocation=null;
   byId('geo-btn').textContent='Capture current location';
   setGeoCopy();
-  showSuccess(`Saved offline as ${draftId}. It will sync when the connection returns.`);
+  showSuccess(`Saved offline as ${draftId}. Will sync when connection returns.`);
 }
 async function retryQueueItem(id){
   const queue=readQueue();
@@ -412,7 +427,7 @@ async function retryQueueItem(id){
     writeQueue(next);
     renderQueue();
     updateQueuePill();
-    showSuccess(`Draft ${id} is still queued. ${error?.message||'Retry failed.'}`);
+    showNotice(`Draft ${id} is still queued. ${error?.message||'Retry failed.'}`,'warn');
   }
 }
 function removeQueueItem(id,showToast=true){
