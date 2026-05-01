@@ -16,6 +16,8 @@ This project can run with or without Supabase. If Supabase is not configured, re
 4. Copy/paste the SQL into the editor and run it.
 5. Open [`supabase/migrations/002_ai_admin_pilot.sql`](./migrations/002_ai_admin_pilot.sql).
 6. Copy/paste the SQL into the editor and run it too.
+7. Open [`supabase/migrations/003_spending_seed.sql`](./migrations/003_spending_seed.sql).
+8. Copy/paste the SQL into the editor and run it to load the official Baltimore CIP-derived spending seed.
 
 This migration creates the live `reports` + `votes` tables and the `report_vote_counts` view that the dashboard now reads for community report cards and map markers.
 
@@ -26,6 +28,10 @@ If you already ran an older version of the schema, rerun the full migration so t
 - `source`, `pilot_slug`, `block_label`, `observed_on`, and `metadata` on `reports`
 - `pilot_accuracy_votes` and `pilot_accuracy_vote_counts`
 - `admin_users`, `analysis_prompt_profiles`, `analysis_sessions`, `analysis_messages`, and `spending_events`
+
+The `003_spending_seed.sql` migration currently seeds `spending_events` from Baltimore City's official FY14-20 CIP GIS layers, spatially allocated to CSAs. That is a real public source, but it is still a capital-project proxy rather than exact work-order execution history.
+
+If older demo-only `phase7_seed_%` rows still exist in your live project from earlier prototyping, the `analysis-desk` function now ignores them automatically so admin summaries prefer official-source spending records.
 
 ## 3. Allowlist admin emails
 

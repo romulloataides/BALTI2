@@ -242,8 +242,7 @@ node scripts/migrate_data_schema.mjs data.json
 - Replace the CDC asthma proxy with a direct neighborhood-level official asthma ED source if BNIA or Maryland publishes a current one again.
 - Add a defensible federal `la` source and newer official `le` years if you want the benchmark switcher to be fully non-scaffolded.
 - Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
-- Run the new Supabase migration and deploy the `analysis-desk` Edge Function so Phase 6 becomes live end to end.
-- Add real spending / work-order records to `spending_events` so efficacy queries stop saying "no spending data loaded yet."
+- Expand the current official Baltimore FY14-20 CIP spending seed with newer CIP, work-order, or procurement data so efficacy queries can move beyond the initial capital-project view.
 - Replace the Carrollton-to-`Southwest Baltimore` proxy if BNIA or another defensible CSA mapping source becomes available.
 - Finish human mobile field-testing with Digital Navigators and adjust the pilot intake copy based on what they actually need in the street.
 
@@ -252,3 +251,5 @@ node scripts/migrate_data_schema.mjs data.json
 - Share links use the current page URL instead of a hardcoded placeholder domain.
 - The dashboard still depends on CDN assets for Leaflet and Chart.js.
 - Most yearly trends are still modeled only when a real `2016`–`2023` array is unavailable after the BNIA, CDC, ACS, and 311 refresh steps run.
+- `spending_events` is now seeded from the official Baltimore Planning FY14-20 CIP layers, spatially allocated to CSAs; project status is inferred from fiscal year because the source does not expose execution dates or completion status.
+- The Phase 6 analysis desk ignores legacy `phase7_seed_%` spending rows if they still exist in Supabase, so efficacy summaries prefer official-source expenditure records.

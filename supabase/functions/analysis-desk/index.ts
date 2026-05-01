@@ -505,6 +505,7 @@ async function queryCityExpenditures(args: Record<string, unknown>, scope: Recor
   let query = adminClient
     .from("spending_events")
     .select("*")
+    .not("source", "like", "phase7_seed_%")
     .order("created_at", { ascending: false })
     .limit(limit);
   if (neighborhoods.length) query = query.in("nsa", neighborhoods);
@@ -518,7 +519,7 @@ async function queryCityExpenditures(args: Record<string, unknown>, scope: Recor
     name: "query_city_expenditures",
     summary: `Returned ${(data ?? []).length} spending record(s).`,
     data: {
-      source: "Supabase spending_events",
+      source: "Supabase spending_events (legacy phase7 demo sources excluded)",
       events: data ?? [],
     },
   };
