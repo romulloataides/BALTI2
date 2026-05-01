@@ -7,7 +7,7 @@
 <meta name="description" content="Interactive Baltimore neighborhood health dashboard with map-based comparison views.">
 <style>
 html,body{height:100%}
-body{margin:0;background:oklch(98.5% 0.006 255);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:oklch(20% 0.015 255)}
+body{margin:0;background:linear-gradient(180deg,oklch(98.8% 0.006 255),oklch(97.2% 0.009 255));font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:oklch(20% 0.015 255)}
 :root{--color-background-primary:oklch(99% 0.005 255);--color-background-secondary:oklch(97% 0.007 255);--color-background-tertiary:oklch(94% 0.008 255);--color-border-tertiary:oklch(88% 0.01 255);--color-text-primary:oklch(20% 0.015 255);--color-text-secondary:oklch(42% 0.012 255);--color-text-tertiary:oklch(58% 0.009 255);--font-sans:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--font-mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace}
 *{box-sizing:border-box;margin:0;padding:0}
 #bd{--brand:oklch(32% 0.09 255);--brand2:oklch(52% 0.11 255);--brand-lt:oklch(95% 0.02 255);--accent:oklch(54% 0.14 35);--accent-lt:oklch(96% 0.02 35);--success:oklch(58% 0.13 162);--success-lt:oklch(96% 0.02 162);--warn:oklch(57% 0.11 68);--warn-lt:oklch(97% 0.02 68);--danger:oklch(42% 0.16 28);--neutral-inverse:oklch(99% 0.004 255);--bg:var(--color-background-primary);--bg2:var(--color-background-secondary);--bg3:var(--color-background-tertiary);--br:var(--color-border-tertiary);--tx:var(--color-text-primary);--t2:var(--color-text-secondary);--t3:var(--color-text-tertiary);--map-stroke:oklch(96% 0.01 255 / 0.78);--metric-low:oklch(42% 0.16 28);--metric-midlow:oklch(60% 0.14 35);--metric-mid:oklch(68% 0.12 68);--metric-midhigh:oklch(56% 0.10 230);--metric-high:oklch(58% 0.13 162);--focus-ring:oklch(72% 0.08 255 / 0.45);font-family:var(--font-sans);color:var(--tx);height:100vh;display:flex;flex-direction:column;overflow:hidden}
@@ -16,18 +16,29 @@ body{margin:0;background:oklch(98.5% 0.006 255);font-family:Inter,system-ui,-app
 button,input,select,textarea{font:inherit}
 button{appearance:none;-webkit-appearance:none}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--brand2);outline-offset:2px}
-#hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:0.5px solid var(--br);flex-shrink:0;gap:8px;flex-wrap:wrap}
-.logo{width:26px;height:26px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;color:var(--neutral-inverse);font-size:10px;font-weight:500;flex-shrink:0}
-.ttl{font-size:13px;font-weight:500}.sub{font-size:10px;color:var(--t3)}
-.mtabs{display:flex;gap:2px;flex-wrap:wrap}
-.mtab{padding:4px 8px;font-size:11px;border-radius:4px;cursor:pointer;border:0.5px solid var(--br);background:transparent;color:var(--t2);transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1);white-space:nowrap}
+#hdr{display:flex;align-items:flex-start;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--br);flex-shrink:0;gap:12px;flex-wrap:wrap;background:linear-gradient(180deg,oklch(99.4% 0.004 255),oklch(97.5% 0.008 255))}
+.hdr-left{display:flex;align-items:flex-start;gap:10px;min-width:280px;flex:1}
+.logo{width:34px;height:34px;border-radius:12px;background:linear-gradient(180deg,var(--brand2),var(--brand));display:flex;align-items:center;justify-content:center;color:var(--neutral-inverse);font-size:12px;font-weight:600;flex-shrink:0}
+.hdr-title-block{display:flex;flex-direction:column;gap:3px;min-width:0}
+.hdr-kicker{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.ttl{font-size:16px;font-weight:600;line-height:1.2}
+.sub{font-size:11px;color:var(--t2);line-height:1.45;max-width:62ch}
+.hdr-badges{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.hdr-right{display:flex;flex-direction:column;gap:6px;align-items:flex-end;min-width:min(100%,520px)}
+.control-shell{display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:12px;border:0.5px solid var(--br);background:color-mix(in oklab,var(--bg) 75%,var(--brand-lt));min-width:min(100%,520px)}
+.shell-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.mtabs{display:flex;gap:4px;flex-wrap:wrap}
+.mtab{padding:5px 9px;font-size:11px;border-radius:999px;cursor:pointer;border:0.5px solid var(--br);background:var(--bg);color:var(--t2);transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1);white-space:nowrap}
 .mtab:hover{background:var(--bg2)}.mtab.active{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
-.ltoggs{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.ltoggs{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .ltog{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);cursor:pointer;padding:3px 6px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg2);transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1)}
 .ltog.on{border-color:var(--brand2);color:var(--brand)}
 .ltog.share-launch{border-color:var(--brand2);color:var(--brand)}
 .ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-#time-bar{flex-shrink:0;border-bottom:0.5px solid var(--br);padding:7px 14px;display:flex;align-items:center;gap:10px;background:var(--bg2)}
+#time-bar{flex-shrink:0;border-bottom:0.5px solid var(--br);padding:9px 16px;display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,var(--bg2),color-mix(in oklab,var(--bg2) 65%,var(--brand-lt)))}
+.time-meta{display:flex;flex-direction:column;gap:2px;min-width:122px;flex-shrink:0}
+.time-kicker{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+.time-copy{font-size:10px;color:var(--t2);line-height:1.35}
 #play-btn{width:26px;height:26px;border-radius:50%;border:0.5px solid var(--br);background:var(--bg);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1)}
 #play-btn:hover{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
 #slider-wrap{flex:1;display:flex;flex-direction:column;gap:2px}
@@ -35,30 +46,33 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 #yr-slider{width:100%;accent-color:var(--brand)}
 #cur-yr{font-size:13px;font-weight:500;color:var(--brand);min-width:34px;text-align:right;flex-shrink:0}
 #body{display:flex;flex:1;overflow:hidden}
-#map-wrap{flex:1;position:relative;overflow:hidden}
-#balt-map{width:100%;height:100%}
-#ml{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:var(--bg2);z-index:1000;font-size:12px;color:var(--t2);flex-direction:column;gap:6px}
+#map-wrap{flex:1;position:relative;overflow:hidden;background:linear-gradient(180deg,oklch(97.7% 0.009 255),oklch(96.1% 0.012 255))}
+#balt-map{position:absolute;inset:14px;width:calc(100% - 28px);height:calc(100% - 28px);border-radius:18px;overflow:hidden;border:0.5px solid color-mix(in oklab,var(--brand) 10%,var(--br))}
+#ml{position:absolute;inset:14px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,var(--bg2),var(--brand-lt));border-radius:18px;z-index:1000;font-size:12px;color:var(--t2);flex-direction:column;gap:6px}
 .spin{width:18px;height:18px;border:2px solid var(--br);border-top-color:var(--brand);border-radius:50%;animation:sp .7s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
-#leg{position:absolute;bottom:10px;left:10px;background:var(--bg);border:0.5px solid var(--br);border-radius:6px;padding:7px 9px;font-size:10px;z-index:999;min-width:110px}
+#leg{position:absolute;bottom:24px;left:24px;background:color-mix(in oklab,var(--bg) 92%,var(--brand-lt));border:0.5px solid var(--br);border-radius:10px;padding:9px 10px;font-size:10px;z-index:999;min-width:132px}
 #leg-title{font-weight:500;font-size:10px;margin-bottom:3px;color:var(--t2)}
 .lr{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ls{width:10px;height:6px;border-radius:2px;flex-shrink:0}
-#side{width:300px;flex-shrink:0;border-left:0.5px solid var(--br);overflow:hidden;display:flex;flex-direction:column}
-#compare-bar{display:flex;align-items:stretch;border-bottom:0.5px solid var(--br);flex-shrink:0;min-height:44px}
-.pin-slot{flex:1;display:flex;align-items:center;padding:6px 8px;gap:6px;position:relative;transition:background-color .12s cubic-bezier(0.16,1,0.3,1)}
-.pin-slot:hover{background:var(--bg2)}.pin-slot+.pin-slot{border-left:0.5px solid var(--br)}
+#side{width:372px;flex-shrink:0;border-left:0.5px solid var(--br);overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
+#compare-bar{display:flex;align-items:stretch;border-bottom:0.5px solid var(--br);flex-shrink:0;min-height:64px;padding:8px;background:var(--bg2);gap:8px}
+.pin-slot{flex:1;display:flex;align-items:center;padding:10px 10px 8px;gap:6px;position:relative;transition:background-color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1);background:var(--bg);border:0.5px solid var(--br);border-radius:12px}
+.pin-slot:hover{background:color-mix(in oklab,var(--bg) 80%,var(--brand-lt))}
+.pin-slot::before{position:absolute;left:10px;top:7px;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
+#slot-a::before{content:'Pin A'}
+#slot-b::before{content:'Pin B'}
 .pin-slot-btn{flex:1;display:flex;align-items:center;gap:5px;min-width:0;border:none;background:transparent;color:inherit;padding:0;text-align:left;cursor:pointer}
 .pin-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;border:2px solid var(--bg)}
-.pin-name{font-size:11px;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pin-name{font-size:11px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pin-clear{font-size:10px;color:var(--t3);cursor:pointer;padding:1px 3px;border-radius:2px;border:none;background:transparent}
 .pin-clear:hover{background:var(--bg3);color:var(--tx)}
-.pin-empty{font-size:10px;color:var(--t3);font-style:italic}
+.pin-empty{font-size:10px;color:var(--t3);font-style:italic;padding-top:10px}
 .pin-score-a{color:var(--accent);font-weight:500}
 .pin-score-b{color:var(--brand);font-weight:500}
 #side-body{flex:1;overflow-y:auto;display:flex;flex-direction:column}
-.pt-row{display:flex;gap:2px;padding:6px 8px 0;border-bottom:0.5px solid var(--br);flex-shrink:0;flex-wrap:wrap}
+.pt-row{display:flex;gap:4px;padding:8px 10px 0;border-bottom:0.5px solid var(--br);flex-shrink:0;flex-wrap:wrap;position:sticky;top:0;background:linear-gradient(180deg,var(--bg),var(--bg2));z-index:20}
 .pt{padding:4px 7px;font-size:10px;border-radius:4px 4px 0 0;cursor:pointer;border:0.5px solid transparent;background:transparent;color:var(--t2);transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1)}
 .pt:hover{background:var(--bg2)}.pt.active{background:var(--bg2);color:var(--tx);border-color:var(--br);border-bottom-color:var(--bg2)}
-.pane{padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.pane{padding:12px 14px;display:flex;flex-direction:column;gap:9px}
 .shd{font-size:10px;font-weight:500;color:var(--t2);padding-bottom:3px;border-bottom:0.5px solid var(--br);margin-top:3px}
 #share-modal{position:fixed;inset:0;z-index:2000;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.35)}
 #share-modal.open{display:flex}
@@ -100,7 +114,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .accuracy-chip.scaffold{background:var(--accent-lt);color:var(--danger);border-color:color-mix(in oklab,var(--accent) 28%,var(--bg))}
 .accuracy-copy{font-size:9px;color:var(--t2);line-height:1.45}
 .gap-grid{display:grid;grid-template-columns:1fr;gap:6px}
-.gap-card{display:flex;flex-direction:column;gap:6px;padding:8px 9px;border-radius:8px;background:var(--bg2);border:0.5px solid var(--br)}
+.gap-card{display:flex;flex-direction:column;gap:7px;padding:10px 11px;border-radius:10px;background:var(--bg2);border:0.5px solid var(--br)}
 .gap-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .gap-title{font-size:11px;font-weight:500;line-height:1.35}
 .gap-meta{font-size:9px;color:var(--t3);line-height:1.4}
@@ -141,8 +155,21 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .annotation-form{display:flex;flex-direction:column;gap:6px;padding:8px 9px;border-radius:7px;background:var(--bg);border:0.5px solid var(--br)}
 .annotation-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .annotation-submit{align-self:flex-start}
-.admin-badge{display:none;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:var(--brand-lt);color:var(--brand);border:0.5px solid color-mix(in oklab,var(--brand2) 24%,var(--bg));font-size:9px;font-weight:500}
-.pilot-badge{display:none;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:var(--accent-lt);color:var(--accent);border:0.5px solid color-mix(in oklab,var(--accent) 24%,var(--bg));font-size:9px;font-weight:500}
+.admin-badge,.pilot-badge{display:none;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;border:0.5px solid var(--br);font-size:9px;font-weight:600;letter-spacing:.02em}
+.admin-badge{background:var(--brand-lt);color:var(--brand);border-color:color-mix(in oklab,var(--brand2) 24%,var(--bg))}
+.pilot-badge{background:var(--accent-lt);color:var(--accent);border-color:color-mix(in oklab,var(--accent) 24%,var(--bg))}
+.empty-state{padding:18px 16px 22px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin:10px 12px 0;border:0.5px solid var(--br);border-radius:16px;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--t2);font-size:11px;text-align:left}
+.empty-eyebrow{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.empty-title{font-size:18px;font-weight:600;line-height:1.25;color:var(--tx);max-width:24ch}
+.empty-copy{font-size:11px;line-height:1.55;max-width:52ch}
+.empty-step-grid{display:grid;grid-template-columns:1fr;gap:8px;width:100%}
+.empty-step{display:flex;align-items:flex-start;gap:9px;padding:10px 11px;border-radius:12px;border:0.5px solid var(--br);background:var(--bg)}
+.empty-step-num{width:20px;height:20px;border-radius:999px;background:var(--brand);color:var(--neutral-inverse);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px}
+.empty-step-copy{display:flex;flex-direction:column;gap:2px}
+.empty-step-title{font-size:11px;font-weight:600;color:var(--tx)}
+.empty-step-text{font-size:10px;color:var(--t2);line-height:1.45}
+.empty-tip{display:flex;flex-wrap:wrap;gap:6px}
+.empty-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;background:var(--bg);border:0.5px solid var(--br);font-size:9px;font-weight:500;color:var(--t2)}
 .admin-panel{display:flex;flex-direction:column;gap:8px}
 .admin-note{font-size:9px;color:var(--t2);line-height:1.45;padding:8px 9px;border-radius:7px;background:var(--bg2);border:0.5px solid var(--br)}
 .admin-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -165,12 +192,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .admin-empty{font-size:10px;color:var(--t3)}
 .admin-inline{font-family:var(--font-mono);font-size:9px;color:var(--t2);word-break:break-all}
 .pilot-shell{display:flex;flex-direction:column;gap:8px}
-.pilot-hero{display:flex;flex-direction:column;gap:7px;padding:10px 11px;border-radius:9px;background:linear-gradient(180deg,var(--accent-lt),var(--bg2));border:0.5px solid color-mix(in oklab,var(--accent) 20%,var(--bg))}
+.pilot-hero{display:flex;flex-direction:column;gap:9px;padding:14px 15px;border-radius:12px;background:linear-gradient(180deg,var(--accent-lt),var(--bg2));border:0.5px solid color-mix(in oklab,var(--accent) 20%,var(--bg))}
 .pilot-kicker{font-size:9px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
 .pilot-title{font-size:14px;font-weight:500;line-height:1.3}
 .pilot-copy{font-size:10px;color:var(--t2);line-height:1.5}
 .pilot-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.pilot-card{display:flex;flex-direction:column;gap:7px;padding:9px 10px;border-radius:8px;background:var(--bg);border:0.5px solid var(--br)}
+.pilot-card{display:flex;flex-direction:column;gap:7px;padding:11px 12px;border-radius:10px;background:var(--bg);border:0.5px solid var(--br)}
 .pilot-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .pilot-card-title{font-size:11px;font-weight:500;line-height:1.35}
 .pilot-card-value{font-size:18px;font-weight:500;color:var(--tx)}
@@ -183,7 +210,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .pilot-vote.active{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
 .pilot-submit-link{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:999px;border:0.5px solid var(--br);background:var(--brand);color:var(--neutral-inverse);text-decoration:none;font-size:9px;font-weight:500}
 .efficacy-grid{display:grid;grid-template-columns:1fr;gap:6px}
-.efficacy-card{display:flex;flex-direction:column;gap:6px;padding:8px 9px;border-radius:8px;background:var(--bg2);border:0.5px solid var(--br)}
+.efficacy-card{display:flex;flex-direction:column;gap:6px;padding:10px 11px;border-radius:10px;background:var(--bg2);border:0.5px solid var(--br)}
 .efficacy-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
 .efficacy-title{font-size:10px;font-weight:500}
 .efficacy-pill{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:999px;font-size:9px;font-weight:500}
@@ -287,6 +314,13 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   #body{flex-direction:column}
   #side{width:100%;height:44vh;border-left:none;border-top:0.5px solid var(--br)}
   #map-wrap{min-height:56vh}
+  #balt-map,#ml{inset:10px;width:calc(100% - 20px);height:calc(100% - 20px)}
+  #leg{left:18px;bottom:18px}
+  #hdr{padding:12px}
+  .hdr-right{width:100%;min-width:0;align-items:stretch}
+  .control-shell{min-width:0}
+  #time-bar{flex-wrap:wrap}
+  .time-meta{min-width:0;width:100%}
   .rf-row{grid-template-columns:1fr}
   .gap-pair{grid-template-columns:1fr}
   .annotation-grid{grid-template-columns:1fr}
@@ -302,17 +336,25 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 </style>
 </head>
 <body>
-<a class="skip-link" href="#main-content">Skip to dashboard</a>
+<a class="skip-link" href="#body">Skip to dashboard</a>
 <div id="bd">
 <div id="hdr">
-  <div style="display:flex;align-items:center;gap:8px">
+  <div class="hdr-left">
     <div class="logo">B</div>
-    <div><div class="ttl">Baltimore Health Dashboard</div><div class="sub" id="hdr-sub">Click map · Pin 2 neighborhoods · Share comparison</div></div>
-    <div class="admin-badge" id="admin-badge">Admin mode</div>
-    <div class="pilot-badge" id="pilot-badge">Pilot mode</div>
+    <div class="hdr-title-block">
+      <div class="hdr-kicker">Project Trace / Project Compass</div>
+      <div class="ttl">Baltimore Health Dashboard</div>
+      <div class="sub" id="hdr-sub">Map-first view for neighborhood health, conditions, and spending signals.</div>
+    </div>
+    <div class="hdr-badges">
+      <div class="admin-badge" id="admin-badge">Admin mode</div>
+      <div class="pilot-badge" id="pilot-badge">Pilot mode</div>
+    </div>
   </div>
-  <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
-    <div class="mtabs" id="mtabs">
+  <div class="hdr-right">
+    <div class="control-shell">
+      <div class="shell-label">Metric</div>
+      <div class="mtabs" id="mtabs">
       <button type="button" class="mtab active" data-m="hi" onclick="setM(this)">Health index</button>
       <button type="button" class="mtab" data-m="le" onclick="setM(this)">Life exp.</button>
       <button type="button" class="mtab" data-m="as" onclick="setM(this)">Asthma</button>
@@ -323,7 +365,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <button type="button" class="mtab" data-m="hs" onclick="setM(this)">HS grad</button>
       <button type="button" class="mtab" data-m="hz" onclick="setM(this)">311 Hazards</button>
     </div>
-    <div class="ltoggs" role="toolbar" aria-label="Map layers and share controls">
+    </div>
+    <div class="control-shell">
+      <div class="shell-label">Layers and tools</div>
+      <div class="ltoggs" role="toolbar" aria-label="Map layers and share controls">
       <button type="button" class="ltog on" id="lt-c" onclick="togL('c')" aria-pressed="true" aria-label="Toggle neighborhood map layer">
         <span class="ldot" style="background:var(--brand2)"></span><span>Map</span>
       </button>
@@ -345,10 +390,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <button type="button" class="ltog desk-launch" id="lt-desk" onclick="toggleDesk()" aria-pressed="false" aria-label="Toggle analysis desk">
         <span class="ldot" style="background:var(--brand)"></span><span>Desk</span>
       </button>
+      </div>
     </div>
   </div>
 </div>
 <div id="time-bar">
+  <div class="time-meta">
+    <div class="time-kicker">Timeline</div>
+    <div class="time-copy">2016 to 2023 playback across map, trends, and benchmarks.</div>
+  </div>
   <button id="play-btn" type="button" onclick="togglePlay()" aria-label="Play timeline">▶</button>
   <div id="slider-wrap">
     <div id="ylabels"></div>
@@ -395,10 +445,37 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <button type="button" class="ss-btn" onclick="closeStrip()" aria-label="Hide inline share bar">✕</button>
     </div>
     <div id="side-body">
-      <div id="no-pin" style="padding:20px 14px;text-align:center;color:var(--t3);font-size:11px;display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:8px">
-        <div style="font-size:22px">📍</div>
-        <div style="font-weight:500;font-size:12px;color:var(--t2)">Pin neighborhoods to compare</div>
-        <div>Click any neighborhood on the map. Pin up to 2 to see side-by-side trends and share them.</div>
+      <div id="no-pin" class="empty-state">
+        <div class="empty-eyebrow">Presentation path</div>
+        <div class="empty-title">Start with one neighborhood, then pin a second for the clearest story.</div>
+        <div class="empty-copy">Use the map to open a neighborhood profile, then pin a second area to compare trends, determinants, gap signals, and resident reports side by side.</div>
+        <div class="empty-step-grid">
+          <div class="empty-step">
+            <span class="empty-step-num">1</span>
+            <div class="empty-step-copy">
+              <div class="empty-step-title">Choose a metric</div>
+              <div class="empty-step-text">Lead, vacancy, life expectancy, or 311 hazards usually tell the story fastest.</div>
+            </div>
+          </div>
+          <div class="empty-step">
+            <span class="empty-step-num">2</span>
+            <div class="empty-step-copy">
+              <div class="empty-step-title">Click one neighborhood</div>
+              <div class="empty-step-text">Show the single-place profile first, then pin a second neighborhood for the strongest comparison.</div>
+            </div>
+          </div>
+          <div class="empty-step">
+            <span class="empty-step-num">3</span>
+            <div class="empty-step-copy">
+              <div class="empty-step-title">Use Gap or Pilot mode</div>
+              <div class="empty-step-text">Gap mode surfaces mismatches between official burden and resident signal. Pilot mode narrows the demo to Carrollton Ridge.</div>
+            </div>
+          </div>
+        </div>
+        <div class="empty-tip">
+          <span class="empty-chip">Best demo flow: metric → map click → compare → gap</span>
+          <span class="empty-chip">Fast alternate: ?pilot=carrollton</span>
+        </div>
         <div id="no-pin-admin" class="pane" style="display:none;width:100%;text-align:left;padding:12px 0 0"></div>
       </div>
       <div id="one-pin" style="display:none;flex-direction:column">
@@ -1033,7 +1110,7 @@ function updateModeUI(){
   const pilotBadge=document.getElementById('pilot-badge');
   if(pilotBadge){pilotBadge.style.display=cfg?'inline-flex':'none';pilotBadge.textContent=cfg?cfg.label:'Pilot mode';}
   const subtitle=document.getElementById('hdr-sub');
-  if(subtitle)subtitle.textContent=cfg?`${cfg.scopeLabel} pilot · illegal dumping and broadband access`:'Click map · Pin 2 neighborhoods · Share comparison';
+  if(subtitle)subtitle.textContent=cfg?`${cfg.scopeLabel} pilot, focused on illegal dumping and broadband access.`:'Choose a metric, pin one neighborhood, then add a second for comparison.';
   const deskLaunch=document.getElementById('lt-desk');
   if(deskLaunch){
     deskLaunch.style.display=adminMode?'inline-flex':'none';
