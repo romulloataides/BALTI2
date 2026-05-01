@@ -689,6 +689,226 @@ load_cdc_asthma_longitudinal <- function(csa_boundaries, years = 2016:2023) {
   )
 }
 
+merge_benchmark_tables <- function(tables) {
+  usable <- tables[map_lgl(tables, ~ !is.null(.x) && nrow(.x) > 0)]
+  if (!length(usable)) {
+    return(tibble(Year = integer()))
+  }
+  reduce(usable, full_join, by = "Year")
+}
+
+year_benchmark_record <- function(tbl, year) {
+  row <- tbl %>% filter(Year == year)
+  if (!nrow(row)) {
+    return(list())
+  }
+
+  record <- as.list(row[1, setdiff(names(row), "Year"), drop = FALSE])
+  record[map_lgl(record, ~ length(.x) == 1 && !is.na(.x))]
+}
+
+load_acs_benchmark_series <- function(years = 2016:2023, has_census_key = FALSE) {
+  if (!has_census_key) {
+    return(list(
+      state = tibble(Year = integer()),
+      federal = tibble(Year = integer()),
+      metrics = character(),
+      sources = character()
+    ))
+  }
+
+  lesshs_ids <- sprintf("B15003_%03d", 2:16)
+  acs_vars <- c(
+    poverty_num = "B17001_002",
+    poverty_den = "B17001_001",
+    ed_total = "B15003_001",
+    setNames(lesshs_ids, paste0("lesshs_", seq_along(lesshs_ids))),
+    housing_total = "B25002_001",
+    housing_vacant = "B25002_003"
+  )
+
+  summarize_acs_benchmark <- function(df, year) {
+    lesshs_cols <- grep("^lesshs_\\d+E$", names(df), value = TRUE)
+
+    tibble(
+      Year = year,
+      pv = round((df$poverty_numE / df$poverty_denE) * 100, 1),
+      hs = round(100 - ((rowSums(df[, lesshs_cols, drop = FALSE], na.rm = TRUE) / df$ed_totalE) * 100), 1),
+      va = round((df$housing_vacantE / df$housing_totalE) * 100, 1)
+    )
+  }
+
+  fetch_acs_level <- function(level = c("state", "federal")) {
+    level <- match.arg(level)
+
+    map_dfr(years, function(year) {
+      tryCatch(
+        {
+          raw <- if (identical(level, "state")) {
+            get_acs(
+              geography = "state",
+              variables = acs_vars,
+              state = "MD",
+              year = year,
+              survey = "acs5",
+              geometry = FALSE,
+              output = "wide"
+            )
+          } else {
+            get_acs(
+              geography = "us",
+              variables = acs_vars,
+              year = year,
+              survey = "acs5",
+              geometry = FALSE,
+              output = "wide"
+            )
+          }
+
+          summarize_acs_benchmark(raw, year)
+        },
+        error = function(e) {
+          warning(paste("ACS", level, "benchmark refresh failed for", year, ":", conditionMessage(e)))
+          tibble(Year = year, pv = NA_real_, hs = NA_real_, va = NA_real_)
+        }
+      )
+    })
+  }
+
+  state_tbl <- fetch_acs_level("state")
+  federal_tbl <- fetch_acs_level("federal")
+
+  list(
+    state = state_tbl %>% filter(if_any(-Year, ~ !is.na(.x))),
+    federal = federal_tbl %>% filter(if_any(-Year, ~ !is.na(.x))),
+    metrics = c("pv", "hs", "va"),
+    sources = c(
+      state = "ACS 5-year Maryland state estimates",
+      federal = "ACS 5-year United States estimates"
+    )
+  )
+}
+
+load_fred_unemployment_benchmarks <- function(years = 2016:2023) {
+  fetch_fred_yearly <- function(series_id) {
+    response <- GET(
+      paste0("https://fred.stlouisfed.org/graph/fredgraph.csv?id=", series_id),
+      timeout(120)
+    )
+    stop_for_status(response)
+
+    txt <- content(response, "text", encoding = "UTF-8")
+    raw <- readr::read_csv(I(txt), show_col_types = FALSE, progress = FALSE)
+    value_col <- setdiff(names(raw), "observation_date")[1]
+
+    raw %>%
+      transmute(
+        Year = lubridate::year(as.Date(observation_date)),
+        value = coerce_numeric_value(.data[[value_col]])
+      ) %>%
+      filter(Year %in% years, !is.na(value)) %>%
+      group_by(Year) %>%
+      summarize(un = round(mean(value, na.rm = TRUE), 1), .groups = "drop")
+  }
+
+  state_tbl <- tryCatch(
+    fetch_fred_yearly("MDUR"),
+    error = function(e) {
+      warning(paste("FRED Maryland unemployment refresh failed:", conditionMessage(e)))
+      tibble(Year = integer(), un = numeric())
+    }
+  )
+
+  federal_tbl <- tryCatch(
+    fetch_fred_yearly("UNRATE"),
+    error = function(e) {
+      warning(paste("FRED national unemployment refresh failed:", conditionMessage(e)))
+      tibble(Year = integer(), un = numeric())
+    }
+  )
+
+  list(
+    state = state_tbl,
+    federal = federal_tbl,
+    metrics = "un",
+    sources = c(
+      state = "https://fred.stlouisfed.org/series/MDUR",
+      federal = "https://fred.stlouisfed.org/series/UNRATE"
+    )
+  )
+}
+
+load_cdc_asthma_benchmark_series <- function(years = 2016:2023) {
+  release_specs <- list(
+    `2018` = list(dataset_id = "4ai3-zynv", year = 2018),
+    `2019` = list(dataset_id = "373s-ayzu", year = 2019),
+    `2020` = list(dataset_id = "nw2y-v4gm", year = 2020),
+    `2021` = list(dataset_id = "em5e-5hvn", year = 2021),
+    `2022` = list(dataset_id = "ai6z-tcin", year = 2022),
+    `2023` = list(dataset_id = "cwsq-ngmh", year = 2023)
+  )
+
+  fetch_weighted_proxy <- function(dataset_id, stateabbr = NULL) {
+    query <- c(
+      list(
+        measureid = "CASTHMA",
+        datavaluetypeid = "CrdPrv"
+      ),
+      if (!is.null(stateabbr)) list(stateabbr = stateabbr) else list(),
+      setNames(
+        list("sum(totalpopulation) as pop,sum(totalpopulation*data_value) as weighted"),
+        "$select"
+      )
+    )
+
+    raw <- fetch_cdc_csv(dataset_id, query = query)
+    if (!nrow(raw)) {
+      return(NA_real_)
+    }
+
+    pop <- coerce_numeric_value(raw$pop[[1]])
+    weighted <- coerce_numeric_value(raw$weighted[[1]])
+    if (is.na(pop) || pop <= 0 || is.na(weighted)) {
+      return(NA_real_)
+    }
+
+    round(weighted / pop, 1)
+  }
+
+  requested_specs <- release_specs[intersect(as.character(years), names(release_specs))]
+
+  rows <- imap_dfr(requested_specs, function(spec, year_key) {
+    state_val <- tryCatch(
+      fetch_weighted_proxy(spec$dataset_id, stateabbr = "MD"),
+      error = function(e) {
+        warning(paste("CDC asthma state benchmark failed for", spec$year, ":", conditionMessage(e)))
+        NA_real_
+      }
+    )
+
+    federal_val <- tryCatch(
+      fetch_weighted_proxy(spec$dataset_id, stateabbr = NULL),
+      error = function(e) {
+        warning(paste("CDC asthma federal benchmark failed for", spec$year, ":", conditionMessage(e)))
+        NA_real_
+      }
+    )
+
+    tibble(
+      Year = spec$year,
+      as_state = state_val,
+      as_federal = federal_val
+    )
+  })
+
+  list(
+    state = rows %>% transmute(Year, as = as_state) %>% filter(!is.na(as)),
+    federal = rows %>% transmute(Year, as = as_federal) %>% filter(!is.na(as)),
+    metrics = "as",
+    sources = map_chr(requested_specs, ~ paste0("https://data.cdc.gov/resource/", .x$dataset_id, ".csv"))
+  )
+}
+
 has_series_data <- function(x) {
   if (is.null(x)) return(FALSE)
   values <- suppressWarnings(as.numeric(unlist(x, use.names = FALSE)))
@@ -996,6 +1216,23 @@ if (has_census_key) {
   csa_acs_summary <- tibble(CSA = character(), CSA_key = character(), pv = numeric())
 }
 
+print("Fetching state and federal benchmark series...")
+acs_benchmark_import <- load_acs_benchmark_series(years = years, has_census_key = has_census_key)
+fred_benchmark_import <- load_fred_unemployment_benchmarks(years = years)
+cdc_benchmark_import <- load_cdc_asthma_benchmark_series(years = years)
+
+state_benchmark_series <- merge_benchmark_tables(list(
+  acs_benchmark_import$state,
+  fred_benchmark_import$state,
+  cdc_benchmark_import$state
+))
+
+federal_benchmark_series <- merge_benchmark_tables(list(
+  acs_benchmark_import$federal,
+  fred_benchmark_import$federal,
+  cdc_benchmark_import$federal
+))
+
 legacy_rates <- c(
   hi = 0.4, le = 0.08, as = -0.6, la = -0.5, va = -0.2, pv = -0.3,
   un = -0.25, hs = 0.15, fd = 0.3, gs = 0.1, hw = -0.2, cr = -0.5,
@@ -1102,7 +1339,7 @@ build_yearly_entry <- function(row, metric_cols, years = 2016:2023) {
   out
 }
 
-build_level_record <- function(city_record, level = c("state", "federal")) {
+build_fallback_level_record <- function(city_record, level = c("state", "federal")) {
   level <- match.arg(level)
   step <- if (identical(level, "state")) 1 else 2
   out <- list()
@@ -1121,6 +1358,47 @@ build_level_record <- function(city_record, level = c("state", "federal")) {
   }
 
   out
+}
+
+derive_benchmark_health_index <- function(neighborhood_data, benchmark_record, year_index) {
+  component_metrics <- c("le", "as", "la", "va", "pv", "un", "hs")
+  inverse_metrics <- c("as", "la", "va", "pv", "un")
+  scores <- numeric()
+
+  for (metric in component_metrics) {
+    benchmark_value <- benchmark_record[[metric]]
+    if (is.null(benchmark_value) || is.na(benchmark_value) || !metric %in% names(neighborhood_data)) {
+      next
+    }
+
+    neighborhood_values <- map_dbl(neighborhood_data[[metric]], function(series) {
+      value <- series[[year_index]]
+      if (is.null(value) || is.na(value)) return(NA_real_)
+      as.numeric(value)
+    })
+
+    usable <- neighborhood_values[!is.na(neighborhood_values)]
+    if (!length(usable)) {
+      next
+    }
+
+    score <- if (dplyr::n_distinct(usable) <= 1) {
+      50
+    } else {
+      scaled <- (as.numeric(benchmark_value) - min(usable, na.rm = TRUE)) /
+        (max(usable, na.rm = TRUE) - min(usable, na.rm = TRUE)) * 100
+      if (metric %in% inverse_metrics) scaled <- 100 - scaled
+      max(0, min(100, scaled))
+    }
+
+    scores <- c(scores, round(score, 1))
+  }
+
+  if (length(scores) < 3) {
+    return(NULL)
+  }
+
+  round(mean(scores), 1)
 }
 
 # 5. MERGE: Combine Data
@@ -1284,6 +1562,10 @@ for (row_idx in seq_len(nrow(final_dashboard_data))) {
 }
 
 benchmarks_output <- list(city = list(), state = list(), federal = list())
+real_benchmark_metrics <- sort(unique(c(
+  setdiff(names(state_benchmark_series), "Year"),
+  setdiff(names(federal_benchmark_series), "Year")
+)))
 
 for (idx in seq_along(years)) {
   year_key <- as.character(years[[idx]])
@@ -1303,8 +1585,29 @@ for (idx in seq_along(years)) {
   }
 
   benchmarks_output$city[[year_key]] <- city_record
-  benchmarks_output$state[[year_key]] <- build_level_record(city_record, "state")
-  benchmarks_output$federal[[year_key]] <- build_level_record(city_record, "federal")
+
+  state_record <- utils::modifyList(
+    build_fallback_level_record(city_record, "state"),
+    year_benchmark_record(state_benchmark_series, years[[idx]])
+  )
+  federal_record <- utils::modifyList(
+    build_fallback_level_record(city_record, "federal"),
+    year_benchmark_record(federal_benchmark_series, years[[idx]])
+  )
+
+  state_hi <- derive_benchmark_health_index(final_dashboard_data, state_record, idx)
+  federal_hi <- derive_benchmark_health_index(final_dashboard_data, federal_record, idx)
+
+  if (!is.null(state_hi)) {
+    state_record$hi <- state_hi
+  }
+
+  if (!is.null(federal_hi)) {
+    federal_record$hi <- federal_hi
+  }
+
+  benchmarks_output$state[[year_key]] <- state_record
+  benchmarks_output$federal[[year_key]] <- federal_record
 }
 
 json_ready_data <- list(
@@ -1363,16 +1666,35 @@ json_ready_data <- list(
         collapse = " "
       )
     },
-    benchmark_note = "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected.",
+    benchmark_note = if (length(real_benchmark_metrics) > 0) {
+      paste0(
+        "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks use real official series for: ",
+        paste(real_benchmark_metrics, collapse = ", "),
+        ". Remaining benchmark metrics still fall back to the provisional scaffold. Benchmark `hi` is derived from available real benchmark components when enough official inputs are present."
+      )
+    } else {
+      "City benchmarks are derived from Baltimore CSA values. State and federal benchmarks are provisional scaffolds until ACS/FRED imports are connected."
+    },
     source_files = list(
       neighborhood = if (!is.na(bnia_import$source_path)) basename(bnia_import$source_path) else NULL,
       neighborhood_services = if (length(bnia_service_import$sources)) unname(as.list(bnia_service_import$sources)) else NULL,
       asthma_proxy = if (length(cdc_asthma_import$sources)) unname(as.list(cdc_asthma_import$sources)) else NULL,
+      state_benchmarks = compact(list(
+        acs = if (length(acs_benchmark_import$sources)) acs_benchmark_import$sources[["state"]] else NULL,
+        fred = if (length(fred_benchmark_import$sources)) fred_benchmark_import$sources[["state"]] else NULL,
+        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES / 500 Cities aggregate queries (2018-2023)" else NULL
+      )),
+      federal_benchmarks = compact(list(
+        acs = if (length(acs_benchmark_import$sources)) acs_benchmark_import$sources[["federal"]] else NULL,
+        fred = if (length(fred_benchmark_import$sources)) fred_benchmark_import$sources[["federal"]] else NULL,
+        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES aggregate queries (2018-2023)" else NULL
+      )),
       hazards = if (has_311_data) "Open Baltimore 311 ArcGIS services" else NULL,
       poverty = if (nrow(csa_acs_summary) > 0) "ACS 2022 tract estimates weighted to CSA" else NULL
     ),
     derived_metrics = if (derive_hi_from_components) as.list("hi") else NULL,
     proxy_metrics = if ("as" %in% cdc_metric_cols) as.list("as") else NULL,
+    real_benchmark_metrics = if (length(real_benchmark_metrics)) as.list(real_benchmark_metrics) else NULL,
     imported_metrics = sort(unique(c(
       service_metric_cols,
       cdc_metric_cols,

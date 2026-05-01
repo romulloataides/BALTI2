@@ -43,7 +43,7 @@ Notes:
 
 - `neighborhoods` stores year-specific records for each CSA.
 - `benchmarks.city` is shared across all neighborhoods and is derived from the Baltimore CSA dataset.
-- `benchmarks.state` and `benchmarks.federal` are currently provisional scaffolds until real ACS/FRED benchmark imports are wired into the pipeline.
+- `benchmarks.state` and `benchmarks.federal` now use real official series where available, and fall back to the old scaffold only for the remaining gaps.
 - Real year arrays now come from a mix of BNIA files, BNIA ArcGIS services, CDC tract datasets, and the existing baseline `data.json`.
 - The dashboard `hi` series is derived from official component metrics when BNIA does not provide a direct health-index series.
 - Remaining gaps are still modeled in the data layer instead of in the frontend render path.
@@ -86,6 +86,25 @@ Official non-BNIA supplements currently fill the remaining health gaps:
 
 These sources are helpful, but they are not perfect substitutes for a current full BNIA export. The CDC asthma series is an adult current-asthma prevalence proxy, not the original asthma emergency-department rate. The pipeline still keeps existing `data.json` values and modeled series for any remaining gaps.
 
+## State and federal benchmarks
+
+The benchmark pipeline now has three tiers:
+
+- `city` is derived directly from the Baltimore CSA dashboard values
+- `state` uses Maryland-wide official series where available
+- `federal` uses national official series where available
+
+Current real benchmark coverage:
+
+- `un` from FRED / BLS (`MDUR` for Maryland and `UNRATE` for the United States)
+- `as` from CDC `PLACES` tract releases for `2018` through `2023`, aggregated with population weighting
+
+Current benchmark gaps that still depend on the old scaffold until more sources are connected:
+
+- `pv`, `hs`, and `va` are implemented in the pipeline through ACS 5-year series, but they only activate when `CENSUS_API_KEY` is available
+- `le` and `la` do not yet have a clean statewide/national benchmark source in this repo
+- benchmark `hi` is derived only when enough real benchmark components are present; otherwise it falls back
+
 ## Deployment
 
 GitHub Pages was previously enabled on the predecessor repository and can be re-enabled here once BALTI2 is ready to publish.
@@ -123,8 +142,9 @@ node scripts/migrate_data_schema.mjs data.json
 
 - Drop the real BNIA Vital Signs longitudinal file into one of the supported locations so `update_data.R` can replace more of the modeled neighborhood series than the live service fallback can cover.
 - Add `CENSUS_API_KEY` to GitHub Actions secrets so `update_data.R` can run end to end.
+- Once `CENSUS_API_KEY` is set, rerun the pipeline so ACS-backed `pv`, `hs`, and `va` state/federal benchmarks replace more of the scaffold.
 - Replace the CDC asthma proxy with a direct neighborhood-level official asthma ED source if BNIA or Maryland publishes a current one again.
-- Add real state and federal benchmarks through ACS/FRED inputs instead of the current provisional scaffolds.
+- Add direct official state/federal sources for `le` and `la` if you want the benchmark switcher to be fully non-scaffolded.
 - Fix or replace the current 311 ingest in `update_data.R` if the ArcGIS service becomes unstable again.
 - Add a real backend for community reports if submissions need persistence.
 
