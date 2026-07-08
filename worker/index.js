@@ -4,7 +4,7 @@ const MODEL = 'gemini-2.5-flash';
 const DEFLECTION = "I can only answer questions using the dashboard's own data, and I don't have data on that here.";
 const YEARS = ['2016','2017','2018','2019','2020','2021','2022','2023'];
 const RECENT_YEARS = ['2020','2021','2022','2023'];
-const LOCAL_ORIGINS = new Set(['http://localhost:8765','http://127.0.0.1:8765','http://[::1]:8765','http://localhost:8787','http://127.0.0.1:8787']);
+const LOCAL_ORIGINS = new Set(['http://localhost:8765','http://127.0.0.1:8765','http://[::1]:8765','http://localhost:8787','http://127.0.0.1:8787','https://rca2908.github.io','https://romulloataides.github.io']);
 const METRIC_LABELS = {
   hi:'Health index',le:'Life expectancy',as:'Adult asthma prevalence',la:'Lead exposure',va:'Vacant housing',un:'Unemployment',hs:'High school graduation',fd:'Food access',gs:'Green space',cr:'Crime reports',pv:'Poverty',rt:'Rat service requests',dp:'Illegal dumping requests',ws:'Water and sewer requests',hz:'Reported 311 hazards',sm:'Smoking',ob:'Obesity',db:'Diabetes',mh:'Poor mental health',pa:'Physical inactivity',bb:'Broadband access',rb:'High rent burden',ui:'No health insurance',gi:'Income inequality',ha:'Housing cost burden',ap:'Air pollution'
 };
@@ -42,6 +42,7 @@ const METRIC_SOURCES = {
   rt:'Open Baltimore 311 service requests',dp:'Open Baltimore 311 service requests',ws:'Open Baltimore 311 service requests',hz:'Open Baltimore 311 service requests',
   hi:'Derived dashboard composite',gs:'Legacy static import',cr:'BNIA legacy import'
 };
+const LATEST_VALUE_FALLBACK_METRICS = new Set(['le']);
 export default {
   async fetch(request, env) {
     const origin = request.headers.get('Origin') || '';
@@ -219,6 +220,19 @@ function findYear(question, context = {}) {
   return YEARS.includes(ctxYear) ? ctxYear : '2023';
 }
 
+function metricSnapshot(years, year, metric) {
+  const current = years?.[year]?.[metric];
+  if (Number.isFinite(Number(current))) return { value:Number(current), year, stale:false };
+  if (!LATEST_VALUE_FALLBACK_METRICS.has(metric)) return { value:null, year:null, stale:false };
+  const idx = YEARS.indexOf(String(year));
+  for (let i = idx; i >= 0; i--) {
+    const fallbackYear = YEARS[i];
+    const value = years?.[fallbackYear]?.[metric];
+    if (Number.isFinite(Number(value))) return { value:Number(value), year:fallbackYear, stale:fallbackYear !== String(year) };
+  }
+  return { value:null, year:null, stale:false };
+}
+
 function answerDeterministically(question, context, data) {
   const q = question.toLowerCase();
   const compare = answerComparison(question, context, data);
@@ -233,8 +247,8 @@ function answerDeterministically(question, context, data) {
   if (!metric) return null;
   const year = findYear(q, context);
   const rows = Object.entries(data.neighborhoods || {}).map(([csa, years]) => {
-    const value = years?.[year]?.[metric];
-    return { csa, value:Number(value) };
+    const snap = metricSnapshot(years, year, metric);
+    return { csa, ...snap };
   }).filter(row => Number.isFinite(row.value));
   if (!rows.length) return null;
   const wantMin = ['least','lowest','smallest','fewest'].includes(rank[1]);
@@ -245,10 +259,11 @@ function answerDeterministically(question, context, data) {
   const value = Math.round(top.value * 10) / 10;
   const direction = wantMin ? 'lowest' : 'highest';
   const source = METRIC_SOURCES[metric] || 'Dashboard data';
+  const yearCopy = top.stale ? `${top.year}, the latest available neighborhood year for ${label.toLowerCase()}` : year;
   return {
-    answer:`In ${year}, ${top.csa} had the ${direction} ${label.toLowerCase()} among CSAs, at ${value}${unit}.`,
+    answer:`In ${yearCopy}, ${top.csa} had the ${direction} ${label.toLowerCase()} among CSAs, at ${value}${unit}.`,
     in_scope:true,
-    citations:[{metric,metric_label:label,csa:top.csa,years:[Number(year)],source}]
+    citations:[{metric,metric_label:label,csa:top.csa,years:[Number(top.year || year)],source}]
   };
 }
 
@@ -265,12 +280,16 @@ function answerComparison(question, context, data) {
   const year = findYear(question, context);
   const [a, b] = neighborhoods;
   const parts = metrics.map(metric => {
-    const av = data.neighborhoods?.[a]?.[year]?.[metric], bv = data.neighborhoods?.[b]?.[year]?.[metric];
-    if (!Number.isFinite(Number(av)) || !Number.isFinite(Number(bv))) return null;
-    return `${METRIC_LABELS[metric] || metric}: ${a} ${formatMetricValue(metric, av)}; ${b} ${formatMetricValue(metric, bv)}`;
+    const as = metricSnapshot(data.neighborhoods?.[a], year, metric), bs = metricSnapshot(data.neighborhoods?.[b], year, metric);
+    if (!Number.isFinite(Number(as.value)) || !Number.isFinite(Number(bs.value))) return null;
+    const yearNote = as.stale || bs.stale ? ` (latest available: ${[as.year, bs.year].filter(Boolean).join('/')})` : '';
+    return `${METRIC_LABELS[metric] || metric}: ${a} ${formatMetricValue(metric, as.value)}; ${b} ${formatMetricValue(metric, bs.value)}${yearNote}`;
   }).filter(Boolean);
   if (!parts.length) return null;
-  return { answer:`In ${year}, ${parts.join('. ')}.`, in_scope:true, citations:metrics.flatMap(metric => [citation(metric, a, year), citation(metric, b, year)]).slice(0, 6) };
+  return { answer:`In ${year}, ${parts.join('. ')}.`, in_scope:true, citations:metrics.flatMap(metric => {
+    const as = metricSnapshot(data.neighborhoods?.[a], year, metric), bs = metricSnapshot(data.neighborhoods?.[b], year, metric);
+    return [citation(metric, a, as.year || year), citation(metric, b, bs.year || year)];
+  }).slice(0, 6) };
 }
 
 function averageMetric(data, metric, year) {
@@ -317,10 +336,10 @@ function answerInterpretation(question, context, data) {
   const neighborhoods = findNeighborhoods(question, context, data);
   const metric = findMetric(question, context);
   if (!neighborhoods.length || !metric) return null;
-  const year = findYear(question, context), csa = neighborhoods[0], value = data.neighborhoods?.[csa]?.[year]?.[metric], city = averageMetric(data, metric, year);
-  if (!Number.isFinite(Number(value)) || city === null) return null;
-  const above = Number(value) > city, label = METRIC_LABELS[metric] || metric;
-  return { answer:`In ${year}, ${csa} had ${label.toLowerCase()} of ${formatMetricValue(metric, value)}, compared with the Baltimore CSA average of ${formatMetricValue(metric, city)}. That is ${above ? 'above' : 'below'} the local average; use the metric direction and source badge before treating it as a concern.`, in_scope:true, citations:[citation(metric, csa, year)] };
+  const year = findYear(question, context), csa = neighborhoods[0], snap = metricSnapshot(data.neighborhoods?.[csa], year, metric), city = averageMetric(data, metric, snap.year || year);
+  if (!Number.isFinite(Number(snap.value)) || city === null) return null;
+  const above = Number(snap.value) > city, label = METRIC_LABELS[metric] || metric, yearCopy = snap.stale ? `${snap.year}, the latest available neighborhood year` : year;
+  return { answer:`In ${yearCopy}, ${csa} had ${label.toLowerCase()} of ${formatMetricValue(metric, snap.value)}, compared with the Baltimore CSA average of ${formatMetricValue(metric, city)}. That is ${above ? 'above' : 'below'} the local average; use the metric direction and source badge before treating it as a concern.`, in_scope:true, citations:[citation(metric, csa, snap.year || year)] };
 }
 
 function compactGrounding(data) {

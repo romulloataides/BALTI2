@@ -913,7 +913,7 @@ function metricInfoRow(key,value){return `<div class="metric-info-row"><div clas
 function openMetricInfo(){
   const info=METRIC_INFO[curM];if(!info)return;
   const label=MCFG[curM]?.label||curM;
-  const unit=MCFG[curM]?.unit||'',coverage=metricValues(curM,curYI).length,cityValue=cityMetricValue(curM,curYI),source=seriesProvenance(curM),benchmark=benchmarkProvenance(curM);
+  const unit=MCFG[curM]?.unit||'',coverageRows=metricValues(curM,curYI),coverage=coverageRows.length,staleCoverage=coverageRows.filter(row=>row.stale).length,cityValue=cityMetricValue(curM,curYI),source=seriesProvenance(curM),benchmark=benchmarkProvenance(curM);
   document.getElementById('metric-info-title').textContent=`About ${label}`;
   const chips=metricInfoChips(curM);
   const chipBox=document.getElementById('metric-info-chips');
@@ -926,7 +926,7 @@ function openMetricInfo(){
     metricInfoRow('Method',info.method),
     metricInfoRow('Disclosure',info.disclosure),
     metricInfoRow('Reliability',[source.detail,benchmark?.detail].filter(Boolean).join(' ')),
-    metricInfoRow('Coverage',`${coverage} neighborhood areas in ${YEARS[curYI]}${cityValue===null?'':`; city average ${cityValue}${unit}`}. Use the CSV button for the current table.`)
+    metricInfoRow('Coverage',`${coverage} neighborhood areas shown for ${YEARS[curYI]}${staleCoverage?`; ${staleCoverage} use the latest available source year`:''}${cityValue===null?'':`; city average ${cityValue}${unit}`}. Use the CSV button for the current table.`)
   ].join('');
   const modal=document.getElementById('metric-info-modal');
   modal.setAttribute('aria-hidden','false');
@@ -940,12 +940,22 @@ function metricConcernScore(metric,value){
   const normalized=Math.max(0,Math.min(1,(Number(value)-config.min)/range));
   return round1((config.inv?normalized:1-normalized)*100);
 }
+const LATEST_VALUE_FALLBACK_METRICS=new Set(['le']);
 function latestNeighborhoodMetric(nsa,metric,yi=curYI){
   for(let i=yi;i>=0;i--){
     const value=yv(nsa,metric,i);
     if(value!==null)return{value,year:YEARS[i],stale:i!==yi,index:i};
   }
   return{value:null,year:null,stale:false,index:null};
+}
+function displayNeighborhoodMetric(nsa,metric,yi=curYI){
+  const current=yv(nsa,metric,yi);
+  if(current!==null)return{value:current,year:YEARS[yi],stale:false,index:yi};
+  if(!LATEST_VALUE_FALLBACK_METRICS.has(metric))return{value:null,year:null,stale:false,index:null};
+  return latestNeighborhoodMetric(nsa,metric,yi);
+}
+function metricDisplayYearNote(snap,selectedYear=YEARS[curYI]){
+  return snap?.stale?`Latest available ${snap.year}; selected year ${selectedYear} has no neighborhood values.`:'';
 }
 function gapCategoryFamily(category){
   const cat=normalizeReportCategory(category);
@@ -1082,7 +1092,7 @@ function allBench(level,k){return YEARS.map((_,i)=>bench(level,k,i));}
 let MCFG={hi:{label:'Health index',min:25,max:87,inv:false,unit:''},le:{label:'Life expectancy',min:59,max:82,inv:false,unit:' years'},as:{label:'Asthma emergency visits',min:14,max:97,inv:true,unit:' per 1k'},la:{label:'Lead exposure',min:7,max:72,inv:true,unit:'%'},va:{label:'Vacant housing',min:1,max:28,inv:true,unit:'%'},pv:{label:'Poverty',min:3,max:52,inv:true,unit:'%'},un:{label:'Unemployment',min:2,max:25,inv:true,unit:'%'},hs:{label:'High school graduation',min:58,max:99,inv:false,unit:'%'},fd:{label:'Food access',min:0,max:100,inv:true,unit:'%'},gs:{label:'Green space',min:0,max:60,inv:false,unit:'%'},cr:{label:'Crime reports',min:0,max:100,inv:true,unit:''},sm:{label:'Smoking',min:5,max:45,inv:true,unit:'%'},ob:{label:'Obesity',min:15,max:55,inv:true,unit:'%'},db:{label:'Diabetes',min:5,max:25,inv:true,unit:'%'},mh:{label:'Poor mental health',min:8,max:30,inv:true,unit:'%'},pa:{label:'Physical inactivity',min:10,max:45,inv:true,unit:'%'},bb:{label:'Broadband access',min:55,max:100,inv:false,unit:'%'},rb:{label:'High rent burden',min:20,max:75,inv:true,unit:'%'},ui:{label:'No health insurance',min:1,max:18,inv:true,unit:'%'},gi:{label:'Income inequality',min:.25,max:.65,inv:true,unit:''},ap:{label:'Air pollution',min:6,max:9,inv:true,unit:' micrograms/m3'},ha:{label:'Housing cost burden',min:15,max:70,inv:true,unit:'%'},hz:{label:'Reported 311 hazards',min:0,max:250,inv:true,unit:' calls'},rt:{label:'Rat service requests',min:0,max:100,inv:true,unit:' calls'},dp:{label:'Illegal dumping requests',min:0,max:100,inv:true,unit:' calls'},ws:{label:'Water and sewer requests',min:0,max:100,inv:true,unit:' calls'}};
 const METRIC_INFO={
   hi:{source:'Derived composite from le/as/la/pv/un/hs',vintage:'2016-2023',method:'Computed in the pipeline from component metrics after yearly citywide min-max normalization.',disclosure:'Derived dashboard index, not an official BNIA indicator.'},
-  le:{source:'BNIA Vital Signs ArcGIS Lifexp service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
+  le:{source:'BNIA Vital Signs ArcGIS Lifexp service',vintage:'2016-2018 neighborhood values; latest available value shown when newer selected years have no CSA coverage',method:'Neighborhood service values loaded at CSA level. The current BNIA service metadata lists life expectancy years through 2018.',disclosure:'Official BNIA neighborhood series with latest-available display for newer dashboard years.'},
   as:{source:'CDC PLACES adult asthma prevalence',vintage:'2018-2023 backfilled',method:'Census tract estimates aggregated to CSA.',disclosure:'Proxy for asthma ED rate; not an emergency-department visit rate.'},
   la:{source:'BNIA Vital Signs ArcGIS Ebll service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
   va:{source:'BNIA Vital Signs ArcGIS Vacant service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
@@ -1413,6 +1423,8 @@ function currentCsvRows(){
   const city=cityMetricValue(metric,curYI),state=bench('state',metric,curYI),federal=bench('federal',metric,curYI);
   return metricValues(metric,curYI).sort((a,b)=>a.nsa.localeCompare(b.nsa)).map(row=>({
     year,
+    source_year:row.year||year,
+    value_status:row.stale?'latest_available':'selected_year',
     metric,
     metric_label:cfg.label||metric,
     neighborhood:row.nsa,
@@ -1442,7 +1454,7 @@ function downloadCurrentCsv(){
 }
 function geoName(props){return props?.Community||props?.CSA2010||props?.name||props?.Name||props?.NAME||'';}
 function gc(val,m){const c=MCFG[m],t=Math.max(0,Math.min(1,(val-c.min)/(c.max-c.min)));const n=c.inv?1-t:t;const p=c.inv?PAL_B:PAL_G;return p[Math.floor(n*4.99)];}
-function getStyle(f){const n=geoName(f.properties);const k=findK(n);if(spendingMode&&k){const amount=spendingTotalForNSA(k);return{fillColor:amount?spendingColor(amount):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(amount?0.82:0.18):0};}if(gapMode&&k){const snapshot=gapSnapshot(k,curM,curYI);const severity=gapSeverityMeta(snapshot);const hidden=blindSpotsOnly&&(snapshot.delta===null||snapshot.delta<15);return{fillColor:snapshot.available?severity.fill:'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(hidden?0.12:0.82):0};}const v=k?yv(k,curM,curYI):null;return{fillColor:v!==null?gc(v,curM):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?0.76:0};}
+function getStyle(f){const n=geoName(f.properties);const k=findK(n);if(spendingMode&&k){const amount=spendingTotalForNSA(k);return{fillColor:amount?spendingColor(amount):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(amount?0.82:0.18):0};}if(gapMode&&k){const snapshot=gapSnapshot(k,curM,curYI);const severity=gapSeverityMeta(snapshot);const hidden=blindSpotsOnly&&(snapshot.delta===null||snapshot.delta<15);return{fillColor:snapshot.available?severity.fill:'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(hidden?0.12:0.82):0};}const v=k?displayNeighborhoodMetric(k,curM,curYI).value:null;return{fillColor:v!==null?gc(v,curM):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?0.76:0};}
 function findK(name){if(BASE[name])return name;for(const k of Object.keys(BASE)){if(k.toLowerCase()===name.toLowerCase())return k;const a=name.toLowerCase().split('/')[0].trim(),b=k.toLowerCase().split('/')[0].trim();if(a===b||a.includes(b)||b.includes(a))return k;}return null;}
 function neighborhoodConcernRank(metric,nsa,yi=curYI){
   if(!nsa)return null;
@@ -1455,11 +1467,12 @@ function mapTooltipHtml(key,name){
   if(spendingMode&&key)return spendingTooltipHtml(key,name);
   if(gapMode&&key)return gapTooltipHtml(key,name);
   const cfg=MCFG[curM]||{},label=key||name||'Neighborhood',unit=cfg.unit||'';
-  const value=key?yv(key,curM,curYI):null,city=cityMetricValue(curM,curYI),rank=neighborhoodConcernRank(curM,key,curYI),source=seriesProvenance(curM);
+  const snap=key?displayNeighborhoodMetric(key,curM,curYI):{value:null,year:null,stale:false},value=snap.value,city=cityMetricValue(curM,curYI),rank=neighborhoodConcernRank(curM,key,curYI),source=seriesProvenance(curM);
   const valueText=value===null||value===undefined?'N/A':`${value}${unit}`;
+  const yearLine=snap.stale?`<br>Latest available: ${snap.year}`:'';
   const cityLine=city===null||city===undefined?'':`<br>City average: ${escapeHtml(`${city}${unit}`)}`;
   const rankLine=rank?`<br>Concern rank: ${rank.rank} of ${rank.total}`:'';
-  return `<strong>${escapeHtml(label)}</strong><br>${escapeHtml(cfg.label||curM)}: <strong>${escapeHtml(valueText)}</strong>${cityLine}${rankLine}<br>${accuracyChip(source.label,source.tone)}`;
+  return `<strong>${escapeHtml(label)}</strong><br>${escapeHtml(cfg.label||curM)}: <strong>${escapeHtml(valueText)}</strong>${yearLine}${cityLine}${rankLine}<br>${accuracyChip(source.label,source.tone)}`;
 }
 const HOLC_GRADES=['A','B','C','D'];
 const HOLC_MORE_URL='https://www.cityhealthdashboard.com/MD/Baltimore/metric-detail?metricId=64&dataPeriod=2023&focus=grade&grade=A&grade=B&grade=C&grade=D#';
@@ -1927,7 +1940,7 @@ function benchComparison(metric,yi){if(benchMode==='neighborhood')return null;re
 function benchLabel(){return LEVEL_META[benchMode]?.benchmarkLabel||null;}
 function pctForMetric(value,metric,maxOverride){const max=maxOverride??MCFG[metric]?.max??100;if(value===null||value===undefined||Number.isNaN(Number(value)))return 0;return Math.min(100,Math.max(0,Math.round((Math.abs(value)/max)*100)));}
 function makeLevelSwitcher(scope,label='Benchmark context'){const scopeId=String(scope||'global').replace(/[^a-z0-9_-]/gi,'-');const noteId=`level-note-${scopeId}`;return`<div class="level-block" data-level-scope="${scopeId}"><div class="level-top"><div class="level-label">${label}</div><div class="level-switch" role="group" aria-label="${label}" aria-describedby="${noteId}">${Object.entries(LEVEL_META).map(([mode,meta])=>`<button type="button" class="level-btn ${benchMode===mode?'active':''}" onclick="setBenchMode('${mode}')" aria-pressed="${benchMode===mode?'true':'false'}">${meta.label}</button>`).join('')}</div></div><div class="level-note" id="${noteId}">${LEVEL_META[benchMode].note}</div></div>`;}
-function metricValues(metric,yi=curYI){return Object.keys(BASE).map(nsa=>({nsa,value:yv(nsa,metric,yi)})).filter(row=>Number.isFinite(row.value));}
+function metricValues(metric,yi=curYI){return Object.keys(BASE).map(nsa=>({nsa,...displayNeighborhoodMetric(nsa,metric,yi)})).filter(row=>Number.isFinite(row.value));}
 function cityMetricValue(metric,yi=curYI){const y=String(YEARS[yi]),city=BENCHMARKS.city?.[y]?.[metric];if(Number.isFinite(Number(city)))return round1(city);const vals=metricValues(metric,yi).map(row=>row.value);return vals.length?mean(vals):null;}
 function metricSpread(metric,yi=curYI){const vals=metricValues(metric,yi);if(!vals.length)return null;const sorted=[...vals].sort((a,b)=>a.value-b.value);return{low:sorted[0],high:sorted[sorted.length-1],count:sorted.length};}
 function metricConcernRows(metric,yi=curYI,limit=5){const vals=metricValues(metric,yi),cfg=MCFG[metric]||{};return vals.sort((a,b)=>cfg.inv?b.value-a.value:a.value-b.value).slice(0,limit);}
@@ -2038,7 +2051,8 @@ const CITY_NEXT_DATA=[
 ];
 function cityMetricCard(metric,label=MCFG[metric]?.label||metric){
   const value=cityMetricValue(metric),unit=MCFG[metric]?.unit||'',spread=metricSpread(metric),meta=seriesProvenance(metric);
-  const spreadText=spread?`${shortNeighborhood(spread.low.nsa)} ${spread.low.value}${unit} to ${shortNeighborhood(spread.high.nsa)} ${spread.high.value}${unit}`:'Neighborhood coverage pending';
+  const latestText=spread&&(spread.low.stale||spread.high.stale)?' (latest available)':'';
+  const spreadText=spread?`${shortNeighborhood(spread.low.nsa)} ${spread.low.value}${unit} to ${shortNeighborhood(spread.high.nsa)} ${spread.high.value}${unit}${latestText}`:'Neighborhood coverage pending';
   return`<button type="button" class="city-card" onclick="setMetricKey('${metric}')" aria-label="Map ${escapeHtml(label)}"><div class="city-card-label">${escapeHtml(label)} ${accuracyChip(meta.label,meta.tone)}</div><div class="city-card-value">${value===null?'--':`${value}${unit}`}</div><div class="city-card-note">${escapeHtml(spreadText)}</div></button>`;
 }
 function cityProfileHtml(){return `<div class="city-profile">${CITY_PROFILE.map(([label,value])=>`<div class="city-profile-item"><div class="city-profile-label">${escapeHtml(label)}</div><div class="city-profile-value">${escapeHtml(value)}</div></div>`).join('')}</div>`;}
@@ -2049,11 +2063,13 @@ function renderCityOverview(){
   const yi=curYI,metric=curM,cfg=MCFG[metric]||{},unit=cfg.unit||'',cityVal=cityMetricValue(metric,yi),spread=metricSpread(metric,yi),rankRows=metricConcernRows(metric,yi),rankLabel=cfg.inv?'Highest local burden':'Lowest local values';
   const selectableMetrics=selectableMetricKeys(),mappedMetrics=selectableMetrics.length,currentYearMetrics=selectableMetrics.filter(k=>metricValues(k,yi).length).length;
   const source=DATA_META?.source_files?sourceLine():'Loaded dashboard data';
-  el.innerHTML=`<div class="city-hero"><div class="city-eyebrow">City overview for</div><div class="city-title">Baltimore, MD</div><div class="city-copy">${YEARS[yi]} snapshot · ${mappedMetrics} mapped metric tabs · ${currentYearMetrics} current-year neighborhood series · ${source}</div></div>${cityProfileHtml()}${makeLevelSwitcher('city','Benchmark context')}<div class="city-section-title">Metrics overview</div><div class="city-grid">${cityMetricCard('hi','Health index')}${cityMetricCard('le','Life expectancy')}${cityMetricCard('un','Unemployment')}${cityMetricCard('bb','Broadband access')}${cityMetricCard('fd','Food access')}${cityMetricCard('gs','Green space')}</div>${CITY_GROUPS.map(group=>cityGroupHtml(group,selectableMetrics)).join('')}${cityNextDataHtml()}${capitalSpendingOverviewHtml()}${redliningAnalysisHtml(metric,yi)}<div class="city-section-title">${escapeHtml(MCFG[metric]?.label||metric)} · ${rankLabel}</div><div>${rankRows.map(row=>`<button type="button" class="city-rank" onclick="pinA=${quoteJsArg(row.nsa)};pinB=null;activeSlot='b';updatePinBar();updatePinStyles();refreshSide();updateShareStrip();" aria-label="Open ${escapeHtml(shortNeighborhood(row.nsa))}"><span class="city-rank-name">${escapeHtml(shortNeighborhood(row.nsa))}</span><span class="city-rank-value">${row.value}${unit}</span></button>`).join('')}</div><div class="city-section-title">Current metric</div><div class="city-card"><div class="city-card-label">${escapeHtml(MCFG[metric]?.label||metric)} · city value</div><div class="city-card-value">${cityVal===null?'--':`${cityVal}${unit}`}</div><div class="city-card-note">${spread?`${spread.count} neighborhood areas, range ${spread.low.value}${unit} to ${spread.high.value}${unit}`:'Neighborhood values unavailable for this year.'}</div></div><div class="city-actions"><button type="button" class="sb-btn" onclick="toggleGapMode()">Gap view</button><button type="button" class="sb-btn" onclick="openShare()">Share</button><button type="button" class="sb-btn" onclick="downloadCurrentCsv()">Download CSV</button><button type="button" class="sb-btn" onclick="toggleChat(true)">Ask data</button></div><div class="src-n">City profile mirrors CHDB-style overview fields. Neighborhood metrics use BALTI2 neighborhood data.</div>`;
+  el.innerHTML=`<div class="city-hero"><div class="city-eyebrow">City overview for</div><div class="city-title">Baltimore, MD</div><div class="city-copy">${YEARS[yi]} snapshot · ${mappedMetrics} mapped metric tabs · ${currentYearMetrics} neighborhood metric layers shown · ${source}</div></div>${cityProfileHtml()}${makeLevelSwitcher('city','Benchmark context')}<div class="city-section-title">Metrics overview</div><div class="city-grid">${cityMetricCard('hi','Health index')}${cityMetricCard('le','Life expectancy')}${cityMetricCard('un','Unemployment')}${cityMetricCard('bb','Broadband access')}${cityMetricCard('fd','Food access')}${cityMetricCard('gs','Green space')}</div>${CITY_GROUPS.map(group=>cityGroupHtml(group,selectableMetrics)).join('')}${cityNextDataHtml()}${capitalSpendingOverviewHtml()}${redliningAnalysisHtml(metric,yi)}<div class="city-section-title">${escapeHtml(MCFG[metric]?.label||metric)} · ${rankLabel}</div><div>${rankRows.map(row=>`<button type="button" class="city-rank" onclick="pinA=${quoteJsArg(row.nsa)};pinB=null;activeSlot='b';updatePinBar();updatePinStyles();refreshSide();updateShareStrip();" aria-label="Open ${escapeHtml(shortNeighborhood(row.nsa))}"><span class="city-rank-name">${escapeHtml(shortNeighborhood(row.nsa))}</span><span class="city-rank-value">${row.value}${unit}${row.stale?` · ${row.year}`:''}</span></button>`).join('')}</div><div class="city-section-title">Current metric</div><div class="city-card"><div class="city-card-label">${escapeHtml(MCFG[metric]?.label||metric)} · city value</div><div class="city-card-value">${cityVal===null?'--':`${cityVal}${unit}`}</div><div class="city-card-note">${spread?`${spread.count} neighborhood areas, range ${spread.low.value}${unit} to ${spread.high.value}${unit}${spread.low.stale||spread.high.stale?'; latest available values shown where needed':''}`:'Neighborhood values unavailable for this year.'}</div></div><div class="city-actions"><button type="button" class="sb-btn" onclick="toggleGapMode()">Gap view</button><button type="button" class="sb-btn" onclick="openShare()">Share</button><button type="button" class="sb-btn" onclick="downloadCurrentCsv()">Download CSV</button><button type="button" class="sb-btn" onclick="toggleChat(true)">Ask data</button></div><div class="src-n">City profile mirrors CHDB-style overview fields. Neighborhood metrics use BALTI2 neighborhood data.</div>`;
 }
 function renderContextMetricCard(nsa,metric,value,contextText,color=COL_A){
-  const displayValue=value===null||value===undefined?'N/A':`${value}${MCFG[metric]?.unit||''}`;
-  return `<div style="background:var(--bg2);border-radius:5px;padding:6px 8px"><div style="font-size:13px;font-weight:500;color:${color}">${escapeHtml(displayValue)}</div><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><div style="font-size:9px;color:var(--t2)">${escapeHtml(MCFG[metric]?.label||metric)}</div>${metricAccuracyInline(metric)}</div><div class="metric-note">${escapeHtml(contextText)}</div>${renderAnnotationPanel(nsa,annotationContext('metric',metric),MCFG[metric]?.label||metric)}</div>`;
+  const snap=value&&typeof value==='object'&&'value' in value?value:{value,year:YEARS[curYI],stale:false};
+  const displayValue=snap.value===null||snap.value===undefined?'N/A':`${snap.value}${MCFG[metric]?.unit||''}`;
+  const note=[contextText,metricDisplayYearNote(snap)].filter(Boolean).join(' ');
+  return `<div style="background:var(--bg2);border-radius:5px;padding:6px 8px"><div style="font-size:13px;font-weight:500;color:${color}">${escapeHtml(displayValue)}</div><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><div style="font-size:9px;color:var(--t2)">${escapeHtml(MCFG[metric]?.label||metric)}</div>${metricAccuracyInline(metric)}</div><div class="metric-note">${escapeHtml(note)}</div>${renderAnnotationPanel(nsa,annotationContext('metric',metric),MCFG[metric]?.label||metric)}</div>`;
 }
 function recentReportsForFamilies(nsa,families,maxDays=120){
   const target=matchNeighborhoodKey(nsa)||nsa;
@@ -2209,6 +2225,107 @@ function renderChatPanel(){
 }
 function clearChat(){chatMessages=[];renderChatPanel();}
 function pushChat(role,content,citations=[]){chatMessages.push({role,content,citations});chatMessages=chatMessages.slice(-10);renderChatPanel();}
+const CHAT_METRIC_ALIASES={
+  bb:['broadband','internet access','internet subscription'],
+  le:['life expectancy','life exp'],
+  pv:['poverty','household poverty'],
+  un:['unemployment','unemployed'],
+  hs:['high school graduation','high school','graduation'],
+  as:['asthma','adult asthma'],
+  la:['lead','lead exposure'],
+  va:['vacant','vacancy','vacant housing'],
+  fd:['food access','food'],
+  gs:['green space','parks'],
+  sm:['smoking'],
+  ob:['obesity'],
+  db:['diabetes'],
+  mh:['mental health','poor mental health'],
+  pa:['physical inactivity','inactivity'],
+  rb:['rent burden','high rent'],
+  ui:['health insurance','uninsured','no health insurance'],
+  gi:['income inequality','gini'],
+  ap:['air pollution','pm2.5','particulate'],
+  ha:['housing cost burden','housing burden'],
+  hz:['311 hazards','hazards','service requests']
+};
+function chatFindMetric(question,fallback=true){
+  const q=String(question||'').toLowerCase();
+  for(const [metric,aliases] of Object.entries(CHAT_METRIC_ALIASES)){if(aliases.some(alias=>q.includes(alias)))return metric;}
+  for(const [metric,cfg] of Object.entries(MCFG)){if(new RegExp(`\\b${metric}\\b`).test(q)||q.includes(String(cfg.label||'').toLowerCase()))return metric;}
+  return fallback&&MCFG[curM]?curM:null;
+}
+function chatFindMetrics(question){
+  const q=String(question||'').toLowerCase(),found=[];
+  for(const [metric,aliases] of Object.entries(CHAT_METRIC_ALIASES)){if(aliases.some(alias=>q.includes(alias)))found.push(metric);}
+  for(const [metric,cfg] of Object.entries(MCFG)){if(new RegExp(`\\b${metric}\\b`).test(q)||q.includes(String(cfg.label||'').toLowerCase()))found.push(metric);}
+  return [...new Set(found.length?found:[curM])].filter(metric=>MCFG[metric]);
+}
+function chatNormalizeName(value){return String(value||'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/[^a-z0-9]+/g,' ').trim();}
+function chatNeighborhoodTerms(name){
+  const generic=new Set(['baltimore','city','neighborhood']);
+  return [...new Set(String(name||'').split(/[/-]/).map(part=>chatNormalizeName(part).replace(/^(greater|old|north|south|east|west)\s+/,'')).filter(term=>term.length>2&&!generic.has(term)))];
+}
+function chatFindNeighborhoods(question){
+  const q=chatNormalizeName(question),hits=[];
+  Object.keys(BASE).forEach(name=>{if(chatNeighborhoodTerms(name).some(term=>q.includes(term)))hits.push(name);});
+  [pinA,pinB].filter(Boolean).forEach(name=>{if(BASE[name]&&!hits.includes(name))hits.push(name);});
+  return hits.slice(0,3);
+}
+function chatYearIndex(question){
+  const matched=String(question||'').match(/\b20(?:1[6-9]|2[0-3])\b/);
+  if(matched){const idx=YEARS.indexOf(Number(matched[0]));if(idx>=0)return idx;}
+  return curYI;
+}
+function chatMetricSource(metric){return METRIC_INFO[metric]?.source||seriesProvenance(metric).detail||'Dashboard data';}
+function chatCitation(metric,csa,snap){return{metric,metric_label:MCFG[metric]?.label||metric,csa,years:[snap?.year||YEARS[curYI]],source:chatMetricSource(metric)};}
+function localChatRank(question){
+  const q=String(question||'').toLowerCase(),rank=q.match(/\b(least|lowest|smallest|fewest|most|highest|largest|greatest)\b/);
+  if(!rank)return null;
+  const metric=chatFindMetric(question,false);if(!metric)return null;
+  const yi=chatYearIndex(question),rows=metricValues(metric,yi);
+  if(!rows.length)return null;
+  const wantMin=['least','lowest','smallest','fewest'].includes(rank[1]);
+  rows.sort((a,b)=>wantMin?a.value-b.value:b.value-a.value);
+  const top=rows[0],unit=MCFG[metric]?.unit||'',label=MCFG[metric]?.label||metric,direction=wantMin?'lowest':'highest';
+  const yearCopy=top.stale?`${top.year}, the latest available neighborhood year for ${label.toLowerCase()}`:YEARS[yi];
+  return{answer:`Among Baltimore CSAs, the ${direction} ${label.toLowerCase()} shown for ${yearCopy} is ${top.nsa}, at ${top.value}${unit}.`,citations:[chatCitation(metric,top.nsa,top)]};
+}
+function localChatComparison(question){
+  if(!/\b(compare|vs|versus|against)\b/i.test(question))return null;
+  const neighborhoods=chatFindNeighborhoods(question),metrics=chatFindMetrics(question).slice(0,4),yi=chatYearIndex(question);
+  if(neighborhoods.length<2||!metrics.length)return null;
+  const [a,b]=neighborhoods,parts=[],citations=[];
+  metrics.forEach(metric=>{
+    const sa=displayNeighborhoodMetric(a,metric,yi),sb=displayNeighborhoodMetric(b,metric,yi),unit=MCFG[metric]?.unit||'';
+    if(sa.value===null||sb.value===null)return;
+    const label=MCFG[metric]?.label||metric,yearNote=sa.stale||sb.stale?` (latest available: ${[sa.year,sb.year].filter(Boolean).join('/')})`:'';
+    parts.push(`${label}: ${shortNeighborhood(a)} ${sa.value}${unit}; ${shortNeighborhood(b)} ${sb.value}${unit}${yearNote}`);
+    citations.push(chatCitation(metric,a,sa),chatCitation(metric,b,sb));
+  });
+  if(!parts.length)return null;
+  return{answer:`For ${YEARS[yi]}, ${parts.join('. ')}.`,citations:citations.slice(0,6)};
+}
+function localChatMetricValue(question){
+  const metric=chatFindMetric(question,false);if(!metric)return null;
+  const yi=chatYearIndex(question),neighborhoods=chatFindNeighborhoods(question),unit=MCFG[metric]?.unit||'',label=MCFG[metric]?.label||metric;
+  if(neighborhoods.length){
+    const nsa=neighborhoods[0],snap=displayNeighborhoodMetric(nsa,metric,yi);
+    if(snap.value===null)return null;
+    const yearCopy=snap.stale?`${snap.year}, the latest available neighborhood year`:`${YEARS[yi]}`;
+    return{answer:`${shortNeighborhood(nsa)} has ${label.toLowerCase()} of ${snap.value}${unit} for ${yearCopy}.`,citations:[chatCitation(metric,nsa,snap)]};
+  }
+  if(/\b(city|average|overall|baltimore|what|show|value|rate)\b/i.test(question)){
+    const value=cityMetricValue(metric,yi),rows=metricValues(metric,yi);
+    if(value===null||!rows.length)return null;
+    const stale=rows.every(row=>row.stale),yearCopy=stale?`${rows[0].year}, the latest available neighborhood year`:`${YEARS[yi]}`;
+    return{answer:`The Baltimore CSA average shown for ${label.toLowerCase()} is ${value}${unit} for ${yearCopy}.`,citations:[{metric,metric_label:label,csa:'Baltimore CSA average',years:[stale?rows[0].year:YEARS[yi]],source:chatMetricSource(metric)}]};
+  }
+  return null;
+}
+function answerChatLocally(question){
+  if(!Object.keys(BASE||{}).length)return null;
+  return localChatRank(question)||localChatComparison(question)||localChatMetricValue(question);
+}
 async function askChat(forcedQuestion=''){
   const input=document.getElementById('chat-input');
   const question=(forcedQuestion||input?.value||'').trim();
@@ -2216,6 +2333,8 @@ async function askChat(forcedQuestion=''){
   if(question.length>500){toast('Keep questions under 500 characters.');return;}
   pushChat('user',question);
   if(input)input.value='';
+  const localAnswer=answerChatLocally(question);
+  if(localAnswer){pushChat('assistant',localAnswer.answer,localAnswer.citations||[]);return;}
   if(!CHAT_WORKER_URL){pushChat('assistant','Chat endpoint is not configured yet. Deploy the Worker and set window.BALTI2_CHAT_WORKER_URL.');return;}
   chatBusy=true;renderChatPanel();
   const history=chatMessages.slice(-9,-1).map(m=>({role:m.role,content:m.content}));
@@ -2477,11 +2596,11 @@ function renderOne(){
   const badgeFg=comparisonDelta===null?(hiV>=65?TOKENS.success:hiV<45?TOKENS.danger:TOKENS.warn):comparisonDelta>1?TOKENS.success:comparisonDelta<-1?TOKENS.danger:TOKENS.warn;
   const badgeLabel=comparisonDelta===null?(hiV>=65?'Above avg':hiV<45?'Below avg':'Near avg'):comparisonDelta>1?`Above ${compText.toLowerCase()}`:comparisonDelta<-1?`Below ${compText.toLowerCase()}`:`Near ${compText.toLowerCase()}`;
   const deltaColor=delta===null?TOKENS.t2:delta>=0?TOKENS.success:TOKENS.danger;
-  document.getElementById('t-ov1').innerHTML=`${currentPilotConfig()?renderPilotOverview(p):''}${makeLevelSwitcher('ov1')}${metricAccuracyBox(curM,'Current map metric')}${renderNeighborhoodProfile(p)}<div style="font-size:13px;font-weight:500">${shortNeighborhood(p)}</div><div style="font-size:9px;color:var(--t3)">${p} · ${YEARS[yi]}</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:26px;font-weight:500;color:${COL_A}">${hiV}</div><div style="font-size:10px;color:var(--t2)">health index<br><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${badgeBg};color:${badgeFg}">${badgeLabel}</span>${delta!==null?`<span style="color:${deltaColor};margin-left:4px">${delta>=0?'▲':'▼'}${Math.abs(delta)}</span>`:''}</div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t2)"><span style="color:${COL_A}">${shortNeighborhood(p)}: ${hiV}</span><span>${compHi!==null?`${compText}: ${compHi}`:'Local view only'}</span></div><div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;position:relative;margin-bottom:2px"><div style="height:100%;width:${pctForMetric(hiV,'hi')}%;background:${COL_A};border-radius:2px"></div>${compHi!==null?`<div style="position:absolute;top:0;left:${pctForMetric(compHi,'hi')}%;width:2px;height:100%;background:var(--t3)"></div>`:''}</div>${renderAnnotationPanel(p,annotationContext('metric','hi'),'Health index')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${['le','as','la','va','pv','hs'].map(k=>{const local=yv(p,k,yi),comp=benchComparison(k,yi);return renderContextMetricCard(p,k,local,comp!==null?`${compText}: ${comp}${MCFG[k].unit}`:'Local neighborhood value');}).join('')}</div><div style="margin-top:4px;background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this view</strong><br><span id="one-url" style="font-family:var(--font-mono);word-break:break-all">${buildURL()}</span><br><button type="button" onclick="copyURL()" aria-label="Copy shareable link for ${shortNeighborhood(p)}" style="margin-top:5px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for ${shortNeighborhood(p)}" style="margin-top:5px;margin-left:4px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">More options</button></div><div class="src-n">${sourceLine()}</div>`;
+  document.getElementById('t-ov1').innerHTML=`${currentPilotConfig()?renderPilotOverview(p):''}${makeLevelSwitcher('ov1')}${metricAccuracyBox(curM,'Current map metric')}${renderNeighborhoodProfile(p)}<div style="font-size:13px;font-weight:500">${shortNeighborhood(p)}</div><div style="font-size:9px;color:var(--t3)">${p} · ${YEARS[yi]}</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:26px;font-weight:500;color:${COL_A}">${hiV}</div><div style="font-size:10px;color:var(--t2)">health index<br><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${badgeBg};color:${badgeFg}">${badgeLabel}</span>${delta!==null?`<span style="color:${deltaColor};margin-left:4px">${delta>=0?'▲':'▼'}${Math.abs(delta)}</span>`:''}</div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t2)"><span style="color:${COL_A}">${shortNeighborhood(p)}: ${hiV}</span><span>${compHi!==null?`${compText}: ${compHi}`:'Local view only'}</span></div><div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;position:relative;margin-bottom:2px"><div style="height:100%;width:${pctForMetric(hiV,'hi')}%;background:${COL_A};border-radius:2px"></div>${compHi!==null?`<div style="position:absolute;top:0;left:${pctForMetric(compHi,'hi')}%;width:2px;height:100%;background:var(--t3)"></div>`:''}</div>${renderAnnotationPanel(p,annotationContext('metric','hi'),'Health index')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${['le','as','la','va','pv','hs'].map(k=>{const local=displayNeighborhoodMetric(p,k,yi),comp=benchComparison(k,yi);return renderContextMetricCard(p,k,local,comp!==null?`${compText}: ${comp}${MCFG[k].unit}`:'Local neighborhood value');}).join('')}</div><div style="margin-top:4px;background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this view</strong><br><span id="one-url" style="font-family:var(--font-mono);word-break:break-all">${buildURL()}</span><br><button type="button" onclick="copyURL()" aria-label="Copy shareable link for ${shortNeighborhood(p)}" style="margin-top:5px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for ${shortNeighborhood(p)}" style="margin-top:5px;margin-left:4px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">More options</button></div><div class="src-n">${sourceLine()}</div>`;
   const keys=[{k:'hi',l:'Health index'},{k:'le',l:'Life expectancy'},{k:'as',l:'Asthma'},{k:'la',l:'Lead exposure'},{k:'pv',l:'Poverty'},{k:'un',l:'Unemployment'}];
-  document.getElementById('t-tr1').innerHTML=`<div class="src-n" style="margin-bottom:4px">2016–${YEARS[yi]}</div>`+keys.map((kv,i)=>{const vals=allY(p,kv.k),cur=vals[yi],chg=Math.round((cur-vals[0])*10)/10;const improving=MCFG[kv.k].inv?chg<0:chg>0;const tone=improving?TOKENS.success:TOKENS.danger;const sign=chg>=0?'+':'';return`<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:0.5px solid var(--br)"><div style="flex:1;font-size:10px;color:var(--t2)">${kv.l}</div><canvas id="spk1-${i}" width="60" height="18" style="flex-shrink:0"></canvas><div style="min-width:26px;font-size:11px;font-weight:500">${cur}${MCFG[kv.k].unit}</div><div style="font-size:9px;min-width:24px;text-align:right;color:${tone}">${sign}${chg}</div></div>`;}).join('');
+  document.getElementById('t-tr1').innerHTML=`<div class="src-n" style="margin-bottom:4px">2016–${YEARS[yi]}</div>`+keys.map((kv,i)=>{const vals=allY(p,kv.k),snap=displayNeighborhoodMetric(p,kv.k,yi),first=vals.find(v=>v!==null),chg=snap.value!==null&&first!==undefined?round1(snap.value-first):null;const improving=chg!==null&&(MCFG[kv.k].inv?chg<0:chg>0);const tone=chg===null?TOKENS.t3:improving?TOKENS.success:TOKENS.danger;const sign=chg!==null&&chg>=0?'+':'';const valueText=metricDisplay(kv.k,snap.value);const yearNote=snap.stale?`<span style="font-size:8px;color:var(--t3)"> ${snap.year}</span>`:'';return`<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:0.5px solid var(--br)"><div style="flex:1;font-size:10px;color:var(--t2)">${kv.l}</div><canvas id="spk1-${i}" width="60" height="18" style="flex-shrink:0"></canvas><div style="min-width:36px;font-size:11px;font-weight:500">${valueText}${yearNote}</div><div style="font-size:9px;min-width:24px;text-align:right;color:${tone}">${chg===null?'--':`${sign}${chg}`}</div></div>`;}).join('');
   requestAnimationFrame(()=>keys.forEach((kv,i)=>drawSpk('spk1-'+i,allY(p,kv.k),yi,COL_A)));
-  document.getElementById('t-dt1').innerHTML=`${makeLevelSwitcher('dt1','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}`+[['hi','Health index',100,false,''],['le','Life expectancy',85,false,' years'],['as',asthmaMetricMeta().compact,100,true,MCFG.as.unit],['la','Lead exposure',75,true,'%'],['pv','Poverty',55,true,'%'],['un','Unemployment',25,true,'%'],['va','Vacant housing',28,true,'%'],['hz','Reported 311 hazards',250,true,' calls']].map(([k,l,mx,inv,u])=>{const v=yv(p,k,yi)||0,cv=benchComparison(k,yi),pct=pctForMetric(v,k,mx),cpct=cv!==null?pctForMetric(cv,k,mx):null,better=cv===null?null:(inv?v<cv:v>cv),col=better===null?TOKENS.brand:better?TOKENS.success:TOKENS.danger;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div class="vs-track-wrap"><div class="vs-track"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div>${cpct!==null?`<div class="vs-benchmark" style="left:${cpct}%"></div>`:''}</div></div><div style="width:32px;text-align:right;font-size:10px;font-weight:500">${v}${u}</div><div style="font-size:9px;color:${cv===null?TOKENS.t3:col};width:74px;text-align:right">${cv!==null?`${compText}: ${cv}${u}`:'Local'}</div></div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()}</div>`;
+  document.getElementById('t-dt1').innerHTML=`${makeLevelSwitcher('dt1','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}`+[['hi','Health index',100,false,''],['le','Life expectancy',85,false,' years'],['as',asthmaMetricMeta().compact,100,true,MCFG.as.unit],['la','Lead exposure',75,true,'%'],['pv','Poverty',55,true,'%'],['un','Unemployment',25,true,'%'],['va','Vacant housing',28,true,'%'],['hz','Reported 311 hazards',250,true,' calls']].map(([k,l,mx,inv,u])=>{const snap=displayNeighborhoodMetric(p,k,yi),v=snap.value,cv=benchComparison(k,yi),pct=pctForMetric(v,k,mx),cpct=cv!==null?pctForMetric(cv,k,mx):null,better=cv===null||v===null?null:(inv?v<cv:v>cv),col=better===null?TOKENS.brand:better?TOKENS.success:TOKENS.danger;const valueText=v===null?'--':`${v}${u}${snap.stale?` (${snap.year})`:''}`;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div class="vs-track-wrap"><div class="vs-track"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div>${cpct!==null?`<div class="vs-benchmark" style="left:${cpct}%"></div>`:''}</div></div><div style="width:44px;text-align:right;font-size:10px;font-weight:500">${valueText}</div><div style="font-size:9px;color:${cv===null?TOKENS.t3:col};width:74px;text-align:right">${cv!==null?`${compText}: ${cv}${u}`:'Local'}</div></div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()}</div>`;
   renderGapPanelOne(p,'t-gap1');
   renderHazardsOne(p,'t-hz1');
   renderSpendingOne(p,'t-sp1');
@@ -2493,9 +2612,9 @@ function renderOne(){
 function renderTwo(){
   const p1=pinA,p2=pinB,yi=curYI,v1=yv(p1,'hi',yi),v2=yv(p2,'hi',yi),gap=Math.abs(v1-v2),compHi=benchComparison('hi',yi),compText=benchLabel();
   const mkeys=[{k:'hi',l:'Health index',u:''},{k:'le',l:'Life expectancy',u:' years'},{k:'as',l:asthmaMetricMeta().compact,u:MCFG.as.unit},{k:'la',l:'Lead exposure',u:'%'},{k:'pv',l:'Poverty',u:'%'},{k:'un',l:'Unemployment',u:'%'},{k:'hs',l:'High school graduation',u:'%'},{k:'va',l:'Vacant housing',u:'%'}];
-  document.getElementById('t-cmp').innerHTML=`${makeLevelSwitcher('cmp')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:5px;margin-bottom:4px"><div style="flex:1;background:${TOKENS.accentLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p1)}</div><div style="font-size:20px;font-weight:500;color:${COL_A}">${v1}</div></div><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 3px"><div style="font-size:9px;color:var(--t3)">gap</div><div style="font-size:14px;font-weight:500">${gap}</div></div><div style="flex:1;background:${TOKENS.brandLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p2)}</div><div style="font-size:20px;font-weight:500;color:${COL_B}">${v2}</div></div></div><div class="bench-chip"><span class="bench-dot"></span>${compHi!==null?`${compText}: ${compHi}`:'Local-only comparison'}</div>${mkeys.map(({k,l,u})=>{const a=yv(p1,k,yi),b=yv(p2,k,yi),comp=benchComparison(k,yi),mx=MCFG[k]?.max||100,w1=Math.min(92,pctForMetric(a,k,mx)),w2=Math.min(92,pctForMetric(b,k,mx)),wc=comp!==null?Math.min(92,pctForMetric(comp,k,mx)):null;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A};font-weight:500">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B};font-weight:500">${b}${u}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3};font-weight:500">${compText}: ${comp}${u}</span></div>`:''}</div></div></div>`;}).join('')}<div style="background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this comparison</strong><br><span style="font-family:var(--font-mono);word-break:break-all;font-size:9px">${buildURL()}</span><br><div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap"><button type="button" onclick="copyURL()" aria-label="Copy shareable comparison link for ${shortNeighborhood(p1)} and ${shortNeighborhood(p2)}" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Share options</button><button type="button" onclick="shareEmail()" aria-label="Share this neighborhood comparison by email" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Email</button><button type="button" onclick="copyEmbed()" aria-label="Show embed code for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Embed</button></div></div><div class="src-n">${sourceLine()} · ${YEARS[yi]}</div>`;
+  document.getElementById('t-cmp').innerHTML=`${makeLevelSwitcher('cmp')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:5px;margin-bottom:4px"><div style="flex:1;background:${TOKENS.accentLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p1)}</div><div style="font-size:20px;font-weight:500;color:${COL_A}">${v1}</div></div><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 3px"><div style="font-size:9px;color:var(--t3)">gap</div><div style="font-size:14px;font-weight:500">${gap}</div></div><div style="flex:1;background:${TOKENS.brandLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p2)}</div><div style="font-size:20px;font-weight:500;color:${COL_B}">${v2}</div></div></div><div class="bench-chip"><span class="bench-dot"></span>${compHi!==null?`${compText}: ${compHi}`:'Local-only comparison'}</div>${mkeys.map(({k,l,u})=>{const snapA=displayNeighborhoodMetric(p1,k,yi),snapB=displayNeighborhoodMetric(p2,k,yi),a=snapA.value,b=snapB.value,comp=benchComparison(k,yi),mx=MCFG[k]?.max||100,w1=Math.min(92,pctForMetric(a,k,mx)),w2=Math.min(92,pctForMetric(b,k,mx)),wc=comp!==null?Math.min(92,pctForMetric(comp,k,mx)):null;const aLabel=a===null?'--':`${a}${u}${snapA.stale?` (${snapA.year})`:''}`,bLabel=b===null?'--':`${b}${u}${snapB.stale?` (${snapB.year})`:''}`;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A};font-weight:500">${aLabel}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B};font-weight:500">${bLabel}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3};font-weight:500">${compText}: ${comp}${u}</span></div>`:''}</div></div></div>`;}).join('')}<div style="background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this comparison</strong><br><span style="font-family:var(--font-mono);word-break:break-all;font-size:9px">${buildURL()}</span><br><div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap"><button type="button" onclick="copyURL()" aria-label="Copy shareable comparison link for ${shortNeighborhood(p1)} and ${shortNeighborhood(p2)}" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Share options</button><button type="button" onclick="shareEmail()" aria-label="Share this neighborhood comparison by email" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Email</button><button type="button" onclick="copyEmbed()" aria-label="Show embed code for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Embed</button></div></div><div class="src-n">${sourceLine()} · ${YEARS[yi]}</div>`;
   document.getElementById('t-tra').innerHTML=`${makeLevelSwitcher('tra')}${metricAccuracyBox('hi','Trajectory metric')}<div class="cmp-legend"><div class="cll"><div class="clsq" style="background:${COL_A}"></div>${shortNeighborhood(p1)}</div><div class="cll"><div class="clsq" style="background:${COL_B}"></div>${shortNeighborhood(p2)}</div>${compHi!==null?`<div class="cll"><div class="clsq" style="background:${TOKENS.t3}"></div>${compText}</div>`:''}</div><div style="position:relative;width:100%;height:140px"><canvas id="traj-chart"></canvas></div><div class="src-n">${healthIndexSourceLine()}</div>`;
-  document.getElementById('t-det').innerHTML=`${makeLevelSwitcher('det','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:8px;font-size:9px;margin-bottom:5px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_A};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p1)}</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_B};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p2)}</span>${compHi!==null?`<span class="bench-chip" style="margin-left:auto"><span class="bench-dot"></span>${compText}</span>`:''}</div>`+[['le','Life expectancy',85,' years'],['as',asthmaMetricMeta().compact,100,MCFG.as.unit],['la','Lead exposure',75,'%'],['pv','Poverty',55,'%'],['un','Unemployment',25,'%'],['va','Vacant housing',28,'%'],['hz','Reported 311 hazards',250,' calls']].map(([k,l,mx,u])=>{const a=yv(p1,k,yi)||0,b=yv(p2,k,yi)||0,comp=benchComparison(k,yi),w1=pctForMetric(a,k,mx),w2=pctForMetric(b,k,mx),wc=comp!==null?pctForMetric(comp,k,mx):null,g=Math.abs(Math.round((a-b)*10)/10);return`<div style="padding:3px 0;border-bottom:0.5px solid var(--br)"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:9px;color:var(--t2)">${l}${metricAccuracyInline(k)}</span><span style="font-size:9px;color:var(--t3)">gap:${g}${u}</span></div><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A}">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B}">${b}${u}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px;margin-top:2px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3}">${compText}: ${comp}${u}</span></div>`:''}</div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()} · EJScreen</div>`;
+  document.getElementById('t-det').innerHTML=`${makeLevelSwitcher('det','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:8px;font-size:9px;margin-bottom:5px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_A};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p1)}</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_B};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p2)}</span>${compHi!==null?`<span class="bench-chip" style="margin-left:auto"><span class="bench-dot"></span>${compText}</span>`:''}</div>`+[['le','Life expectancy',85,' years'],['as',asthmaMetricMeta().compact,100,MCFG.as.unit],['la','Lead exposure',75,'%'],['pv','Poverty',55,'%'],['un','Unemployment',25,'%'],['va','Vacant housing',28,'%'],['hz','Reported 311 hazards',250,' calls']].map(([k,l,mx,u])=>{const snapA=displayNeighborhoodMetric(p1,k,yi),snapB=displayNeighborhoodMetric(p2,k,yi),a=snapA.value,b=snapB.value,comp=benchComparison(k,yi),w1=pctForMetric(a,k,mx),w2=pctForMetric(b,k,mx),wc=comp!==null?pctForMetric(comp,k,mx):null,g=a===null||b===null?null:Math.abs(round1(a-b));const aLabel=a===null?'--':`${a}${u}${snapA.stale?` (${snapA.year})`:''}`,bLabel=b===null?'--':`${b}${u}${snapB.stale?` (${snapB.year})`:''}`;return`<div style="padding:3px 0;border-bottom:0.5px solid var(--br)"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:9px;color:var(--t2)">${l}${metricAccuracyInline(k)}</span><span style="font-size:9px;color:var(--t3)">gap:${g===null?'--':`${g}${u}`}</span></div><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A}">${aLabel}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B}">${bLabel}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px;margin-top:2px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3}">${compText}: ${comp}${u}</span></div>`:''}</div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()} · EJScreen</div>`;
   renderGapPanelTwo(p1,p2,'t-gap2');
   renderHazardsTwo(p1,p2,'t-hz2');
   renderSpendingTwo(p1,p2,'t-sp2');
