@@ -3,8 +3,8 @@ Updated: 2026-07-08. Workflow: Codex works directly in `/Users/RomulloAtaides/Do
 
 ## Repo state
 - Branch: `codex/balti2-dashboard-work`, tracking `fork/codex/balti2-dashboard-work`.
-- Latest pushed commit: `a677d68 Fix ask data fallback and life expectancy display`.
-- GitHub Pages: built for `a677d686302a03b0641f9b0f3aeb4208443459c3` at `https://rca2908.github.io/BALTI2/`.
+- Recent application-code commit: `a677d68 Fix ask data fallback and life expectancy display`; graph/handoff commits follow it on the same branch.
+- GitHub Pages: deployed from `codex/balti2-dashboard-work` at `https://rca2908.github.io/BALTI2/`.
 - Working tree tracked files are clean. Existing untracked local artifacts/backups remain (`.DS_Store`, `.Rhistory`, `.playwright-cli/`, `data/cache/`, `*.bak`, `index.html.pre311`, `data.json.pre-*`, Supabase temp files). Do not commit them unless explicitly requested.
 
 ## Completed & verified (this session cycle)
