@@ -45,7 +45,18 @@ dashboard_metric_aliases <- list(
   rt = c("rt", "rat eradication", "rodent", "rodent complaints", "rats"),
   dp = c("dp", "illegal dumping", "dumping"),
   ws = c("ws", "water sewer", "water and sewer", "water/sewer"),
-  hz = c("hz", "hazards", "311 hazards", "total hazards")
+  hz = c("hz", "hazards", "311 hazards", "total hazards"),
+  sm = c("sm", "smoking", "current smoking", "adult smoking"),
+  ob = c("ob", "obesity", "adult obesity"),
+  db = c("db", "diabetes", "adult diabetes"),
+  mh = c("mh", "mental health", "poor mental health"),
+  pa = c("pa", "physical inactivity", "inactive"),
+  bb = c("bb", "broadband", "internet subscription", "internet access"),
+  rb = c("rb", "rent burden", "renter cost burden"),
+  ui = c("ui", "uninsured", "no health insurance"),
+  gi = c("gi", "gini", "income inequality"),
+  ap = c("ap", "air pollution", "pm2.5", "pm25"),
+  ha = c("ha", "housing affordability", "housing cost burden")
 )
 
 metric_alias_lookup <- purrr::imap(
@@ -382,6 +393,7 @@ load_bnia_service_longitudinal <- function(csa_lookup, years = 2016:2023) {
     la = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ebll/FeatureServer", prefix = "ebll", transform = identity),
     va = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer", prefix = "vacant", transform = identity),
     un = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Unempr/FeatureServer", prefix = "unempr", transform = identity),
+    pv = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hhpov/FeatureServer", prefix = "hhpov", transform = identity),
     hs = list(url = "https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Lesshs/FeatureServer", prefix = "lesshs", transform = function(x) ifelse(is.na(x), NA_real_, 100 - x))
   )
 
@@ -464,6 +476,762 @@ fetch_cdc_csv <- function(dataset_id, query = list()) {
   txt <- content(response, "text", encoding = "UTF-8")
   readr::read_csv(I(txt), show_col_types = FALSE, progress = FALSE)
 }
+
+# BEGIN inserted from new_loaders.R
+default_cdc_places_measure_specs <- function() {
+  list(
+    as = list(measureid = "CASTHMA", legacy_col = "casthma_crudeprev", label = "asthma"),
+    sm = list(measureid = "CSMOKING", legacy_col = "csmoking_crudeprev", label = "smoking"),
+    ob = list(measureid = "OBESITY", legacy_col = "obesity_crudeprev", label = "obesity"),
+    db = list(measureid = "DIABETES", legacy_col = "diabetes_crudeprev", label = "diabetes"),
+    mh = list(measureid = "MHLTH", legacy_col = "mhlth_crudeprev", label = "poor mental health"),
+    pa = list(measureid = "LPA", legacy_col = "lpa_crudeprev", label = "physical inactivity")
+  )
+}
+
+empty_metric_import <- function() {
+  list(
+    data = tibble(CSA = character(), CSA_key = character()),
+    metrics = character(),
+    sources = character()
+  )
+}
+
+metric_has_values <- function(x) {
+  values <- suppressWarnings(as.numeric(unlist(x, use.names = FALSE)))
+  length(values) > 0 && any(!is.na(values))
+}
+
+sum_available_cols <- function(df, cols) {
+  if (inherits(df, "sf")) {
+    df <- sf::st_drop_geometry(df)
+  }
+  available <- intersect(cols, names(df))
+  if (!length(available)) {
+    return(rep(NA_real_, nrow(df)))
+  }
+  rowSums(df[, available, drop = FALSE], na.rm = TRUE)
+}
+
+weighted_metric <- function(value, weight, digits = 1) {
+  usable <- !is.na(value) & !is.na(weight) & weight > 0
+  if (!any(usable)) {
+    return(NA_real_)
+  }
+  round(weighted.mean(value[usable], weight[usable], na.rm = TRUE), digits)
+}
+
+extract_tract_geoid <- function(x) {
+  txt <- as.character(x)
+  sci <- str_detect(txt, "e\\+|E\\+")
+  txt[sci] <- sprintf("%.0f", suppressWarnings(as.numeric(txt[sci])))
+  hit <- str_extract(txt, "\\d{11}(?=\\D*$)")
+  fallback <- str_pad(str_replace_all(txt, "\\D", ""), 11, pad = "0")
+  if_else(is.na(hit), fallback, hit)
+}
+
+build_tract_csa_lookup <- function(tract_sf, csa_boundaries) {
+  if (is.null(tract_sf) || !nrow(tract_sf) || !"GEOID" %in% names(tract_sf)) {
+    return(tibble(tract_id = character(), CSA = character(), CSA_key = character()))
+  }
+
+  suppressWarnings(
+    tract_sf %>%
+      select(GEOID, geometry) %>%
+      st_transform(4326) %>%
+      st_centroid()
+  ) %>%
+    st_join(csa_boundaries %>% select(CSA, CSA_key), join = st_intersects, left = FALSE) %>%
+    st_drop_geometry() %>%
+    transmute(tract_id = as.character(GEOID), CSA, CSA_key) %>%
+    distinct(tract_id, .keep_all = TRUE)
+}
+
+repeat_static_metric <- function(csa_boundaries, csa_values, metric, years = 2016:2023) {
+  csa_lookup <- csa_boundaries %>%
+    st_drop_geometry() %>%
+    distinct(CSA, CSA_key)
+
+  if (!metric %in% names(csa_values)) {
+    csa_values[[metric]] <- NA_real_
+  }
+
+  csa_lookup %>%
+    left_join(csa_values %>% select(CSA_key, value = all_of(metric)), by = "CSA_key") %>%
+    mutate(!!metric := map(value, ~ rep(as.numeric(.x), length(years)))) %>%
+    select(CSA, CSA_key, all_of(metric))
+}
+
+load_cdc_places_longitudinal <- function(csa_boundaries, years = 2016:2023, measure_specs = default_cdc_places_measure_specs()) {
+  release_specs <- list(
+    `2016` = list(dataset_id = "k25u-mg9b", schema = "legacy_500cities", year = 2016),
+    `2017` = list(dataset_id = "k86t-wghb", schema = "legacy_500cities", year = 2017),
+    `2018` = list(dataset_id = "4ai3-zynv", schema = "places", year = 2018),
+    `2019` = list(dataset_id = "373s-ayzu", schema = "places", year = 2019),
+    `2020` = list(dataset_id = "nw2y-v4gm", schema = "places", year = 2020),
+    `2021` = list(dataset_id = "em5e-5hvn", schema = "places", year = 2021),
+    `2022` = list(dataset_id = "ai6z-tcin", schema = "places", year = 2022),
+    `2023` = list(dataset_id = "cwsq-ngmh", schema = "places", year = 2023)
+  )
+
+  csa_lookup <- csa_boundaries %>%
+    st_drop_geometry() %>%
+    distinct(CSA, CSA_key)
+
+  print("Loading CDC PLACES tract metrics...")
+
+  requested_specs <- release_specs[intersect(as.character(years), names(release_specs))]
+
+  places_points <- imap_dfr(measure_specs, function(measure, metric) {
+    imap_dfr(requested_specs, function(spec, year_key) {
+      raw <- tryCatch(
+        {
+          if (identical(spec$schema, "legacy_500cities")) {
+            fetch_cdc_csv(
+              spec$dataset_id,
+              query = c(
+                list(
+                  stateabbr = "MD",
+                  placefips = "2404000",
+                  `$limit` = 5000
+                ),
+                setNames(
+                  list(paste(c("tractfips", "population2010", measure$legacy_col, "geolocation"), collapse = ",")),
+                  "$select"
+                )
+              )
+            )
+          } else {
+            fetch_cdc_csv(
+              spec$dataset_id,
+              query = list(
+                stateabbr = "MD",
+                countyfips = "24510",
+                measureid = measure$measureid,
+                datavaluetypeid = "CrdPrv",
+                `$limit` = 5000
+              )
+            )
+          }
+        },
+        error = function(e) {
+          warning(paste("CDC PLACES import failed for", metric, spec$year, ":", conditionMessage(e)))
+          tibble()
+        }
+      )
+
+      if (!nrow(raw)) {
+        return(tibble(
+          Year = integer(),
+          metric = character(),
+          tract_id = character(),
+          weight = numeric(),
+          value = numeric(),
+          Longitude = numeric(),
+          Latitude = numeric()
+        ))
+      }
+
+      enriched_raw <- bind_cols(raw, parse_geolocation_point(col_or_default(raw, "geolocation", NA_character_)))
+
+      if (identical(spec$schema, "legacy_500cities")) {
+        tibble(
+          Year = rep(spec$year, nrow(enriched_raw)),
+          metric = rep(metric, nrow(enriched_raw)),
+          tract_id = as.character(col_or_default(enriched_raw, "tractfips", NA_character_)),
+          weight = coerce_numeric_value(col_or_default(enriched_raw, "population2010", NA_real_)),
+          value = coerce_numeric_value(col_or_default(enriched_raw, measure$legacy_col, NA_real_)),
+          Longitude = suppressWarnings(as.numeric(col_or_default(enriched_raw, "Longitude", NA_real_))),
+          Latitude = suppressWarnings(as.numeric(col_or_default(enriched_raw, "Latitude", NA_real_)))
+        )
+      } else {
+        tibble(
+          Year = parse_year_value(col_or_default(enriched_raw, "year", spec$year)),
+          metric = rep(metric, nrow(enriched_raw)),
+          tract_id = as.character(col_or_default(enriched_raw, "locationid", NA_character_)),
+          weight = coalesce(
+            coerce_numeric_value(col_or_default(enriched_raw, "totalpop18plus", NA_real_)),
+            coerce_numeric_value(col_or_default(enriched_raw, "totalpopulation", NA_real_))
+          ),
+          value = coerce_numeric_value(col_or_default(enriched_raw, "data_value", NA_real_)),
+          Longitude = coalesce(
+            suppressWarnings(as.numeric(col_or_default(enriched_raw, "Longitude", NA_real_))),
+            suppressWarnings(as.numeric(col_or_default(enriched_raw, "longitude", NA_real_)))
+          ),
+          Latitude = coalesce(
+            suppressWarnings(as.numeric(col_or_default(enriched_raw, "Latitude", NA_real_))),
+            suppressWarnings(as.numeric(col_or_default(enriched_raw, "latitude", NA_real_)))
+          )
+        ) %>%
+          filter(Year == spec$year)
+      }
+    })
+  }) %>%
+    filter(
+      Year %in% years,
+      metric %in% names(measure_specs),
+      !is.na(value),
+      !is.na(Longitude),
+      !is.na(Latitude)
+    ) %>%
+    mutate(weight = if_else(is.na(weight) | weight <= 0, 1, weight))
+
+  if (!nrow(places_points)) {
+    print("No CDC PLACES tract records were imported.")
+    return(empty_metric_import())
+  }
+
+  places_csa <- places_points %>%
+    st_as_sf(coords = c("Longitude", "Latitude"), crs = 4326) %>%
+    st_join(csa_boundaries %>% select(CSA, CSA_key), join = st_intersects, left = FALSE) %>%
+    st_drop_geometry() %>%
+    group_by(CSA, CSA_key, Year, metric) %>%
+    summarize(value = round(weighted.mean(value, weight, na.rm = TRUE), 1), .groups = "drop")
+
+  series_long <- tidyr::crossing(
+    csa_lookup,
+    Year = years,
+    metric = names(measure_specs)
+  ) %>%
+    left_join(places_csa, by = c("CSA", "CSA_key", "Year", "metric")) %>%
+    arrange(CSA, CSA_key, metric, Year) %>%
+    group_by(CSA, CSA_key, metric) %>%
+    tidyr::fill(value, .direction = "downup") %>%
+    summarize(series = list(as.numeric(value)), .groups = "drop")
+
+  series_wide <- series_long %>%
+    pivot_wider(names_from = metric, values_from = series)
+
+  imported_metrics <- names(measure_specs)[
+    names(measure_specs) %in% names(series_wide) &
+      map_lgl(series_wide[names(measure_specs)[names(measure_specs) %in% names(series_wide)]], metric_has_values)
+  ]
+
+  if (!length(imported_metrics)) {
+    print("No CDC PLACES metrics had usable values after CSA aggregation.")
+    return(empty_metric_import())
+  }
+
+  print(paste("  Imported CDC PLACES metrics:", paste(imported_metrics, collapse = ", ")))
+
+  list(
+    data = series_wide %>% select(CSA, CSA_key, all_of(imported_metrics)),
+    metrics = imported_metrics,
+    sources = map_chr(requested_specs, ~ paste0("https://data.cdc.gov/resource/", .x$dataset_id, ".csv"))
+  )
+}
+
+load_cdc_places_benchmark_series <- function(years = 2016:2023, measure_specs = default_cdc_places_measure_specs()) {
+  release_specs <- list(
+    `2018` = list(dataset_id = "4ai3-zynv", year = 2018),
+    `2019` = list(dataset_id = "373s-ayzu", year = 2019),
+    `2020` = list(dataset_id = "nw2y-v4gm", year = 2020),
+    `2021` = list(dataset_id = "em5e-5hvn", year = 2021),
+    `2022` = list(dataset_id = "ai6z-tcin", year = 2022),
+    `2023` = list(dataset_id = "cwsq-ngmh", year = 2023)
+  )
+
+  fetch_weighted_proxy <- function(dataset_id, measureid, stateabbr = NULL) {
+    query <- c(
+      list(
+        measureid = measureid,
+        datavaluetypeid = "CrdPrv"
+      ),
+      if (!is.null(stateabbr)) list(stateabbr = stateabbr) else list(),
+      setNames(
+        list("sum(totalpopulation) as pop,sum(totalpopulation*data_value) as weighted"),
+        "$select"
+      )
+    )
+
+    raw <- fetch_cdc_csv(dataset_id, query = query)
+    if (!nrow(raw)) {
+      return(NA_real_)
+    }
+
+    pop <- coerce_numeric_value(raw$pop[[1]])
+    weighted <- coerce_numeric_value(raw$weighted[[1]])
+    if (is.na(pop) || pop <= 0 || is.na(weighted)) {
+      return(NA_real_)
+    }
+
+    round(weighted / pop, 1)
+  }
+
+  requested_specs <- release_specs[intersect(as.character(years), names(release_specs))]
+
+  rows <- imap_dfr(requested_specs, function(spec, year_key) {
+    row <- tibble(Year = spec$year)
+
+    for (metric in names(measure_specs)) {
+      measure <- measure_specs[[metric]]
+      row[[paste0(metric, "_state")]] <- tryCatch(
+        fetch_weighted_proxy(spec$dataset_id, measure$measureid, stateabbr = "MD"),
+        error = function(e) {
+          warning(paste("CDC PLACES state benchmark failed for", metric, spec$year, ":", conditionMessage(e)))
+          NA_real_
+        }
+      )
+      row[[paste0(metric, "_federal")]] <- tryCatch(
+        fetch_weighted_proxy(spec$dataset_id, measure$measureid, stateabbr = NULL),
+        error = function(e) {
+          warning(paste("CDC PLACES federal benchmark failed for", metric, spec$year, ":", conditionMessage(e)))
+          NA_real_
+        }
+      )
+    }
+
+    row
+  })
+
+  list(
+    state = rows %>%
+      select(Year, ends_with("_state")) %>%
+      rename_with(~ str_remove(.x, "_state$"), -Year) %>%
+      filter(if_any(-Year, ~ !is.na(.x))),
+    federal = rows %>%
+      select(Year, ends_with("_federal")) %>%
+      rename_with(~ str_remove(.x, "_federal$"), -Year) %>%
+      filter(if_any(-Year, ~ !is.na(.x))),
+    metrics = names(measure_specs),
+    sources = map_chr(requested_specs, ~ paste0("https://data.cdc.gov/resource/", .x$dataset_id, ".csv"))
+  )
+}
+
+acs_health_variables <- function(year) {
+  uninsured_no_health_ids <- sprintf(
+    "B27001_%03d",
+    c(5, 8, 11, 14, 17, 20, 23, 26, 29, 33, 36, 39, 42, 45, 48, 51, 54, 57)
+  )
+
+  vars <- c(
+    pop = "B01003_001",
+    rb_den = "B25070_001",
+    rb_007 = "B25070_007",
+    rb_008 = "B25070_008",
+    rb_009 = "B25070_009",
+    rb_010 = "B25070_010",
+    ui_total = "B27001_001",
+    set_names(uninsured_no_health_ids, paste0("ui_no_", seq_along(uninsured_no_health_ids))),
+    gi = "B19083_001"
+  )
+
+  if (year >= 2017) {
+    vars <- c(vars, bb_den = "B28002_001", bb_num = "B28002_004")
+  }
+
+  vars
+}
+
+summarize_acs_health_rows <- function(raw) {
+  rb_num <- sum_available_cols(raw, paste0("rb_00", 7:9, "E") %>% c("rb_010E"))
+  ui_num <- sum_available_cols(raw, paste0("ui_no_", 1:18, "E"))
+  bb_den <- coerce_numeric_value(col_or_default(raw, "bb_denE", NA_real_))
+  bb_num <- coerce_numeric_value(col_or_default(raw, "bb_numE", NA_real_))
+  rb_den <- coerce_numeric_value(col_or_default(raw, "rb_denE", NA_real_))
+  ui_total <- coerce_numeric_value(col_or_default(raw, "ui_totalE", NA_real_))
+
+  raw %>%
+    mutate(
+      pop = coerce_numeric_value(col_or_default(raw, "popE", NA_real_)),
+      bb = if_else(!is.na(bb_den) & bb_den > 0, (bb_num / bb_den) * 100, NA_real_),
+      rb = if_else(!is.na(rb_den) & rb_den > 0, (rb_num / rb_den) * 100, NA_real_),
+      ui = if_else(!is.na(ui_total) & ui_total > 0, (ui_num / ui_total) * 100, NA_real_),
+      gi = coerce_numeric_value(col_or_default(raw, "giE", NA_real_))
+    )
+}
+
+load_acs_tract_health_longitudinal <- function(csa_boundaries, years = 2016:2023, has_census_key = FALSE) {
+  if (!has_census_key) {
+    warning("CENSUS_API_KEY is not set. ACS tract health metrics will be skipped.")
+    out <- empty_metric_import()
+    out$tract_lookup <- tibble(tract_id = character(), CSA = character(), CSA_key = character())
+    return(out)
+  }
+
+  print("Loading ACS tract health metrics...")
+
+  acs_rows <- map_dfr(years, function(year) {
+    tryCatch(
+      {
+        raw <- get_acs(
+          geography = "tract",
+          variables = acs_health_variables(year),
+          state = "MD",
+          county = "510",
+          year = year,
+          survey = "acs5",
+          geometry = TRUE,
+          output = "wide"
+        ) %>%
+          st_transform(4326)
+
+        summarize_acs_health_rows(raw) %>%
+          mutate(Year = year) %>%
+          select(GEOID, Year, pop, bb, rb, ui, gi, geometry)
+      },
+      error = function(e) {
+        warning(paste("ACS tract health import failed for", year, ":", conditionMessage(e)))
+        st_sf(
+          GEOID = character(),
+          Year = integer(),
+          pop = numeric(),
+          bb = numeric(),
+          rb = numeric(),
+          ui = numeric(),
+          gi = numeric(),
+          geometry = st_sfc(crs = 4326)
+        )
+      }
+    )
+  })
+
+  if (!nrow(acs_rows)) {
+    out <- empty_metric_import()
+    out$tract_lookup <- tibble(tract_id = character(), CSA = character(), CSA_key = character())
+    return(out)
+  }
+
+  tract_lookup <- build_tract_csa_lookup(
+    acs_rows %>% distinct(GEOID, .keep_all = TRUE),
+    csa_boundaries
+  )
+
+  if (!nrow(tract_lookup)) {
+    warning("ACS tract health import could not map tract centroids to CSA boundaries.")
+    out <- empty_metric_import()
+    out$tract_lookup <- tract_lookup
+    return(out)
+  }
+
+  acs_csa <- acs_rows %>%
+    st_drop_geometry() %>%
+    inner_join(tract_lookup, by = c("GEOID" = "tract_id")) %>%
+    group_by(CSA, CSA_key, Year) %>%
+    summarize(
+      bb = weighted_metric(bb, pop, 1),
+      rb = weighted_metric(rb, pop, 1),
+      ui = weighted_metric(ui, pop, 1),
+      # Gini is a tract value, so this is an approximate population-weighted CSA mean.
+      gi = weighted_metric(gi, pop, 2),
+      .groups = "drop"
+    )
+
+  metric_names <- c("bb", "rb", "ui", "gi")
+  csa_lookup <- csa_boundaries %>%
+    st_drop_geometry() %>%
+    distinct(CSA, CSA_key)
+
+  series_wide <- tidyr::crossing(csa_lookup, Year = years) %>%
+    left_join(acs_csa, by = c("CSA", "CSA_key", "Year")) %>%
+    pivot_longer(all_of(metric_names), names_to = "metric", values_to = "value") %>%
+    arrange(CSA, CSA_key, metric, Year) %>%
+    group_by(CSA, CSA_key, metric) %>%
+    tidyr::fill(value, .direction = "downup") %>%
+    summarize(series = list(as.numeric(value)), .groups = "drop") %>%
+    pivot_wider(names_from = metric, values_from = series)
+
+  imported_metrics <- metric_names[
+    metric_names %in% names(series_wide) &
+      map_lgl(series_wide[metric_names[metric_names %in% names(series_wide)]], metric_has_values)
+  ]
+
+  print(paste("  Imported ACS tract metrics:", paste(imported_metrics, collapse = ", ")))
+
+  list(
+    data = series_wide %>% select(CSA, CSA_key, all_of(imported_metrics)),
+    metrics = imported_metrics,
+    sources = "ACS 5-year tract estimates, population-weighted to CSA by tract centroid",
+    tract_lookup = tract_lookup
+  )
+}
+
+load_acs_health_benchmark_series <- function(years = 2016:2023, has_census_key = FALSE) {
+  if (!has_census_key) {
+    return(empty_benchmark_import())
+  }
+
+  fetch_acs_health_level <- function(level = c("state", "federal")) {
+    level <- match.arg(level)
+
+    map_dfr(years, function(year) {
+      tryCatch(
+        {
+          raw <- if (identical(level, "state")) {
+            get_acs(
+              geography = "state",
+              variables = acs_health_variables(year),
+              state = "MD",
+              year = year,
+              survey = "acs5",
+              geometry = FALSE,
+              output = "wide"
+            )
+          } else {
+            get_acs(
+              geography = "us",
+              variables = acs_health_variables(year),
+              year = year,
+              survey = "acs5",
+              geometry = FALSE,
+              output = "wide"
+            )
+          }
+
+          summarize_acs_health_rows(raw) %>%
+            transmute(
+              Year = year,
+              bb = round(bb, 1),
+              rb = round(rb, 1),
+              ui = round(ui, 1),
+              gi = round(gi, 2)
+            )
+        },
+        error = function(e) {
+          warning(paste("ACS", level, "health benchmark import failed for", year, ":", conditionMessage(e)))
+          tibble(Year = year, bb = NA_real_, rb = NA_real_, ui = NA_real_, gi = NA_real_)
+        }
+      )
+    })
+  }
+
+  list(
+    state = fetch_acs_health_level("state") %>% filter(if_any(-Year, ~ !is.na(.x))),
+    federal = fetch_acs_health_level("federal") %>% filter(if_any(-Year, ~ !is.na(.x))),
+    metrics = c("bb", "rb", "ui", "gi"),
+    sources = c(
+      state = "ACS 5-year Maryland state estimates",
+      federal = "ACS 5-year United States estimates"
+    )
+  )
+}
+
+load_usda_food_access_static <- function(csa_boundaries, years = 2016:2023, tract_lookup = NULL, source_path = "data/cache/usda_food_access_baltimore.csv") {
+  if (is.null(tract_lookup) || !nrow(tract_lookup)) {
+    warning("USDA food access import skipped because tract-to-CSA lookup is empty.")
+    return(empty_metric_import())
+  }
+
+  print("Loading USDA Food Access static metric...")
+
+  raw <- tryCatch(
+    readr::read_csv(source_path, na = c("", "NA", "N/A", "NULL", "null"), show_col_types = FALSE, progress = FALSE),
+    error = function(e) {
+      warning(paste("USDA food access import failed:", conditionMessage(e)))
+      tibble()
+    }
+  )
+
+  if (!nrow(raw)) {
+    return(empty_metric_import())
+  }
+
+  csa_values <- raw %>%
+    transmute(
+      tract_id = extract_tract_geoid(CensusTract),
+      pop = coerce_numeric_value(Pop2010),
+      lila = coerce_numeric_value(LILATracts_1And10)
+    ) %>%
+    inner_join(tract_lookup, by = "tract_id") %>%
+    group_by(CSA, CSA_key) %>%
+    summarize(
+      fd = round((sum(if_else(lila > 0, pop, 0), na.rm = TRUE) / sum(pop, na.rm = TRUE)) * 100, 1),
+      .groups = "drop"
+    )
+
+  list(
+    data = repeat_static_metric(csa_boundaries, csa_values, "fd", years),
+    metrics = "fd",
+    sources = source_path
+  )
+}
+
+load_chas_housing_affordability_static <- function(csa_boundaries, years = 2016:2023, tract_lookup = NULL, source_path = "data/cache/chas_baltimore/Table9.csv") {
+  if (is.null(tract_lookup) || !nrow(tract_lookup)) {
+    warning("HUD CHAS import skipped because tract-to-CSA lookup is empty.")
+    return(empty_metric_import())
+  }
+
+  print("Loading HUD CHAS housing affordability static metric...")
+
+  raw <- tryCatch(
+    readr::read_csv(source_path, show_col_types = FALSE, progress = FALSE),
+    error = function(e) {
+      warning(paste("HUD CHAS import failed:", conditionMessage(e)))
+      tibble()
+    }
+  )
+
+  if (!nrow(raw)) {
+    return(empty_metric_import())
+  }
+
+  owner_burden_cols <- paste0("T9_est", c(5, 6, 10, 11, 15, 16, 20, 21, 25, 26, 30, 31, 35, 36))
+  renter_burden_cols <- paste0("T9_est", c(41, 42, 46, 47, 51, 52, 56, 57, 61, 62, 66, 67, 71, 72))
+
+  missing_cols <- setdiff(c("T9_est1", owner_burden_cols, renter_burden_cols), names(raw))
+  if (length(missing_cols)) {
+    warning(paste("HUD CHAS Table9 schema missing expected columns:", paste(missing_cols, collapse = ", ")))
+    return(empty_metric_import())
+  }
+
+  chas_filtered <- raw %>%
+    filter(coerce_numeric_value(st) == 24, coerce_numeric_value(cnty) == 510)
+
+  burdened_values <- sum_available_cols(chas_filtered, c(owner_burden_cols, renter_burden_cols))
+
+  chas_tracts <- chas_filtered %>%
+    transmute(
+      tract_id = extract_tract_geoid(geoid),
+      households = coerce_numeric_value(T9_est1),
+      burdened = burdened_values
+    )
+
+  city_share <- with(chas_tracts, round(sum(burdened, na.rm = TRUE) / sum(households, na.rm = TRUE) * 100, 1))
+  print(paste("  HUD CHAS citywide housing cost burden check:", city_share, "%"))
+
+  csa_values <- chas_tracts %>%
+    inner_join(tract_lookup, by = "tract_id") %>%
+    group_by(CSA, CSA_key) %>%
+    summarize(
+      ha = round((sum(burdened, na.rm = TRUE) / sum(households, na.rm = TRUE)) * 100, 1),
+      .groups = "drop"
+    )
+
+  list(
+    data = repeat_static_metric(csa_boundaries, csa_values, "ha", years),
+    metrics = "ha",
+    sources = paste(
+      source_path,
+      "using owner burden columns",
+      paste(owner_burden_cols, collapse = ","),
+      "and renter burden columns",
+      paste(renter_burden_cols, collapse = ",")
+    )
+  )
+}
+
+load_ejscreen_air_static <- function(csa_boundaries, years = 2016:2023, tract_lookup = NULL, source_path = "data/cache/ejscreen_2024_baltimore.csv") {
+  if (!file.exists(source_path)) {
+    warning(paste("EJScreen import skipped; file not found:", source_path))
+    return(empty_metric_import())
+  }
+
+  if (is.null(tract_lookup) || !nrow(tract_lookup)) {
+    warning("EJScreen import skipped because tract-to-CSA lookup is empty.")
+    return(empty_metric_import())
+  }
+
+  print("Loading EPA EJScreen PM2.5 static metric...")
+
+  raw <- tryCatch(
+    readr::read_csv(source_path, show_col_types = FALSE, progress = FALSE),
+    error = function(e) {
+      warning(paste("EJScreen import failed:", conditionMessage(e)))
+      tibble()
+    }
+  )
+
+  if (!nrow(raw)) {
+    return(empty_metric_import())
+  }
+
+  csa_values <- raw %>%
+    transmute(
+      tract_id = extract_tract_geoid(ID),
+      pop = coerce_numeric_value(ACSTOTPOP),
+      pm25 = coerce_numeric_value(PM25)
+    ) %>%
+    inner_join(tract_lookup, by = "tract_id") %>%
+    group_by(CSA, CSA_key) %>%
+    summarize(ap = weighted_metric(pm25, pop, 2), .groups = "drop")
+
+  list(
+    data = repeat_static_metric(csa_boundaries, csa_values, "ap", years),
+    metrics = "ap",
+    sources = source_path
+  )
+}
+
+write_usaleep_le_validation <- function(csa_boundaries, bnia_like_data, years = 2016:2023, tract_lookup = NULL, source_path = "data/cache/usaleep_md.csv", output_path = "data/metadata/usaleep_le_validation.csv") {
+  if (!file.exists(source_path)) {
+    warning(paste("USALEEP validation skipped; file not found:", source_path))
+    return(tibble(CSA = character(), usaleep_le = numeric(), bnia_le = numeric(), diff = numeric()))
+  }
+
+  if (is.null(tract_lookup) || !nrow(tract_lookup)) {
+    warning("USALEEP validation skipped because tract-to-CSA lookup is empty.")
+    return(tibble(CSA = character(), usaleep_le = numeric(), bnia_le = numeric(), diff = numeric()))
+  }
+
+  if (!"le" %in% names(bnia_like_data)) {
+    warning("USALEEP validation skipped because BNIA-like data has no `le` column.")
+    return(tibble(CSA = character(), usaleep_le = numeric(), bnia_le = numeric(), diff = numeric()))
+  }
+
+  print("Writing USALEEP life expectancy validation...")
+
+  raw <- tryCatch(
+    readr::read_csv(source_path, show_col_types = FALSE, progress = FALSE),
+    error = function(e) {
+      warning(paste("USALEEP validation import failed:", conditionMessage(e)))
+      tibble()
+    }
+  )
+
+  if (!nrow(raw)) {
+    return(tibble(CSA = character(), usaleep_le = numeric(), bnia_le = numeric(), diff = numeric()))
+  }
+
+  usaleep_csa <- raw %>%
+    filter(coerce_numeric_value(CNTY2KX) == 510) %>%
+    transmute(
+      tract_id = sprintf(
+        "%02d%03d%06d",
+        as.integer(coerce_numeric_value(STATE2KX)),
+        as.integer(coerce_numeric_value(CNTY2KX)),
+        as.integer(coerce_numeric_value(TRACT2KX))
+      ),
+      usaleep_le = coerce_numeric_value(.data[["e(0)"]])
+    ) %>%
+    inner_join(tract_lookup, by = "tract_id") %>%
+    group_by(CSA, CSA_key) %>%
+    summarize(usaleep_le = round(mean(usaleep_le, na.rm = TRUE), 1), .groups = "drop")
+
+  closest_idx <- which.min(abs(years - 2015))
+  bnia_le <- bnia_like_data %>%
+    transmute(
+      CSA,
+      CSA_key,
+      bnia_le = map_dbl(le, function(series) {
+        values <- suppressWarnings(as.numeric(unlist(series, use.names = FALSE)))
+        if (length(values) < closest_idx || is.na(values[[closest_idx]])) {
+          return(NA_real_)
+        }
+        values[[closest_idx]]
+      })
+    )
+
+  validation <- usaleep_csa %>%
+    left_join(bnia_le, by = c("CSA", "CSA_key")) %>%
+    transmute(
+      CSA,
+      usaleep_le,
+      bnia_le = round(bnia_le, 1),
+      diff = round(usaleep_le - bnia_le, 1)
+    ) %>%
+    arrange(desc(abs(diff)))
+
+  dir.create(dirname(output_path), recursive = TRUE, showWarnings = FALSE)
+  readr::write_csv(validation, output_path)
+
+  print("  Top 5 USALEEP vs BNIA life expectancy divergences:")
+  print(validation %>% slice_head(n = 5))
+
+  validation
+}
+
+# END inserted from new_loaders.R
 
 normalize_component_scores <- function(values, inverse = FALSE) {
   scores <- rep(NA_real_, length(values))
@@ -1279,7 +2047,12 @@ csa_lookup <- csa_boundaries %>%
 
 bnia_import <- load_bnia_longitudinal(csa_lookup, years = years)
 bnia_service_import <- load_bnia_service_longitudinal(csa_lookup, years = years)
-cdc_asthma_import <- load_cdc_asthma_longitudinal(csa_boundaries, years = years)
+cdc_places_import <- load_cdc_places_longitudinal(csa_boundaries, years = years)
+acs_health_import <- load_acs_tract_health_longitudinal(csa_boundaries, years = years, has_census_key = has_census_key)
+tract_csa_lookup <- acs_health_import$tract_lookup
+usda_food_access_import <- load_usda_food_access_static(csa_boundaries, years = years, tract_lookup = tract_csa_lookup)
+chas_housing_affordability_import <- load_chas_housing_affordability_static(csa_boundaries, years = years, tract_lookup = tract_csa_lookup)
+ejscreen_air_import <- load_ejscreen_air_static(csa_boundaries, years = years, tract_lookup = tract_csa_lookup)
 
 # 3. EXTRACT & TRANSFORM: Historical 311 Environmental Hazards
 print("Fetching historical 311 data with GPS coordinates...")
@@ -1458,34 +2231,39 @@ if (has_census_key) {
 
 print("Fetching state and federal benchmark series...")
 acs_benchmark_import <- load_acs_benchmark_series(years = years, has_census_key = has_census_key)
+acs_health_benchmark_import <- load_acs_health_benchmark_series(years = years, has_census_key = has_census_key)
 fred_benchmark_import <- load_fred_unemployment_benchmarks(years = years)
-cdc_benchmark_import <- load_cdc_asthma_benchmark_series(years = years)
+cdc_places_benchmark_import <- load_cdc_places_benchmark_series(years = years)
 cdc_life_expectancy_benchmark_import <- load_cdc_life_expectancy_benchmark_series(years = years)
 cdc_lead_benchmark_import <- load_cdc_lead_benchmark_series(years = years)
 
 state_benchmark_series <- merge_benchmark_tables(list(
   acs_benchmark_import$state,
+  acs_health_benchmark_import$state,
   fred_benchmark_import$state,
-  cdc_benchmark_import$state,
+  cdc_places_benchmark_import$state,
   cdc_life_expectancy_benchmark_import$state,
   cdc_lead_benchmark_import$state
 ))
 
 federal_benchmark_series <- merge_benchmark_tables(list(
   acs_benchmark_import$federal,
+  acs_health_benchmark_import$federal,
   fred_benchmark_import$federal,
-  cdc_benchmark_import$federal,
+  cdc_places_benchmark_import$federal,
   cdc_life_expectancy_benchmark_import$federal,
   cdc_lead_benchmark_import$federal
 ))
 
 legacy_rates <- c(
   hi = 0.4, le = 0.08, as = -0.6, la = -0.5, va = -0.2, pv = -0.3,
-  un = -0.25, hs = 0.15, fd = 0.3, gs = 0.1, hw = -0.2, cr = -0.5,
-  "in" = 0.8, tp = 0.2, dp = 0.4, rt = 0.25, ws = 0.3, hz = 0.45
+  un = -0.25, hs = 0.15, fd = 0, gs = 0.1, hw = -0.2, cr = -0.5,
+  "in" = 0.8, tp = 0.2, dp = 0.4, rt = 0.25, ws = 0.3, hz = 0.45,
+  sm = -0.2, ob = 0.15, db = 0.05, mh = 0.1, pa = -0.15,
+  bb = 1.2, rb = 0.1, ui = -0.2, gi = 0, ap = 0, ha = 0
 )
-benchmark_metrics <- c("hi", "le", "as", "la", "va", "pv", "un", "hs", "fd", "gs", "cr")
-inverse_benchmark_metrics <- c("as", "la", "va", "pv", "un", "cr")
+benchmark_metrics <- c("hi", "le", "as", "la", "va", "pv", "un", "hs", "fd", "gs", "cr", "sm", "ob", "db", "mh", "pa", "bb", "rb", "ui", "gi", "ap", "ha")
+inverse_benchmark_metrics <- c("as", "la", "va", "pv", "un", "fd", "cr", "sm", "ob", "db", "mh", "pa", "rb", "ui", "gi", "ap", "ha")
 benchmark_metric_bounds <- list(
   hi = c(0, 100),
   le = c(0, Inf),
@@ -1497,7 +2275,18 @@ benchmark_metric_bounds <- list(
   hs = c(0, 100),
   fd = c(0, 100),
   gs = c(0, 100),
-  cr = c(0, 100)
+  cr = c(0, 100),
+  sm = c(0, 100),
+  ob = c(0, 100),
+  db = c(0, 100),
+  mh = c(0, 100),
+  pa = c(0, 100),
+  bb = c(0, 100),
+  rb = c(0, 100),
+  ui = c(0, 100),
+  gi = c(0, 1),
+  ap = c(0, Inf),
+  ha = c(0, 100)
 )
 
 clamp_benchmark_value <- function(metric, value) {
@@ -1755,12 +2544,12 @@ if (nrow(bnia_service_import$data) > 0) {
   service_metric_cols <- character()
 }
 
-if (nrow(cdc_asthma_import$data) > 0) {
-  cdc_metric_cols <- setdiff(names(cdc_asthma_import$data), c("CSA", "CSA_key"))
+if (nrow(cdc_places_import$data) > 0) {
+  cdc_metric_cols <- setdiff(names(cdc_places_import$data), c("CSA", "CSA_key"))
 
   final_dashboard_data <- final_dashboard_data %>%
     left_join(
-      cdc_asthma_import$data %>%
+      cdc_places_import$data %>%
         rename_with(~ paste0(.x, "_cdc"), all_of(cdc_metric_cols)) %>%
         select(CSA_key, ends_with("_cdc")),
       by = "CSA_key"
@@ -1806,6 +2595,48 @@ if (nrow(bnia_import$data) > 0) {
 } else {
   bnia_metric_cols <- character()
 }
+
+local_health_imports <- list(
+  acs_health_import,
+  usda_food_access_import,
+  chas_housing_affordability_import,
+  ejscreen_air_import
+)
+local_health_metric_cols <- character()
+
+for (local_import in local_health_imports) {
+  if (!is.null(local_import$data) && nrow(local_import$data) > 0) {
+    local_metric_cols <- setdiff(names(local_import$data), c("CSA", "CSA_key"))
+    local_health_metric_cols <- sort(unique(c(local_health_metric_cols, local_metric_cols)))
+
+    final_dashboard_data <- final_dashboard_data %>%
+      left_join(
+        local_import$data %>%
+          rename_with(~ paste0(.x, "_local"), all_of(local_metric_cols)) %>%
+          select(CSA_key, ends_with("_local")),
+        by = "CSA_key"
+      )
+
+    for (metric in local_metric_cols) {
+      final_dashboard_data <- ensure_metric_column(final_dashboard_data, metric)
+      override_col <- paste0(metric, "_local")
+      final_dashboard_data[[metric]] <- map2(
+        final_dashboard_data[[override_col]],
+        final_dashboard_data[[metric]],
+        prefer_metric_input
+      )
+    }
+
+    final_dashboard_data <- final_dashboard_data %>% select(-ends_with("_local"))
+  }
+}
+
+write_usaleep_le_validation(
+  csa_boundaries,
+  final_dashboard_data,
+  years = years,
+  tract_lookup = tract_csa_lookup
+)
 
 metric_cols <- setdiff(names(final_dashboard_data), c("CSA", "CSA_key"))
 
@@ -1931,10 +2762,32 @@ json_ready_data <- list(
         )
       }
 
+      if (length(cdc_metric_cols) > 0) {
+        note_parts <- c(
+          note_parts,
+          paste0(
+            "CDC 500 Cities / PLACES tract releases supplied: ",
+            paste(sort(cdc_metric_cols), collapse = ", "),
+            "."
+          )
+        )
+      }
+
       if ("as" %in% cdc_metric_cols) {
         note_parts <- c(
           note_parts,
-          "CDC 500 Cities / PLACES tract releases currently supply `as` as an adult asthma prevalence proxy. TODO: replace with official BCHD asthma ED rate series when a public endpoint is available."
+          "`as` remains an adult asthma prevalence proxy until an official BCHD asthma ED rate series is connected."
+        )
+      }
+
+      if (length(local_health_metric_cols) > 0) {
+        note_parts <- c(
+          note_parts,
+          paste0(
+            "Local staged sources supplied: ",
+            paste(sort(local_health_metric_cols), collapse = ", "),
+            "."
+          )
         )
       }
 
@@ -1946,7 +2799,7 @@ json_ready_data <- list(
       }
 
       if (!length(note_parts)) {
-        note_parts <- "No BNIA longitudinal file, CDC asthma proxy, or live BNIA service metrics were imported."
+        note_parts <- "No BNIA longitudinal file, CDC PLACES import, local health import, or live BNIA service metrics were imported."
       }
 
       paste(
@@ -2010,24 +2863,34 @@ json_ready_data <- list(
     source_files = list(
       neighborhood = if (!is.na(bnia_import$source_path)) basename(bnia_import$source_path) else NULL,
       neighborhood_services = if (length(bnia_service_import$sources)) unname(as.list(bnia_service_import$sources)) else NULL,
-      asthma_proxy = if (length(cdc_asthma_import$sources)) unname(as.list(cdc_asthma_import$sources)) else NULL,
+      cdc_places = if (length(cdc_places_import$sources)) unname(as.list(cdc_places_import$sources)) else NULL,
+      local_health = compact(list(
+        acs_tract = if (length(acs_health_import$sources)) acs_health_import$sources else NULL,
+        usda_food_access = if (length(usda_food_access_import$sources)) usda_food_access_import$sources else NULL,
+        hud_chas = if (length(chas_housing_affordability_import$sources)) chas_housing_affordability_import$sources else NULL,
+        ejscreen = if (length(ejscreen_air_import$sources)) ejscreen_air_import$sources else NULL
+      )),
       state_benchmarks = compact(list(
         acs = if (length(acs_benchmark_import$sources)) acs_benchmark_import$sources[["state"]] else NULL,
         fred = if (length(fred_benchmark_import$sources)) fred_benchmark_import$sources[["state"]] else NULL,
-        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES / 500 Cities aggregate queries (2018-2023)" else NULL,
+        cdc_places = if (length(cdc_places_benchmark_import$sources)) "CDC PLACES / 500 Cities aggregate queries (2018-2023)" else NULL,
         cdc_life_expectancy = if (length(cdc_life_expectancy_benchmark_import$sources)) cdc_life_expectancy_benchmark_import$sources[["state"]] else NULL,
         cdc_lead = if (length(cdc_lead_benchmark_import$sources)) cdc_lead_benchmark_import$sources[["state"]] else NULL
       )),
       federal_benchmarks = compact(list(
         acs = if (length(acs_benchmark_import$sources)) acs_benchmark_import$sources[["federal"]] else NULL,
         fred = if (length(fred_benchmark_import$sources)) fred_benchmark_import$sources[["federal"]] else NULL,
-        cdc_asthma = if (length(cdc_benchmark_import$sources)) "CDC PLACES aggregate queries (2018-2023)" else NULL,
+        cdc_places = if (length(cdc_places_benchmark_import$sources)) "CDC PLACES aggregate queries (2018-2023)" else NULL,
         cdc_life_expectancy = if (length(cdc_life_expectancy_benchmark_import$sources)) cdc_life_expectancy_benchmark_import$sources[["federal"]] else NULL,
         nhanes_lead_proxy = if ("la" %in% federal_proxy_benchmark_metrics) cdc_lead_benchmark_import$sources[["federal"]] else NULL
       )),
       hazards = if (has_311_data) "Open Baltimore 311 ArcGIS services" else NULL,
       poverty = if (nrow(csa_acs_summary) > 0) "ACS 2022 tract estimates weighted to CSA" else NULL
     ),
+    data_type = list(
+      hi = "derived_composite"
+    ),
+    health_index_normalization_bounds = if (!is.null(health_index_norm_bounds)) health_index_norm_bounds else NULL,
     derived_metrics = if (derive_hi_from_components) as.list("hi") else NULL,
     proxy_metrics = if ("as" %in% cdc_metric_cols) as.list("as") else NULL,
     benchmark_proxy_metrics = if (length(benchmark_proxy_metrics)) as.list(benchmark_proxy_metrics) else NULL,
@@ -2038,6 +2901,7 @@ json_ready_data <- list(
       service_metric_cols,
       cdc_metric_cols,
       bnia_metric_cols,
+      local_health_metric_cols,
       if (derive_hi_from_components) "hi",
       if (nrow(csa_acs_summary) > 0) "pv",
       if (has_311_data) c("rt", "dp", "ws", "hz")

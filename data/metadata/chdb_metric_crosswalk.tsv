@@ -1,0 +1,48 @@
+chdb_metric_id	chdb_metric	domain	balti2_key	map_status	reproduction_path	notes
+14	Breast Cancer Deaths	Health Outcomes		needs_source	CHDB API metric-data/14 for city benchmark	Deaths per 100000 females; no CSA source wired.
+15	Cardiovascular Disease Deaths	Health Outcomes		needs_source	CHDB API metric-data/15 for city benchmark	Deaths per 100000 people; no CSA source wired.
+16	Colorectal Cancer Deaths	Health Outcomes		needs_source	CHDB API metric-data/16 for city benchmark	Deaths per 100000 people; no CSA source wired.
+17	Diabetes	Health Outcomes	db	mapped_now	CDC PLACES tract aggregation in update_data.R	CHDB definition matches adult self-reported diabetes percent closely enough for dashboard mapping.
+18	Firearm Homicides	Health Outcomes		needs_source	CHDB API metric-data/18 for city benchmark	No CSA homicide source wired.
+19	Firearm Suicides	Health Outcomes		needs_source	CHDB API metric-data/19 for city benchmark	No CSA firearm suicide source wired.
+20	Frequent Mental Distress	Health Outcomes	mh	mapped_now	CDC PLACES tract aggregation in update_data.R	CHDB definition is adults with at least 14 poor mental health days in prior 30 days.
+21	Frequent Physical Distress	Health Outcomes		candidate_tract_to_csa	CDC PLACES PHLTH tract aggregation	Not wired yet; same aggregation pattern as mh.
+22	High Blood Pressure	Health Outcomes		candidate_tract_to_csa	CDC PLACES BPHIGH tract aggregation	Not wired yet; same aggregation pattern as db and ob.
+23	Independent Living Difficulty	Health Outcomes		candidate_tract_to_csa	ACS disability tables tract aggregation	Not wired yet.
+24	Life Expectancy - City-Level	Health Outcomes	le	city_benchmark_only	CHDB API metric-data/24 for city benchmark	City value can reproduce CHDB overview; map uses CSA-level life expectancy path.
+25	Life Expectancy - Neighborhood-Level 2015	Health Outcomes	le	mapped_now	BNIA/USALEEP life expectancy path in update_data.R	BALTI2 maps CSA series rather than CHDB static 2015 neighborhoods.
+26	Low Birthweight	Health Outcomes		needs_source	CHDB API metric-data/26 for city benchmark	No CSA birth outcome source wired.
+27	Obesity	Health Outcomes	ob	mapped_now	CDC PLACES tract aggregation in update_data.R	Adult obesity percent.
+28	Opioid Overdose Deaths	Health Outcomes		needs_source	CHDB API metric-data/28 for city benchmark	No CSA overdose death source wired.
+29	Premature Deaths All Causes	Health Outcomes		needs_source	CHDB API metric-data/29 for city benchmark	No CSA YPLL source wired.
+30	Broadband Connection	Social and Economic Factors	bb	mapped_now	ACS tract aggregation in update_data.R	Households with high-speed broadband connection.
+31	Children in Poverty	Social and Economic Factors		candidate_tract_to_csa	ACS B17001 child poverty tract aggregation	BALTI2 pv is household poverty and is not equivalent.
+32	Chronic Absenteeism	Social and Economic Factors		city_only_not_map	CHDB API metric-data/32 for city benchmark	CHDB notes this is city-level not school district/small-area.
+33	Credit Insecurity Index	Social and Economic Factors		needs_source	CHDB API metric-data/33 for city benchmark	No CSA credit source wired.
+34	Food Insecurity	Social and Economic Factors	fd	related_not_equivalent	USDA food access static metric in update_data.R	BALTI2 fd is low food access not self-reported food insecurity.
+35	High School Completion	Social and Economic Factors	hs	mapped_now	BNIA/ACS education path in update_data.R	Adults age 25+ with high school diploma or equivalent.
+36	Income Inequality	Social and Economic Factors	gi	related_not_equivalent	ACS Gini tract aggregation in update_data.R	CHDB uses an extremes index; BALTI2 gi is Gini.
+37	Neighborhood Racial/Ethnic Segregation	Social and Economic Factors		candidate_tract_to_csa	ACS race/ethnicity tract calculation	Not wired yet.
+38	Racial/Ethnic Diversity	Social and Economic Factors		candidate_tract_to_csa	ACS race/ethnicity tract calculation	Not wired yet.
+39	Rent Burden	Social and Economic Factors	rb	mapped_now	ACS tract aggregation in update_data.R	Renter households with at least 30 percent of income spent on rent.
+40	Third-Grade Reading Scores	Social and Economic Factors		city_only_not_map	CHDB API metric-data/40 for city benchmark	CHDB notes this is city-level.
+41	Unemployment - Annual Neighborhood-Level	Social and Economic Factors	un	mapped_now	BNIA/ACS/BLS unemployment path in update_data.R	CSA annual map metric.
+42	Unemployment - Current City-Level	Social and Economic Factors	un	city_benchmark_only	CHDB API metric-data/42 or BLS LAUS monthly city series	Reproduces linked CHDB overview; not a neighborhood map metric.
+43	Voter Turnout	Social and Economic Factors		needs_source	CHDB API metric-data/43 for city benchmark	Precinct-to-CSA join would be needed for mapping.
+44	Youth Not in Work or School	Social and Economic Factors		candidate_tract_to_csa	ACS youth employment/schooling tract aggregation	Not wired yet.
+45	Binge Drinking	Health Behavior		candidate_tract_to_csa	CDC PLACES BINGE tract aggregation	Not wired yet.
+46	Physical Inactivity	Health Behavior	pa	mapped_now	CDC PLACES tract aggregation in update_data.R	No leisure-time physical activity percent.
+47	Smoking	Health Behavior	sm	mapped_now	CDC PLACES tract aggregation in update_data.R	Current smoking percent.
+48	Teen Births	Health Behavior		needs_source	CHDB API metric-data/48 for city benchmark	No CSA teen birth source wired.
+49	Air Pollution - Ozone	Physical Environment		city_benchmark_only	CHDB API metric-data/49 for city benchmark	Monthly/citywide ozone is not a CSA choropleth without modeled small-area source.
+50	Air Pollution - Particulate Matter	Physical Environment	ap	mapped_now	EJScreen PM2.5 tract/block-group aggregation in update_data.R	Annual PM2.5 screen; CHDB may be monthly/city value.
+51	CO2 Emissions - Census Tract Average All Sectors	Physical Environment		candidate_tract_to_csa	CHDB tract data if available then tract-to-CSA aggregation	Not wired yet.
+52	CO2 Emissions - Per Capita All Sectors	Physical Environment		city_only_not_map	CHDB API metric-data/52 for city benchmark	Citywide per-capita value.
+53	Housing with Potential Lead Risk	Physical Environment		candidate_tract_to_csa	ACS housing age tract aggregation or EJScreen lead paint proxy	Not wired yet; do not confuse with child blood lead exposure.
+54	Lead Exposure Risk Index	Physical Environment	la	related_not_equivalent	BNIA child blood lead exposure in update_data.R	BALTI2 la is observed elevated blood lead percent not CHDB risk index.
+55	Park Access	Physical Environment	gs	related_not_equivalent	BNIA green space or external park access source	BALTI2 gs is green-space context and may not match CHDB 10-minute walk definition.
+56	Walkability	Physical Environment		needs_source	CHDB API metric-data/56 for city benchmark	No Walk Score or equivalent CSA source wired.
+57	Dental Care	Clinical Care		candidate_tract_to_csa	CDC PLACES DENTAL tract aggregation	Not wired yet.
+58	Prenatal Care	Clinical Care		needs_source	CHDB API metric-data/58 for city benchmark	No CSA prenatal care source wired.
+59	Routine Checkup 18+	Clinical Care		candidate_tract_to_csa	CDC PLACES CHECKUP tract aggregation	Not wired yet.
+60	Uninsured	Clinical Care	ui	mapped_now	ACS tract aggregation in update_data.R	Population under 65 without health insurance.

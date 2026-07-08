@@ -1,4 +1,4 @@
-{
+export const DASHBOARD_DATA = {
   "meta": {
     "schema_version": 2,
     "years": [
@@ -12765,3 +12765,4 @@
     }
   }
 }
+;

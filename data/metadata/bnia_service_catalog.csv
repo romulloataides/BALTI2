@@ -1,0 +1,623 @@
+title,service_name,url,tags
+Data Points,DataPoints,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/DataPoints/FeatureServer,geoloom
+Transformation_Zones,Transformation_Zones,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Transformation_Zones/FeatureServer,transformation zones| baltimore city| businesses| bnia
+Publicly_Funded_Murals,Publicly_Funded_Murals,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Publicly_Funded_Murals/FeatureServer,featured map|geoloom
+"Liquor Outlet density per 1,000 Residents",Liquor,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Liquor/FeatureServer,health
+"Rate of Businesses in the Creative Economy per 1,000 Residents",Cebus,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Cebus/FeatureServer,arts
+"Number of Businesses that are Arts-Related per 1,000 Residents",Artbus,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Artbus/FeatureServer,arts
+RPD_CSA_COVIDdata,RPD_CSA_COVIDdata,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_COVIDdata/FeatureServer,covid
+Percent of Residents - Black/African-American (Non-Hispanic),Paa,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Paa/FeatureServer,census
+"Number of Narcotics Calls for Service per 1,000 Residents",Narc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Narc/FeatureServer,crime| public safety
+"Percent of Households Earning Less than 25,000",Hh25inc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hh25inc/FeatureServer,census
+Libraries_in_Neighborhoods,Libraries_in_Neighborhoods,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Libraries_in_Neighborhoods/FeatureServer,Geoloom|featured map
+Baltimore City Geographic Boundaries (Collection),GP_Boundaries,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/GP_Boundaries/FeatureServer,baltimore|geography|mapping|boundaries
+Percent of Students that are White (non-Hispanic),Wstud,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wstud/FeatureServer,education
+Percent of Households with No Internet at Home,Nohhint,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Nohhint/FeatureServer,workforce
+Affordability Index - Rent,RPD_CSA_Affordr,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Affordr/FeatureServer,csa|  rpd|  covid
+Total Employment in Arts-Related Businesses,Artemp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Artemp/FeatureServer,art
+Percent of Population that Walks to Work,Walked,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Walked/FeatureServer,sustainability
+Number of Employees in the Creative Economy,Ceemp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ceemp/FeatureServer,arts
+Preliminary Baltimore City P.L. 94-171 Redistricting Dataset,Preliminary_2020_Data,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Preliminary_2020_Data/FeatureServer,baltimore|  census 2020|  demographics|  population change|  bnia|  redistricting|  2020
+BaltimorePublicSchoolsPoly,BaltimorePublicSchoolsPoly,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BaltimorePublicSchoolsPoly/FeatureServer,bnia| schools| education| learning| baltimore| bcpss
+Median Household Income,Mhhi,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mhhi/FeatureServer,census
+PSO Part1 Crime 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Part1_Crime_2023/FeatureServer,Crime|Public Safety|Part 1 Crime
+Percent of 1st-5th Grade Students that are Chronically Absent (Missing at least 20 days),Abse,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Abse/FeatureServer,education
+Dirtystreetsarpa,Dirtystreetsarpa,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Dirtystreetsarpa/FeatureServer,sustainability| 2010| 2011| 2012| 2013| 2014| 2015| 2016| 2017| 2018
+Community Statistical Areas (CSAs)  Reference Boundaries,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Statistical_Areas_(CSAs)__Reference_Boundaries/FeatureServer,csa|baltimore|bnia|communities|neighborhoods
+Percent of 6th-8th Grade Students that are Chronically Absent (Missing at least 20 days),Absmd,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Absmd/FeatureServer,education
+Percent of Area Covered by Trees,Trees,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Trees/FeatureServer,sustainability|environment
+Percentage of Residential Properties that are Vacant and Abandoned,Vacant,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant/FeatureServer,housing
+Percent of Children Living Below the Poverty Line,Hhchpov,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hhchpov/FeatureServer,census
+Percent of Residents - White/Caucasian (Non-Hispanic),Pwhite,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pwhite/FeatureServer,census
+"Juvenile Arrest Rate for Drug-Related Offenses per 1,000 Juveniles",Juvdrug,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Juvdrug/FeatureServer,crime
+Percent of Residents - Hispanic,Phisp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Phisp/FeatureServer,census
+High School Dropout/Withdrawl Rate,Drop,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Drop/FeatureServer,education
+DigitalAccessIndicators,DigitalAccessIndicators,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/DigitalAccessIndicators/FeatureServer,acs|  baltimore|  digital access|  accessibility|  computers|  cell phone usage|  internet
+Percent of Family Households Living Below the Poverty Line,Hhpov,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hhpov/FeatureServer,census
+Total Dollar Amount Invested in Small Businesses per 50 Businesses,Smlinvst,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Smlinvst/FeatureServer,workforce
+"Rate of Housing Vouchers per 1,000 Rental Units",Hcvhouse,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hcvhouse/FeatureServer,housing
+"Juvenile Arrest Rate for Violent Offenses per 1,000 Juveniles",Juvviol,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Juvviol/FeatureServer,crime
+Median Number of Days on the Market,Dom,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Dom/FeatureServer,housing|  housing & development
+Percent Population 16-64 Not in Labor Force,Nilf,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Nilf/FeatureServer,workforce
+"Fast Food Outlet Density per 1,000 Residents",Fastfd,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Fastfd/FeatureServer,health
+Average Healthy Food Availability Index,Hfai,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hfai/FeatureServer,health
+Community Statistical Areas (2020),Community_Statistical_Areas_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Statistical_Areas_2020/FeatureServer,boundaries| 2020| community statistical area| csa| bnia
+Percentage of Population aged 16-19 in School and/or Employed,Sclemp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Sclemp/FeatureServer,education
+Percent of Residents - Asian (Non-Hispanic),Pasi,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pasi/FeatureServer,census
+Percent Population (25 Years and over) With Less Than a High School Diploma or GED,Lesshs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Lesshs/FeatureServer,workforce
+Percent Population 16-64 Employed,Empl,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Empl/FeatureServer,workforce
+Percent of Children (aged 0-6) with Elevated Blood Lead Levels,Ebll,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ebll/FeatureServer,health
+Total Number of Employees by Selected Neighborhood Industry (NAICS Sectors),Neiemp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiemp/FeatureServer,workforce
+Community Change Database,Community_Change_Database,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Change_Database/FeatureServer,demographics| occupancy| accessibility| connectivity| housing diversity| quality of life
+"Neighborhood Businesses per 1,000 Residents (NAICS Sectors)",Neibus,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neibus/FeatureServer,workforce
+Percentage of Students Passing H.S.A. Government,Hsagov,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsagov/FeatureServer,education
+Percentage of Students Passing H.S.A. English,Hsaeng,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsaeng/FeatureServer,education
+Kindergarten School Readiness,Ready,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ready/FeatureServer,education
+Percent Population (25 Years and over) With High School Diploma and Some College or Associates Degree,Hsdipl,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsdipl/FeatureServer,workforce
+"Violent Crime Rate per 1,000 Residents",Viol,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Viol/FeatureServer,crime
+Percent Population (25 Years and over) with a Bachelor's Degree or Above,Bahigher,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Bahigher/FeatureServer,workforce
+Percent of Students Switching Schools within School Year,Sclsw,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Sclsw/FeatureServer,education
+Percentage of Students Passing H.S.A. Algebra,Hsaalg,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsaalg/FeatureServer,education
+Demographics_and_Workforce_Community_Indicators,Demographics_and_Workforce_Community_Indicators,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Demographics_and_Workforce_Community_Indicators/FeatureServer,geoloom
+"Number of Persons with Library Cards per 1,000 Residents",Libcard,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Libcard/FeatureServer,arts
+Neighborhood_Investment_Map,Neighborhood_Investment_Map,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neighborhood_Investment_Map/FeatureServer,bnia| investments| community
+"Juvenile Arrest Rate per 1,000 Juveniles",Juvarr,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Juvarr/FeatureServer,crime
+Percentage of 3rd Grade Students who Met or Exceeded PARCC Math,Pmath3,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pmath3/FeatureServer,education
+Racial Diversity Index,Racdiv,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Racdiv/FeatureServer,census
+Number of Children (aged 0-6) Tested for Elevated Blood Lead Levels,Leadtest,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Leadtest/FeatureServer,health
+"Property Crime Rate per 1,000 Residents",Prop,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Prop/FeatureServer,crime. public safety
+PSO_Boundary_Crime,PSO_Boundary_Crime,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Boundary_Crime/FeatureServer,pso
+"Number of Gun-Related Homicides per 1,000 Residents",Gunhom,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Gunhom/FeatureServer,crime|public safety
+Percent of Population 65 Years and over,Age65_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age65_/FeatureServer,census
+Percent of Population that Uses Public Transportation to Get to Work,Pubtran,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pubtran/FeatureServer,sustainability
+Percentage of Students Passing H.S.A. Biology,Hsabio,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsabio/FeatureServer,education
+Life Expectancy,Lifexp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Lifexp/FeatureServer,health
+Unemployment Rate,Unempr,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Unempr/FeatureServer,workforce
+NoInternetACS17,NoInternetACS17,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NoInternetACS17/FeatureServer,bnia| baltimore| acs| internet access
+PSO_RelocationsMap,PSO_RelocationsMap,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_RelocationsMap/FeatureServer,pso
+Walk Score,Wlksc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wlksc/FeatureServer,sustainability
+History_in_Baltimore,History_in_Baltimore,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/History_in_Baltimore/FeatureServer,geoloom|featured map
+Total Population,Tpop,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tpop/FeatureServer,census
+Median Price of Homes Sold,Salepr,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Salepr/FeatureServer,housing| housing & development
+Percent of Population 5-17 Years old,Age18_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age18_/FeatureServer,census
+Affordability Index - Rent,Affordr,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Affordr/FeatureServer,housing
+Percent of Employed Population with Travel Time to Work of 45 Minutes and Over,Trav45_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Trav45_/FeatureServer,sustainability
+Baltimore City Census Tracts (2010) and Community Statistical Areas ,Tracts_to_CSA,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tracts_to_CSA/FeatureServer,boundaries| baltimore| csa| census tract
+"Number of Homeowner's Tax Credits per 1,000 Residential Units",Owntax,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Owntax/FeatureServer,housing
+"Number of Shootings per 1,000 Residents",Shoot,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Shoot/FeatureServer,crime| public safety
+Percent of Families Receiving TANF,Tanf,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tanf/FeatureServer,health
+Percent of Households with No Vehicles Available,Novhcl,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Novhcl/FeatureServer,sustainability
+"Number of Overdose Calls for Service per 1,000 Residents",Overd,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Overd/FeatureServer,health
+Education_Community_Indicators,Education_Community_Indicators,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Education_Community_Indicators/FeatureServer,geoloom
+"Rate of Dirty Streets and Alleys Reports per 1,000 Residents",Dirtyst,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Dirtyst/FeatureServer,sustainability
+"Percent of Residents - All Other Races (Hawaiian/ Pacific Islander, Alaskan/ Native American Other Race) (Non-Hispanic)",Ppac,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ppac/FeatureServer,census
+Number of Trees of Planted,Treeplnt,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Treeplnt/FeatureServer,sustainability
+Baltimore_Metro_Zip_Codes,Baltimore_Metro_Zip_Codes,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_Metro_Zip_Codes/FeatureServer,baltimore metro| zip code
+"Percent of Households Earning 40,000 to 60,000",Hh60inc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hh60inc/FeatureServer,census
+"Percentage of Properties with Rehabilitation Permits Exceeding 5,000",Resrehab,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Resrehab/FeatureServer,housing
+Percent of Homes Weatherized,Weather,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Weather/FeatureServer,sustainability
+Percent of Employed Population with Travel Time to Work of 0-14 Minutes,Trav14_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Trav14_/FeatureServer,sustainability
+Percent of Births Where the Mother Received Early Prenatal Care (First Trimester),Prenatal,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Prenatal/FeatureServer,health
+"Number of Automobile Accident Calls for Service per 1,000 Residents",Caracc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Caracc/FeatureServer,crime
+Percent of Population that Drove Alone to Work,Drvalone,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Drvalone/FeatureServer,sustainability
+Percent of Households with Children Under 18,Fam,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Fam/FeatureServer,census
+"Percent of Population Using Other Means to Commute to Work (Taxi, Motorcycle, Bicycle, Other)",Othrcom,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Othrcom/FeatureServer,sustainability
+SAFMR_Data,SAFMR_Data,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/SAFMR_Data/FeatureServer,safmr| baltimore metro
+Total Number of Residential Properties,Totalres,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Totalres/FeatureServer,housing
+"Number of Homestead Tax Credits per 1,000 Residential Units",Homtax,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Homtax/FeatureServer,housing
+Percent of Businesses that are 1 Year old or less,Biz1_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Biz1_/FeatureServer,workforce
+"Number of Event Permits Requested per 1,000 Residents",Artevnt,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Artevnt/FeatureServer,arts
+Percent of 9th-12th Grade Students that are Chronically Absent (Missing at least 20 days),Abshs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Abshs/FeatureServer,education
+Percent of Persons Receiving SNAP,Snap,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Snap/FeatureServer, health
+Percentage of Residential Properties with Housing Violations (Excluding Vacants),Vio,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vio/FeatureServer,housing| housing & development
+Percent of Students that are African American (non-Hispanic),Aastud,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Aastud/FeatureServer,education
+CityLimits,CityLimits,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CityLimits/FeatureServer,geoloom
+"Number of Common Assault Calls for Service per 1,000 Residents",Caslt,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Caslt/FeatureServer,crime| public safety
+Percentage of Vacant Properties Owned by Baltimore City,Baltvac,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltvac/FeatureServer,housing
+"Number of Historic Tax Credits per 1,000 Residential Units",Histax,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Histax/FeatureServer,housing
+Affordability Index - Mortgage,Affordm,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Affordm/FeatureServer,housing
+Percent Population Change from Last Census,Popchg,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Popchg/FeatureServer,census
+Percentage of Housing Units that are Owner-Occupied,Ownroc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Ownroc/FeatureServer,housing
+Number of Public Murals,Murals,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Murals/FeatureServer,arts
+Percentage of Properties Under Mortgage Foreclosure,Fore,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Fore/FeatureServer,housing
+Mortality by Age (1-14 Years old),Mort14_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mort14_/FeatureServer,health
+Percent of Students that are Hispanic,Hstud,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hstud/FeatureServer,education
+Total Number of Households,Hhs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hhs/FeatureServer,census
+"Part 1 Crime Rate per 1,000 Residents",Crime_Updated,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Crime_Updated/FeatureServer,crime
+Community Statistical Areas (2000),Community_Statistical_Areas_2000,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Statistical_Areas_2000/FeatureServer,boundaries|  community statistical areas|  csa|  bnia|  2000
+"Number of Daily Bus Stop Loadings per 1,000 Residents",Busload,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Busload/FeatureServer,sustainability
+"Domestic Violence Calls For Service per 1,000 Residents",Domvio,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Domvio/FeatureServer,crime
+"Public Art per 1,000 Residents",Publart,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Publart/FeatureServer,arts
+Number of Community Managed Open Spaces,Cmos,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Cmos/FeatureServer,sustainability
+High School Completion Rate,Compl,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Compl/FeatureServer,education
+"Rate of Street Light Outages per 1,000 Residents",Lights,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Lights/FeatureServer,crime
+Percent of Employed Population with Travel Time to Work of 15-29 Minutes,Trav29_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Trav29_/FeatureServer,sustainability
+Median Daily Water Consumption,Waterc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Waterc/FeatureServer,sustainability
+Percent of Employed Residents who Work Outside the City,Wrkout,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Wrkout/FeatureServer,workforce
+Percent of Adult Population on Parole/Probation,Prbprl,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Prbprl/FeatureServer,workforce
+PSO_Part1Crime_2021,PSO_Part1Crime_2021,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Part1Crime_2021/FeatureServer,pso
+Percent Residential Properties that do Not Receive Mail,Nomail,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Nomail/FeatureServer,housing
+GreenPatterns,GreenPatterns,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/GreenPatterns/FeatureServer,#Gardens|     #Baltimore|     tree plantings|     urban forest|     forest patches|     baltimore|     baltimore city|     Baltimore neighborhood indicators alliance|     bnia|     bniajfi|     cmos|     community managed open spaces|     development|     stormwater|     trees
+"Percent of Households Earning 25,000 to 40,000",Hh40inc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hh40inc/FeatureServer,census
+Percent of Population 18-24 Years old,Age24_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age24_/FeatureServer,census
+Number of Businesses with Under 50 Employees,Smlbus,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Smlbus/FeatureServer,workforce
+Percent of Female-Headed Households with Children Under 18,Femhhs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Femhhs/FeatureServer,census
+"Teen Birth Rate per 1,000 Females (aged 15-19)",Teenbir,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Teenbir/FeatureServer,health
+Total Number of Commercial Properties,Comprop,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Comprop/FeatureServer,workforce
+Percent of Residences Heated by Electricity,Elheat,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Elheat/FeatureServer,sustainability
+Percent Population 16-64 Unemployed and Looking for Work,Unempl,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Unempl/FeatureServer,workforce
+Percentage of Residential Sales in Foreclosure (REO),Reosa,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Reosa/FeatureServer,housing|  housing & development
+Number of Total Jobs Filled by Employees,Totjobs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Totjobs/FeatureServer,workforce
+Number of Students Ever Attended 6th - 8th Grade,Mattend,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mattend/FeatureServer,education
+Number of Students Officially Enrolled in 6th - 8th Grade,Menrol,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Menrol/FeatureServer,education
+Community Statistical Areas (2010),Community_Statistical_Areas_2010,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Statistical_Areas_2010/FeatureServer,boundaries|  community statistical areas|  csa|  bnia|  2010
+Percent Population (Over the age of 18) Who Voted in the General Election,Voted,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Voted/FeatureServer,sustainability| 2010| 2012| 2014| 2016| 2018| 2020
+Percent of Residents - Two or More Races (Non-Hispanic),P2more,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/P2more/FeatureServer,census
+Infant Mortality Rate,Mort1_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mort1_/FeatureServer,health
+Percent of Population Under 5 Years old,Age5_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age5_/FeatureServer,census
+"Percent of Households Earning 60,000 to 75,000",Hh75inc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hh75inc/FeatureServer,census
+Percent of Population that Carpool to Work,Carpool,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Carpool/FeatureServer,sustainability
+Number of Students Ever Attended 9th - 12th Grade,Hsattend,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsattend/FeatureServer,education
+PSO_VBN,PSO_VBN,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_VBN/FeatureServer,pso
+Number of Businesses by Selected Neighborhood Industry (NAICS Sectors),Neiind,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neiind/FeatureServer,workforce
+"Percent of Commercial Properties with Rehab Permits Above 5,000",Crehab,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Crehab/FeatureServer,workforce
+"Rate of Clogged Storm Drain Reports per 1,000 Residents",Clogged,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Clogged/FeatureServer,sustainability
+Percent of Babies Born with a Satisfactory Birth Weight,Birthwt,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Birthwt/FeatureServer,health
+Number of Homes Sold,Shomes,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Shomes/FeatureServer,housing
+Percent of Residences Heated by Utility Gas,Heatgas,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Heatgas/FeatureServer,sustainability
+"Percent of Households Earning More than 75,000",Hhm75,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hhm75/FeatureServer,census
+Total Number of Businesses,Numbus,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Numbus/FeatureServer,workforce
+Percentage of 5th Grade Students Passing MSA Math,Math5,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Math5/FeatureServer,education
+Kindergarten Readiness,Kra,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Kra/FeatureServer,education
+Number of Miles of Bike Lanes,Bkln,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Bkln/FeatureServer,sustainability
+Maryland Digital Equity Index by Zipcode,Join_Features_to_ZipDissolved_2012_Maryland,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_ZipDissolved_2012_Maryland/FeatureServer,Analysis Result|Join Features
+Percent of Residential Mortgages Originated or Approved,Hmda,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hmda/FeatureServer,housing
+Average Household Size,Hhsize,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hhsize/FeatureServer,census
+Percent of Population 25-64 Years old,Age64_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Age64_/FeatureServer,census
+Percentage of Residential Sales for Cash,Cashsa,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Cashsa/FeatureServer,housing| housing & development
+Number of Students Officially Enrolled in 9th - 12th Grade,Hsenrol,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Hsenrol/FeatureServer,education
+Percentage of 5th Grade Students who Met or Exceeded PARCC Math,Pmath5,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pmath5/FeatureServer,education
+Total Number of Employees,Totemp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Totemp/FeatureServer,workforce
+Percentage of Residential Tax Lien Sales,Taxlien,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Taxlien/FeatureServer,housing
+Percent of Employed Population with Travel Time to Work of 30-44 Minutes,Trav44_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Trav44_/FeatureServer,sustainability
+Housing_Community_Indicators,Housing_Community_Indicators,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Housing_Community_Indicators/FeatureServer,geoloom
+Percentage of Students Enrolled in Special Education Programs,Sped,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Sped/FeatureServer,education
+"Number of Demolition Permits per 1,000 Residential Properties",Demper,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Demper/FeatureServer,housing
+Total Male Population,Male,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Male/FeatureServer,census
+Number of Students Officially Enrolled in 1st - 5th Grade,Eenrol,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Eenrol/FeatureServer,education
+Mortality by Age (65-84 Years old),Mort84_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mort84_/FeatureServer,health
+Percent of Births Delivered at Term (37-42 Weeks),Termbir,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Termbir/FeatureServer,health
+Percent of Businesses that are 4 Years old or less,Biz4_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Biz4_/FeatureServer,workforce
+Percent of Population (Over the age of 18) Who are Registered to Vote,Regvote,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Regvote/FeatureServer,sustainability
+Mortality by Age (85 and over),Mort85_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mort85_/FeatureServer,health
+"Number of New Construction Permits per 1,000 Residential Properties",Constper,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Constper/FeatureServer,housing
+Percent of Businesses that are 2 Years old or less,Biz2_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Biz2_/FeatureServer,workforce
+Percentage of Students who Met or Exceeded PARCC Algebra II,Palg2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Palg2/FeatureServer,education
+Mortality by Age (45-64 Years old),Mort64_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mort64_/FeatureServer,health
+Percentage of 3rd Grade Students who Met or Exceeded PARCC Math,Pread3,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread3/FeatureServer,education
+Total Female Population,Female,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Female/FeatureServer,census
+"Number of Banks and Bank Branches per 1,000 Residents",Banks,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Banks/FeatureServer,workforce
+"Number of Arrests per 1,000 Residents",Arrests,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Arrests/FeatureServer,crime
+Number of Students Ever Attended 1st - 5th Grade,Eattend,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Eattend/FeatureServer,education
+Health_and_Crime_Community_Indicators,Health_and_Crime_Community_Indicators,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Health_and_Crime_Community_Indicators/FeatureServer,geoloom
+"Project Vital Lots as of May 22, 2022",Project_VITAL_Lots_05222022,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Project_VITAL_Lots_05222022/FeatureServer,project vital| greening
+Percentage of 3rd Grade Students Passing MSA Reading,Read3,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Read3/FeatureServer,education
+Percent of Population Working from Home,Workhome,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Workhome/FeatureServer,workforce
+Percentage of 5th Grade Students who Met or Exceeded PARCC Reading,Pread5,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread5/FeatureServer,education
+RebUILD_Metro_Clusters,RebUILD_Metro_Clusters,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RebUILD_Metro_Clusters/FeatureServer,rebuild
+Percentage of Students Receiving Free or Reduced Meals,Farms,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Farms/FeatureServer,education
+Percentage of 5th Grade Students Passing MSA Reading,Read5,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Read5/FeatureServer,education
+Mortality by Age (15-24 Years old),Mort24_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mort24_/FeatureServer,health
+Percentage of 3rd Grade Students Passing MSA Math,Math3,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Math3/FeatureServer,education
+Percentage of 8th Grade Students Passing MSA Math,Math8,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Math8/FeatureServer,education
+Percentage of 8th Grade Students who Met or Exceeded PARCC Math,Pmath8,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pmath8/FeatureServer,education
+Percentage of 8th Grade Students who Met or Exceeded PARCC Reading,Pread8,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Pread8/FeatureServer,education
+ReBUILD_Metro_Oliver_Case_Study,ReBUILD_Metro_Oliver_Case_Study,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ReBUILD_Metro_Oliver_Case_Study/FeatureServer,oliver
+Mortality by Age (25-44 Years old),Mort44_,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mort44_/FeatureServer,health
+"""In four years, I think my neighborhood will be...""",OSI_FutureNeigh,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/OSI_FutureNeigh/FeatureServer,osi data
+Population Change by Community Statistical Area (2000-2010),Population_Change_2000_to_2010,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Population_Change_2000_to_2010/FeatureServer,demographics| 2010
+Percentage of 8th Grade Students Passing MSA Reading,Read8,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Read8/FeatureServer,education
+Percentage of Students Suspended or Expelled During School Year,Susp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Susp/FeatureServer,education
+21st Century Schools,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/21st_Century_Schools/FeatureServer,schools
+Percentage of Students who Met or Exceeded PARCC Algebra I,Palg1,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Palg1/FeatureServer,education
+The thing that would make the most difference in my neighborhood is...,DiffNeigh,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/DiffNeigh/FeatureServer,osi|  map
+Economic Diversity Index,Econdiv,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Econdiv/FeatureServer,census
+"Percent Change of Residents - Hispanic, 2010-2020",Percent_of_Residents_Hispanic_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Percent_of_Residents_Hispanic_2020/FeatureServer,race
+Public WiFi Locations,Free_Baltimore_Wifi_Hotspots,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Free_Baltimore_Wifi_Hotspots/FeatureServer,baltimore| arpa
+"Percent Change of Residents that are White/Caucasian (Non-Hispanic), 2010-2020",Percent_of_Residents_White_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Percent_of_Residents_White_2020/FeatureServer,race
+Change in Percent of Commuters Traveling More than 45 Minutes to Work (2014-2019),45_Minute_Commute_Map,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/45_Minute_Commute_Map/FeatureServer,accessibility|2019
+Arts_Community_Indicators,Arts_Community_Indicators,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Arts_Community_Indicators/FeatureServer,geoloom
+Accessibility Indicators - Community Change Database,Accessibility_Community_Change_Database,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessibility_Community_Change_Database/FeatureServer,accessibility
+"If more money were allocated to reducing violence, the government should...",ViolenceReduc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ViolenceReduc/FeatureServer,osi|  map
+TIFs,TIFs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/TIFs/FeatureServer,tif
+"If more money were allocated to children and youth support, the government should...",ChildrenYouth,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ChildrenYouth/FeatureServer,osi| map
+Change in Number of Persons with Library Cards (2011-2020),Library_Cards,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Library_Cards/FeatureServer,connectivity|2020
+"Percent Change of Residents - Asian (Non-Hispanic), 2010-2020",Percent_of_Residents_Asian_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Percent_of_Residents_Asian_2020/FeatureServer,race
+How can the Baltimore Police Department use their budget to better serve Baltimore City residents?,BPDBudget,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BPDBudget/FeatureServer,osi| map
+"If more money were allocated to Baltimore City Public Schools, they should...",Schools,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Schools/FeatureServer,osi|  map
+Which City services should be prioritized?,CityBudget,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CityBudget/FeatureServer,osi|  map
+Life Expectancy (2018),Life_Expectancy_2018,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Life_Expectancy_2018/FeatureServer,quality of life| 2018
+People in my neighborhood could live a healthier lifestyle if there were more...,Health,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Health/FeatureServer,osi| map
+Survey Data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Blueprint_for_Baltimore_Survey_Responses/FeatureServer,osi data
+Top_CSAs_VHN_2020,Top_CSAs_VHN_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Top_CSAs_VHN_2020/FeatureServer,occupancy
+"Percent Change of Residents - Black/African American (Non-Hispanic), 2020",Percent_of_Residents_Black_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Percent_of_Residents_Black_2020/FeatureServer,change
+Enoch Pratt Libraries,EnochPrattLibraries,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/EnochPrattLibraries/FeatureServer,library
+BCF_Impact_Investments,BCL_Impact_Investments,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCL_Impact_Investments/FeatureServer,bcl|    community|    investment projects|    sectors|    trf|    rbc|    bbl
+RebUILD_Metro_Point_VBN,RebUILD_Metro_Point_VBN,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RebUILD_Metro_Point_VBN/FeatureServer,vbn
+Neighborhoods with Housing Projects,Join_Features_to_Neighborhood,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_Neighborhood/FeatureServer,Analysis Result|Join Features
+"Map: ""Currently, I think my neighborhood is...""",OSI_CurrentNeigh,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/OSI_CurrentNeigh/FeatureServer,osi| map
+Median Sales Price (2019),Median_Sales_Price_2019,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Median_Sales_Price_2019/FeatureServer,diversity|2019
+Percent of Households with No Internet at Home (2015-2019),Connectivity_Households_without_Internet,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Connectivity_Households_without_Internet/FeatureServer,connectivity|2019
+Change in Percent of Commuters Using Public Transportation to Get to Work (2014-2019),Public_Transit,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Public_Transit/FeatureServer,accessibility|2019
+"If more money were allocated to mental health, trauma, and substance abuse services, the government should...",MentalHealth,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MentalHealth/FeatureServer,osi| map
+Percent of Residents - White/Caucasian (Non-Hispanic),RPD_CSA_Pwhite,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Pwhite/FeatureServer,csa| rpd| covid
+Percent of Residents - Black/African-American (Non-Hispanic),RPD_CSA_Paa,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Paa/FeatureServer,csa| rpd| covid
+Percent of Population 5-17 Years Old,RPD_CSA_Age18,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Age18/FeatureServer,csa| rpd| covid
+Redistricting Data 2020: Race/Ethnicity Population Change from 2010,Redistricting_Data_2020_Race_Change,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Redistricting_Data_2020_Race_Change/FeatureServer,census 2020|baltimore|demographics
+Percent of Households with No Vehicles Available,RPD_CSA_Novhcl,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Novhcl/FeatureServer,csa|rpd|covid
+"Rate of Evictions per 1,000 Residents",Evict,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Evict/FeatureServer,housing
+Sustainability_Community_Indicators,Sustainability_Community_Indicators,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Sustainability_Community_Indicators/FeatureServer,geoloom
+"If more money were allocated to creating additional jobs for Baltimoreans, the government should...",Createjobs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Createjobs/FeatureServer,osi| map
+Metro Housing and Demographics Data,Metro_Housing_and_Demographics2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Metro_Housing_and_Demographics2/FeatureServer,mdcep| affordable housing| vouchers| race and ethnicity| owner occupancy| housing
+Blueprint for Baltimore Responses by Community Statistical Area,OSI_Baltimore_CSA_Map,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/OSI_Baltimore_CSA_Map/FeatureServer,osi maps
+PSO_Boundary_Crime_Q32020,PSO_Boundary_Crime_Q32020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Boundary_Crime_Q32020/FeatureServer,pso
+Which of the following services do you think the Affordable Housing Trust Fund should prioritize?,HousingFund,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/HousingFund/FeatureServer,osi| map
+"In my neighborhood, housing is affordable.",Affordable,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Affordable/FeatureServer,osi|   map
+Percent of Residents - Hispanic,RPD_CSA_Phisp,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Phisp/FeatureServer,csa| rpd| covid
+ARPA Capital Invesmtent Neighborhoods,ARPA_Capital_Investments_Neighborhoods,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA_Capital_Investments_Neighborhoods/FeatureServer,bnia|   arpa|   cip
+"Percent of Households Earning Less than 25,000",RPD_CSA_Hh25inc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Hh25inc/FeatureServer,csa| rpd| covid
+PSO_Boundary_Crime_Q22020,PSO_Boundary_Crime_Q22020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Boundary_Crime_Q22020/FeatureServer,pso
+Change in Percent of Employed Residents Working Outside the City (2011-2018),Working_Outside_Baltimore,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Working_Outside_Baltimore/FeatureServer,2018|accessibility
+Change in Percent of Commuters Driving Alone to Work (2014-2019),Drove_Alone,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Drove_Alone/FeatureServer,accessibility|2019
+Geoloom_Crowd,Geoloom_Crowd,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Geoloom_Crowd/FeatureServer,bnia|geoloom
+Housing Affordability by Tract with QCT 2022,Join_Features_to_Rent_Affordability_in_QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_Rent_Affordability_in_QCT/FeatureServer,Analysis Result|Join Features
+Percent of Households Without Internet at Home,RPD_CSA_Nohhint,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Nohhint/FeatureServer,csa| rpd| covid
+Percent of Population 65 Years and Over,RPD_CSA_Age65,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RPD_CSA_Age65/FeatureServer,csa| rpd| covid
+Geoloom_Place_Query_Functions,Geoloom_Place_Query_Functions,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Geoloom_Place_Query_Functions/FeatureServer,bnia|  geoloom
+ProjectVITAL_BlockGroups,ProjectVITAL_BlockGroups,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ProjectVITAL_BlockGroups/FeatureServer,project vital
+Part1_Crime_Q3_Q4_2020,Part1_Crime_Q3_Q4_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Part1_Crime_Q3_Q4_2020/FeatureServer,crime
+2024_Oliver_Data,2024_Oliver_Data,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/2024_Oliver_Data/FeatureServer,vbn
+CashSalesAnalysis,CashSalesAnalysis,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CashSalesAnalysis/FeatureServer,home sales| baltimore
+Neighborhood_Wifi,Neighborhood_Wifi,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neighborhood_Wifi/FeatureServer,change
+Digital_Equity_Impact_Indicator,Digital_Equity_Impact_Indicator,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Digital_Equity_Impact_Indicator/FeatureServer,arpa
+Project_VITAL_Lots_07162021,Project_VITAL_Lots_07162021,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Project_VITAL_Lots_07162021/FeatureServer,baltimore
+Major Development Projects,MajorProjectsCSA,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MajorProjectsCSA/FeatureServer,Change
+Murals_2020,Murals_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Murals_2020/FeatureServer,vs20
+ImpactInvestandPriorityInvestAreas,ImpactInvestandPriorityInvestAreas,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ImpactInvestandPriorityInvestAreas/FeatureServer,baltimore|    niif|    neighborhood
+Project_VITAL_Lots_070092021,Project_VITAL_Lots_070092021,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Project_VITAL_Lots_070092021/FeatureServer,baltimore
+BCF_Impact_Investments_2019_2020_Sept23,BCF_Impact_Investments_2019_2020_Sept23,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCF_Impact_Investments_2019_2020_Sept23/FeatureServer,bcf
+BCFTargetAreas,BCFTargetAreas,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCFTargetAreas/FeatureServer,baltimore| bcf target areas| school catchment zones| program areas
+Not in Labor Force - Change from 2018 to 2023,Nilf_Change_2018_2023,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Nilf_Change_2018_2023/FeatureServer,workforce
+Neighborhoods (2020) to Community Statistical Areas,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NSA2020_to_CSA2010_and_CSA2020_Crosswalk/FeatureServer,crosswalk|baltimore|neighborhoods|2020|community statistical areas
+Gun_Homicides_2023,Gun_Homicides_2023,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Gun_Homicides_2023/FeatureServer,crime| violent
+GunHomicides2018,GunHomicides2018,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/GunHomicides2018/FeatureServer,homicide
+RacDiv18_CSAselect,RacDiv18_CSAselect,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RacDiv18_CSAselect/FeatureServer,racdiv
+Clean_Corps_Neighborhoods,Clean_Corps_Neighborhoods,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Clean_Corps_Neighborhoods/FeatureServer,Analysis Result|Join Features
+GunHomicides_2020,GunHomicides_2020,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/GunHomicides_2020/FeatureServer,homicide
+VITAL_03162021,VITAL_03162021,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/VITAL_03162021/FeatureServer,VITAL
+BelairEdison_FeaturedMap,BelairEdison_FeaturedMap,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BelairEdison_FeaturedMap/FeatureServer,public art| geoloom| baltimore
+ZipDissolved_2012_Maryland,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ZipDissolved_2012_Maryland/FeatureServer,Zip Codes
+Census Tract (2020) to Community Statistical Area (2020),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tract2020_to_CSA2020/FeatureServer,crosswalk|baltimore|2020|community statistical areas|census tract
+Community Statistical Areas (2010) and Adjacent Communities,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Statistical_Areas_(2010)_and_Adjacent_Communities/FeatureServer,baltimore|crosswalk|community statistical areas|2010
+DigitalAccessEcosystem,DigitalAccessEcosystem,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/DigitalAccessEcosystem/FeatureServer,baltimore| digital access| training programs| digital communication| workforce| literacy programs| census 2020| equity
+Neighborhood Statistical Areas (2010) to Maryland Legislative Districts (2012),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neighborhood_2010_to_Legislative_District_2012/FeatureServer,neighborhoods|legislative districts|baltimore|crosswalk|2010|2012
+Census Tracts (2010) to Community Statistical Areas (2010),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Census_Tracts_(2010)_to_Community_Statistical_Areas_(2010)/FeatureServer,mapping|crosswalk|tracts|community statistical areas|baltimore|2010
+Census Tract (2010) to Community Statistical Area (2010),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Census_Tract_(2010)_to_Community_Statistical_Area_(2010)/FeatureServer,crosswalk|baltimore|census tract|2010|community statistical areas
+Census Tracts (2020) to Community Statistical Areas (2010),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tract_2020_to_Community_Statistical_Area_2010/FeatureServer,tract|community statistical areas|baltimore|crosswalk|2020|2010
+Interstates,Interstates,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Interstates/FeatureServer,roads
+Census Tract (2000) to Community Statistical Area (2000),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Census_Tract_(2000)_to_Community_Statistical_Area_(2000)/FeatureServer,census tract|community statistical areas|crosswalk|baltimore|2000
+Census Tracts (2020) to Maryland Legislative Districts (2012),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tract_2020_to_Legislative_District_2012/FeatureServer,census tracts|baltimore|legislative distrcit|crosswalk|2020|2012
+ARPA_Housing_Affordability,ARPA_Housing_Affordability,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA_Housing_Affordability/FeatureServer,affordability
+Join_Features_to_Baltimore_Resource_Landscape_Survey_Responses___copy,Join_Features_to_Baltimore_Resource_Landscape_Survey_Responses___copy,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_Baltimore_Resource_Landscape_Survey_Responses___copy/FeatureServer,Analysis Result|Join Features
+TRoweOrganizations,TRoweOrganizations,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/TRoweOrganizations/FeatureServer,BNIA|  Organizations
+NSAs,NSAs,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NSAs/FeatureServer,neighborhoods|baltimore
+NeighARPAHousingProg2025,NeighARPAHousingProg2025,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NeighARPAHousingProg2025/FeatureServer,baltimore
+Baltimore City Population Change,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_Population_Change/FeatureServer,demographics
+Recycling_Activity_Measures_Index,Recycling_Activity_Measures_Index,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Recycling_Activity_Measures_Index/FeatureServer,Analysis Result|Join Features
+Join_Features_to_Council_District_2021___Council_District,Join_Features_to_Council_District_2021___Council_District,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_Council_District_2021___Council_District/FeatureServer,Analysis Result|Join Features
+Add a Lot Form,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Add a Lot Form/FeatureServer,baltimore
+Recycling 311 Service Requests Jan20 to Apr21,Jan20_Apr21_recycling_311_ca1,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Jan20_Apr21_recycling_311_ca1/FeatureServer,DPW
+VITAL Lots 2023 Update,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/VItal2023updatefeet/FeatureServer,project vital
+Comparison_of_Enrollment_and_Population,Comparison_of_Enrollment_and_Population,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Comparison_of_Enrollment_and_Population/FeatureServer,education| acs| bcps enrollment
+data_dictionary2,data_dictionary2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/data_dictionary2/FeatureServer,data dictionary
+Join_Features_to_ActiveHighAirEmissions_Active_High_Emission_Facilities,Join_Features_to_ActiveHighAirEmissions_Active_High_Emission_Facilities,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_ActiveHighAirEmissions_Active_High_Emission_Facilities/FeatureServer,Analysis Result|Join Features
+NIIF_Neighborhoods,NIIF_Neighborhoods,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NIIF_Neighborhoods/FeatureServer,baltimore|   niif|   neighborhood
+Maryland_High_EF,Maryland_High_EF,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Maryland_High_EF/FeatureServer,Analysis Result|Join Features
+Community Statistical Areas (2010) to Community Statistical Areas (2020),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CSA2010_to_CSA2020/FeatureServer,crosswalk|2010|2020
+Baltimore City Digital Equity Index - 2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Digital_Equity_Index_2022/FeatureServer,
+OwnerOccbyTract,OwnerOccbyTract,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/OwnerOccbyTract/FeatureServer,baltimore
+RebUILD_Metro_ActiveVBN,RebUILD_Metro_ActiveVBN,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RebUILD_Metro_ActiveVBN/FeatureServer,vbn
+Accessbility Correlations - Travel Time,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessbility_Correlations_-_Travel_Time/FeatureServer,correlations
+Community_Assets_Gensler,Community_Assets_Gensler,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Assets_Gensler/FeatureServer,community assets| baltimore
+Community_Statistical_Areas__CSAs___Reference_Boundaries,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Community_Statistical_Areas__CSAs___Reference_Boundaries/FeatureServer,boundries
+NIIF_PriorityNeighborhood,NIIF_PriorityNeighborhood,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NIIF_PriorityNeighborhood/FeatureServer,niif|  baltimore|  neighborhoods
+Race 2020 to Elementary School Zones,Join_Features_to_Catchment_Zones,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_Catchment_Zones/FeatureServer,Analysis Result|Join Features
+Metro_Housing_Data,Metro_Housing_Data,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Metro_Housing_Data/FeatureServer,Analysis Result|Join Features
+Connectivity Correlations - Households without Internet,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Connectivity_Correlations_-_Households_without_Internet/FeatureServer,correlations
+Geoloom_Data_Dictionary,Geoloom_Data_Dictionary,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Geoloom_Data_Dictionary/FeatureServer,geoloom
+Digital_Equity_Index_by_Zipcode,Digital_Equity_Index_by_Zipcode,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Digital_Equity_Index_by_Zipcode/FeatureServer,Analysis Result|Join Features
+Accessbility Correlations - Walks to Work,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessbility_Correlations_-_Walks_to_Work/FeatureServer,correlations
+Accessbility Correlations - No Vehicles,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessbility_Correlations_-_No_Vehicles/FeatureServer,correlations
+5yearACS_Vacancy,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/5_year_BaltCity_Vacancy/FeatureServer,BaltimoreCity|BNIA|Vacancy|5-year ACS
+Accessbility Correlations - Work Outside City,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessbility_Correlations_-_Work_Outside_City/FeatureServer,correlations
+Join_Features_to_Maryland_Physical_Boundaries___County_Boundaries_(Generalized),Join_Features_to_Maryland_Physical_Boundaries___County_Boundaries_(Generalized),https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_Maryland_Physical_Boundaries___County_Boundaries_(Generalized)/FeatureServer,Analysis Result|Join Features
+CrimeQ22020,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CrimeQ22020/FeatureServer,crime|covid
+CrimeQ12020,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CrimeQ12020/FeatureServer,crime|covid
+Accessbility Correlations - Drove Alone,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessbility_Correlations_-_Drove_Alone/FeatureServer,correlations
+EP_LocationBuffers,EP_LocationBuffers,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/EP_LocationBuffers/FeatureServer,buffers| baltimore
+Accessbility Correlations - Public Transit,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessbility_Correlations_-_Public_Transit/FeatureServer,correlations
+Connectivity Correlations - Voter Participation,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Connectivity_Correlations_-_Voter_Participation/FeatureServer,correlations
+PSO Self Sufficiency,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Self_Sufficiency/FeatureServer,pso
+PSO TANF,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_TANF/FeatureServer,pso
+PSO SSI,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_SSI/FeatureServer,pso
+Onsite Offsite Constructions,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Onsite_Offsite_Constructions/FeatureServer,pso
+PSO Violent and Property Crimes,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Violent_and_Property_Crimes/FeatureServer,pso
+PSO Vacancy,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Vacancy/FeatureServer,pso
+Census Tract (2020) to Community Statistical Areas (2010),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tract (2020) to CSA (2010) Crosswalk/FeatureServer,  baltimore|crosswalk|tract to csa|mapping|2020|2010
+PSO Relocations,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Relocations/FeatureServer,pso
+PSO Days Receiving Assistance,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Days_Receiving_Assistance/FeatureServer,pso
+AverageSalary,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/AverageSalary/FeatureServer,pso
+PSO Current Households,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Current_Households/FeatureServer,pso
+PSO Expenditures,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Expenditures/FeatureServer,pso
+Unemployed,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Unemployed/FeatureServer,pso
+VS18Intro_OwnOccCSA,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/VS18Intro_OwnOccCSA/FeatureServer,housing
+Jobs Created and Hires,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Jobs_Created_and_Hires/FeatureServer,pso
+Census Blocks (2010) and Neighborhood Statistical Areas (2010),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Census_Blocks_(2010)_and_Neighborhood_Statistical_Areas_(2010)/FeatureServer,crosswalk|census blocks|neighborhoods|baltimore|2010
+Baltimore City Net International Migration,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_Net_International_Migration/FeatureServer,demographics
+Baltimore City Total Jobs 2010 to 2018,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_Total_Jobs_2010_to_2017/FeatureServer,jobs
+VS18Intro_AffordCSAs,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/VS18Intro_AffordCSAs/FeatureServer,housing
+HomesteadTaxChartData18,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/HomesteadTaxChartData18/FeatureServer,homestead tax
+Baltimore City Birth and Death Rates 2011-2020,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_Birth_and_Death_Rates_2011-2020/FeatureServer,quality of life
+Join_Features_to_Voucher_Use_and_Rental_Unaffordability___copy,Join_Features_to_Voucher_Use_and_Rental_Unaffordability___copy,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Join_Features_to_Voucher_Use_and_Rental_Unaffordability___copy/FeatureServer,Analysis Result|Join Features
+ARP Table,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARP Table/FeatureServer,census
+ARPA BDC Payments,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA_BDC_Payments/FeatureServer,ARPA
+211 Calls for Assistance,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/211_Calls_Aug11/FeatureServer,211
+Counties_2010_Maryland,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Counties_2010_Maryland/FeatureServer,002
+community responses 6_21 (1),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/community_responses_6_21_(1)/FeatureServer,
+top 5 income,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/top_5_income/FeatureServer,census|2019
+Vital Signs 18 Crime and Safety Dashboard Data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vital_Signs_18_Crime_and_Safety_Dashboard_Data/FeatureServer,crime
+Percent of Residents 65 Years and Older,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Percent_of_Residents_65_Years_and_Older/FeatureServer,age
+Narcotics 2019-2020,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NarcoticsV1/FeatureServer,narcotics
+Larceny_Quarterly,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Larceny_Quarterly/FeatureServer,crime|covid
+311 Customer Service Requests,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/311Dash/FeatureServer,311|covid
+Burglary_Quarterly,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Burglary_Quarterly/FeatureServer,crime|covid
+Percent of Residents Aged 18 to 24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Percent_of_Residents_Aged_18_to_24/FeatureServer,age
+Unemp_BCity_2010_2019,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Unemp_BCity_2010_2019/FeatureServer,workforce
+AggAssault_Quarterly,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/AggAssault_Quarterly/FeatureServer,crime|covid
+Rape_Quarterly,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Rape_Quarterly/FeatureServer,crime|covid
+Robbery_Quarterly,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Robbery_Quarterly/FeatureServer,crime|covid
+AutoThefts_Quarterly,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/AutoThefts_Quarterly/FeatureServer,crime|covid
+VS18Intro_VouchersCSAs,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/VS18Intro_VouchersCSAs/FeatureServer,housing
+911CFS_CovidDash,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/911CFS_CovidDash/FeatureServer,covid
+PSO Total Population Residents,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Total_Population_Residents/FeatureServer,pso
+PSO Demolitions,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Demolitions/FeatureServer,pso
+PSO Involuntary Termination,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Involuntary_Termination/FeatureServer,pso
+Murder_Quarterly,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Murder_Quarterly/FeatureServer,crime|covid
+PSO New Build New Bus,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_New_Build_New_Bus/FeatureServer,pso
+PSO Median Household Income,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Median_Household_Income/FeatureServer,pso
+Quarterly_Homicide,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Quarterly_Homicide/FeatureServer,covid
+PSO Number Poverty,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Number_Poverty/FeatureServer,pso
+PSO Number of Crimes,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Number_of_Crimes/FeatureServer,pso
+Race and Ethnicity Layer,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CashSalesAnalysis/FeatureServer,home sales|baltimore
+Violent Crime Data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Violent_Crime_Data/FeatureServer,crime
+Introduction Types of Data Table,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Introduction_Types_of_Data_Table/FeatureServer,change
+JobsCreated,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/JobsCreated/FeatureServer,pso
+PSO Case Management,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Case_Management/FeatureServer,pso
+Section 3 Hires,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Section_3_Hires/FeatureServer,pso
+PSO Original Households,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Original_Households/FeatureServer,pso
+Map Test 123_WFL1,Map_Test_123_WFL1,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Map_Test_123_WFL1/FeatureServer,test
+"Part 1 Crime Rate per 1,000 Residents (Depreciated - Not Updated past 2022)",Crime,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Crime/FeatureServer,crime| public safety
+BCF_Impact_Investments_Oct19,BCF_Impact_Investments_Oct19,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCF_Impact_Investments_Oct19/FeatureServer,test| baltimore
+Labor Force Participation 2023 & 2024,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor Force Participation 2023/FeatureServer,
+Survey responses,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Survey_responses/FeatureServer,
+ARPA Affordability Rent 2024,ARPA Affordability Rent 2024,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA Affordability Rent 2024/FeatureServer,
+BGCMB Community Assets,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BGCMB_Community_Assets/FeatureServer,
+"Change in Percent Using Public Transportation, 2019-2024",TransitWrk,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/TransitWrk/FeatureServer,
+WNADA Residential Vacancy 2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_Residential_Vacancy_2/FeatureServer,
+new_gross_rent23,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/new_gross_rent23/FeatureServer,
+Violent Crime CSA Comparison VS24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Violent_Crime_CSA_Comparison_VS24/FeatureServer,
+Accessibility Chart Data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Accessibility_Chart_Data/FeatureServer,
+WNADA Owner Occupancy 2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_Owner_Occupancy_2/FeatureServer,
+Walking_BGCMB,Walking_BGCMB,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Walking_BGCMB/FeatureServer,
+PSO crime rates,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_crime_rates/FeatureServer,
+ARPA Investments (Feb. 2026),ARPA_Investments_Feb26,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA_Investments_Feb26/FeatureServer,
+PSO Sales,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Sales/FeatureServer,
+Neighborhoodprograms,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neighborhoodprograms/FeatureServer,
+WNADA New Businesses,WNADA New Businesses,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA New Businesses/FeatureServer,
+2022smallbus,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/2022smallbus/FeatureServer,
+WNADA Library Card Membership,WNADA Library Card Membership,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Library Card Membership/FeatureServer,
+AllQCT,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/AllQCT/FeatureServer,
+Small Business Investments by CSA,Small Business Investments by CSA,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Small Business Investments by CSA/FeatureServer,
+Baltimore City Clinic Locations Jun 2025,Baltimore City Clinic Locations Jun 2025,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore City Clinic Locations Jun 2025/FeatureServer,
+arpa housing 23,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/arpa_housing_23/FeatureServer,
+FoodDistNeighborhoodpoints,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/FoodDistNeighborhoodpoints/FeatureServer,
+"Percent of Tested Children (Aged 0-6) with Elevated Blood Lead Levels, 2010-2019",,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Blood_Lead_Data/FeatureServer,
+WNADA Sales Prices,WNADA Sales Prices,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Sales Prices/FeatureServer,
+WNADA Total Number of Jobs,WNADA_TotJobs_v2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_TotJobs_v2/FeatureServer,
+Overdose CFS in Selected CSAs 2018_2024,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Overdose_CFS_in_Selected_CSAs_2018_2024/FeatureServer,
+Baltimore City Unaffordability 2018t2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_Unaffordability_2018t2022/FeatureServer,
+Residential Rehab by Tract (Data),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/TractResrehab/FeatureServer,
+"Block Parties by CSA, 2018 to 2022",CSA Block Party Change,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CSA Block Party Change/FeatureServer,
+Labor Force Participation 2018-2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/2018_to_2022_QCT_labor_indicators/FeatureServer,
+Baltimore Resource Landscape Survey FINAL,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_Resource_Landscape_Survey_FINAL/FeatureServer,
+Food Distribution Site Location by Volume,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Food_Distribution_Site_Location_by_Volume/FeatureServer,
+Meals Distributed 2025 Update,Meals Distributed 2025 Update,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Meals Distributed 2025 Update/FeatureServer,
+rehab22_23_mdprop,rehab22_23_mdprop,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/rehab22_23_mdprop/FeatureServer,
+Community Responses,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Communtiy_Responses/FeatureServer,
+"Households without Internet by Census Tracts, 2018-2022",Households without Internet by Census Tracts 2018 to 2022,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Households without Internet by Census Tracts 2018 to 2022/FeatureServer,
+PSO With at Least a Diploma 2019_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_With_at_Least_a_Diploma_2018_2022/FeatureServer,
+PSO Age 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Age_2022/FeatureServer,
+PSO Broadband Internet Access 2018_2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Broadband_Internet_Access_2018_2022/FeatureServer,
+Vaccination Clinic Locations,Vax Clinics and QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vax Clinics and QCT/FeatureServer,
+VaccineClinicsJune25qct,VaccineClinicsJune25qct,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/VaccineClinicsJune25qct/FeatureServer,
+Labor Force 2018_2022 ARPA Chart Data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor_Force_2018_2022_ARPA_Chart_Data/FeatureServer,
+ARPA-Program Neighborhoods,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NeighborhoodsforARPA/FeatureServer,
+MedianSalesRateChange,MedianSalesRateChange,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MedianSalesRateChange/FeatureServer,
+WNADA Sales Change,WNADA Sales Change,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Sales Change/FeatureServer,
+WNADA Cash Sales,WNADA Cash Sales,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Cash Sales/FeatureServer,
+WNADA Commercial Vacancy,WNADA Commercial Vacancy,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Commercial Vacancy/FeatureServer,
+Oliver Data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Oliver_Data/FeatureServer,
+Rent Affordability in QCT,Rent Affordability in QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Rent Affordability in QCT/FeatureServer,
+"Digital Equity Index by Tract, 2020-2024",DigitalEquity2024,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/DigitalEquity2024/FeatureServer,
+"Change in Rental Affordability Index, 2019-2024",Affordrcsa,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Affordrcsa/FeatureServer,
+WNADA Rehab Permits,WNADA Rehab Permits,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Rehab Permits/FeatureServer,
+No_Mail_2024_Updated Tracts,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/No_Mail_2024_Updated_Tracts/FeatureServer,
+2024 Percent of Residential Properties that are Vacant and Abandoned,2024 Percent of Residential Properties that are Vacant and Abandoned,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/2024 Percent of Residential Properties that are Vacant and Abandoned/FeatureServer,
+"Percent Change in Homeowner Tax Credits, 2019-2024",Owntax24csa,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Owntax24csa/FeatureServer,
+WNADAHousingOcc,WNADAHousingOcc,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADAHousingOcc/FeatureServer,
+City Populations,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/City_Populations/FeatureServer,
+Tobacco Retailers by Community Statistical Area (2024),Tobacco_Retailers_CSA_2024,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tobacco_Retailers_CSA_2024/FeatureServer,
+Labor Force Participation QCT,Labor Force Participation QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor Force Participation QCT/FeatureServer,
+City_tracts_vacancy,BaltimoreCity_tracts_vacancy,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BaltimoreCity_tracts_vacancy/FeatureServer,
+ARPA Afford mortgage23,ARPA Afford mortgage23,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA Afford mortgage23/FeatureServer,
+Housing Unit Types,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Housing_Unit_Types/FeatureServer,
+LFBarChart_v1,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/LFBarChart_v1/FeatureServer,
+VBN_2024QCTcity,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/VBN_2024QCTcity/FeatureServer,
+2018 and 2023 Teen Female Population VS24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/2018_and_2023_Teen_Female_Population_VS24/FeatureServer,
+MOED 23 24 Participants,MOED 23 24 Participants,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MOED 23 24 Participants/FeatureServer,
+Tobacco licenses_list of all businesses 2025_20251008,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tobacco_licenses_list_of_all_businesses_2025_20251008/FeatureServer,
+ARPA housing unafford 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA_housing_unafford_2023/FeatureServer,
+Vacant and Abandoned and QCT,Vacant and Abandoned and QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant and Abandoned and QCT/FeatureServer,
+WNADA Work Outside City,WNADA Work Outside City,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Work Outside City/FeatureServer,
+bdcpaymentdata2024,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/bdcpaymentdata2024/FeatureServer,
+PSO unemployment,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_unemployment/FeatureServer,
+Vax Data April 10 2024,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vax_Data_April_10_2024/FeatureServer,
+No Mail Data for Baltimore and QCTs Line Chart,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/No_Mail_Data_for_Baltimore_and_QCTs_Line_Chart/FeatureServer,
+PSO_Vacants_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Vacants_2023/FeatureServer,
+Name Changed,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Name_Changed/FeatureServer,
+Clinics in QCTs,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Clinics_in_QCTs/FeatureServer,
+Digital Access City versus QCT,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Digital_Access_City_versus_QCT/FeatureServer,
+Walkshed15min_pubwifi,Walkshed15min_pubwifi,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Walkshed15min_pubwifi/FeatureServer,
+Arts Employment VS24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Arts_Employment_VS24/FeatureServer,
+V24 Withdrawalsv2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/V24_Withdrawalsv2/FeatureServer,
+Change in Travel Time to Work (0-14 Minutes),TravChangeJoin,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/TravChangeJoin/FeatureServer,
+survey responses5_4,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/survey_responses5_4/FeatureServer,
+WNADA School Enrollment,WNADA School Enrollment,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA School Enrollment/FeatureServer,
+VHNs by Tract (Data),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PercentVacantTracts/FeatureServer,
+Labor Force Participation 2023,Labor Force Participation 2023,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor Force Participation 2023/FeatureServer,
+Neighborhoods for Explore Geography Map,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Neighborhoods_for_Explore_Geography_Map/FeatureServer,
+WNADA Transit Ridership,WNADA Transit Ridership,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Transit Ridership/FeatureServer,
+COVID Vax Data Thru October 2023,COVID Vax Data Thru October 2023,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/COVID Vax Data Thru October 2023/FeatureServer,
+WNADA Total Businesses,WNADA Total Businesses,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Total Businesses/FeatureServer,
+ATCC 2024 Baltimore City Tobacco Retailers list,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ATCC_2024_Baltimore_City_Tobacco_Retailers_list/FeatureServer,
+WNADA Residential Vacancy,WNADA Residential Vacancy,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Residential Vacancy/FeatureServer,
+Vacant and QCT,Vacant and QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant and QCT/FeatureServer,
+Tobacco Licenses by Community Statistical Area (2025),Tobacco_Licenses_CSA_2025,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tobacco_Licenses_CSA_2025/FeatureServer,
+Arts Emplyoment in Select CSAs 2012 to 2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Arts_Emplyoment_in_Select_CSAs_2012_to_2022/FeatureServer,
+Rehab24update,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Rehab24update/FeatureServer,
+NoMail2024v2,NoMail2024v2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NoMail2024v2/FeatureServer,
+Rebuild Round 2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Rebuild_Round_2/FeatureServer,
+English_Ability_Index,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/a97e92/FeatureServer,
+Vacancy 2018_2023 Line Chart,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacancy_2018_2023_Line_Chart/FeatureServer,
+Baltimore City Vacancy and QCTs,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_Vacancy_and_QCTs/FeatureServer,
+Sales Data,Sales Data,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Sales Data/FeatureServer,
+Small Business Investments per 50 Bus 2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Small_Business_Investments_per_50_Bus_2022/FeatureServer,
+ARPA-Funded Capital Trail Investments,Trails_for_ARPA,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Trails_for_ARPA/FeatureServer,
+CommercialCorridors,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CommercialCorridors/FeatureServer,
+PSO 16 to 19 in School or Working 2018_2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_16_to_19_in_School_or_Working_2018_2022/FeatureServer,
+PSO 45 Minute Commute 2019_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_45_Minute_Commute_2018_2022/FeatureServer,
+MONSE Neighborhood Assets,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MONSE_Neighborhood_Assets/FeatureServer,
+Labor Force 2024 data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor_Force_2024_data/FeatureServer,
+Mayors action plan,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Mayors_action_plan/FeatureServer,
+vacants_pso_q3_2022_shp,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/vacants_pso_q3_2022_shp/FeatureServer,
+full database 711,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/full_database_711/FeatureServer,
+Digital Equity Fund Programs,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Digital_Equity_Fund_Programs/FeatureServer,
+WNADA Owner Occupancy,WNADA Owner Occupancy,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Owner Occupancy/FeatureServer,
+Labor Force Participation 2024 v2,Labor Force Participation 2024,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor Force Participation 2024/FeatureServer,
+MONSE_SURVEY,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MONSE_SURVEY/FeatureServer,
+Race and Ethnicity 2020_2024 VS24v2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Race_and_Ethnicity_2020_2024_VS24v2/FeatureServer,
+WNADA Home Sales 2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_Home_Sales_2/FeatureServer,
+Part 1 Crime Incidents (2022),,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Part_1_Cime_PSO_Q3_2022/FeatureServer,
+Food DIst Sites,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Food_DIst_Sites/FeatureServer,
+NoMail2024ACT,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NoMail2024ACT/FeatureServer,
+Small Business Invest v3,Small Business Invest v3,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Small Business Invest v3/FeatureServer,
+Trav14_24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Trav14_24/FeatureServer,
+Food dist updatev2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Food_dist_updatev2/FeatureServer,
+BDC to Tract by Amount,BDC to Tract by Amount,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BDC to Tract by Amount/FeatureServer,
+BGCMB Locations,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BGCMB_Locations/FeatureServer,
+Dist site update,Dist site update,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Dist site update/FeatureServer,
+Labor Force Participation in QCT,Labor Force Participation in QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor Force Participation in QCT/FeatureServer,
+DOP food dist update 2025,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/DOP_food_dist_update_2025/FeatureServer,
+Rehabilitation Permit Data for Baltimore and QCTs Line Chart,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Rehabilitation_Permit_Data_for_Baltimore_and_QCTs_Line_Chart/FeatureServer,
+Food Distribution Sites QCT,Food Distribution Sites QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Food Distribution Sites QCT/FeatureServer,
+MORP Train Up Participant Counts by Neighborhood Q4 2023 MORP Reporting,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MORP_Train_Up_Participant_Counts_by_Neighborhood_Q4_2023_MORP_Reporting/FeatureServer,
+PSO No Vehicle 2019_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_No_Vehicle_2018_2022/FeatureServer,
+Vacant_and_QCTupdate,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant_and_QCTupdate/FeatureServer,
+Digital Equity Tract 2023,Digital Equity Tract 2023,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Digital Equity Tract 2023/FeatureServer,
+Baltimore City NoStat Data 2018_2023 Tract,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_NoStat_Data_2018_2023_Tract/FeatureServer,
+RentAffordARPA23,RentAffordARPA23,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RentAffordARPA23/FeatureServer,
+"Percent of Residential Properties with Rehab Permits Over 5,000 for ARPA 2023",RehabJoin2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RehabJoin2/FeatureServer,
+Percent Vacant in QCT,Percents Vacant in QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Percents Vacant in QCT/FeatureServer,
+ARPAlabor2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPAlabor2023/FeatureServer,
+CreativeEconVS24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CreativeEconVS24/FeatureServer,
+Baltimore Owner  Address Analysis,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_Owner_Address_Analysis/FeatureServer,
+WNADA_LEHD,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_LEHD/FeatureServer,
+WNADA Sales Change,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_Sales_Change/FeatureServer,
+Vacant and QCT 2023,Vacant and QCT 2023,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacant and QCT 2023/FeatureServer,
+Tobacco_Licences_Council_2025,Tobacco_Licences_Council_2025,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tobacco_Licences_Council_2025/FeatureServer,
+WNADA Commercial Properties,WNADA Commercial Properties,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Commercial Properties/FeatureServer,
+WNADA Sales Rate,WNADA Sales Rate,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Sales Rate/FeatureServer,
+"MOED Program Participants, 2023-2025",MOED_2025,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MOED_2025/FeatureServer,
+WNADA Neighborhoods,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADANeighborhoods/FeatureServer,
+ARPA_CIP_FY14to23,ARPA_CIP_FY14to23,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA_CIP_FY14to23/FeatureServer,
+WNADA Sales Price,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_Sales_Price/FeatureServer,
+WNADABusData2,WNADABusData2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADABusData2/FeatureServer,
+ARPA Rent Afford 23,ARPA Rent Afford 23,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA Rent Afford 23/FeatureServer,
+AARPA_affordability_24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/AARPA_affordability_24/FeatureServer,
+ARPA labor stats 2023v2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/ARPA_labor_stats_2023v2/FeatureServer,
+MOED 2324,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MOED_2324/FeatureServer,
+Small Business Invest v2,Small Business Invest v2,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Small Business Invest v2/FeatureServer,
+Labor Force by Tract,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Labor_Force_by_Tract/FeatureServer,
+All combined MONSE Records 6-15,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/All_combined_MONSE_Records_5_30_23/FeatureServer,
+Change in ForeignBorn Populations by Census Tract,Change in ForeignBorn Populations by Census Tract,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Change in ForeignBorn Populations by Census Tract/FeatureServer,
+All MONSE Final,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/All_MONSE_Final/FeatureServer,
+Distnace_to_nwts,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/a4e940/FeatureServer,
+PSO Public Transit 2019_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Public_Transit_2018_2022/FeatureServer,
+RemingtonCleanup,RemingtonCleanup,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/RemingtonCleanup/FeatureServer,
+Food distrtribution 2024v2,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Food_distrtribution_2024v2/FeatureServer,
+PSO Finances 2025 Update,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Finances_2025_Update/FeatureServer,
+911 CFS in Baltimore 2018 to 2022,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/911_CFS_in_Baltimore_2018_to_2022/FeatureServer,
+PSO jobs,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_jobs/FeatureServer,
+WiFi Locations,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WiFi_Locations/FeatureServer,
+PSO Race and Ethnicity 2020,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Race_and_Ethnicity_2020/FeatureServer,
+Left Unchanged,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Left_Unchanged/FeatureServer,
+Elementary Absenteeism 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Elementary_Absenteeism_2023/FeatureServer,
+"Mayor's Office of Employment Development Program Participants by Neighborhood, 2023",MOED Neigh 2023,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/MOED Neigh 2023/FeatureServer,
+digital equity index,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/digital_equity_index/FeatureServer,
+BCIT WiFi Locations 2024 Update,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCIT_WiFi_Locations_2024_Update/FeatureServer,
+BHCD 2025 food dist update,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BHCD_2025_food_dist_update/FeatureServer,
+vbntract2024,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/vbntract2024/FeatureServer,
+assault graph data,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/assault_graph_data/FeatureServer,
+BGCMB Tract Data,BGCMB Tract Data,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BGCMB Tract Data/FeatureServer,
+2024 Residential Rehabilitation,2024 Residential Rehabilitation,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/2024 Residential Rehabilitation/FeatureServer,
+PSO Walks to Work 2019_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/PSO_Walks_to_Work_2018_2022/FeatureServer,
+Baltimore Digital Equity Index by Tract,Baltimore Digital Equity Index by Tract,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore Digital Equity Index by Tract/FeatureServer,
+WNADAJobsTotal,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADAJobsTotal/FeatureServer,
+Baltimore County Working BGCMB,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_County_Working_BGCMB/FeatureServer,
+All combined MONSE Records 5_30_23,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/All_combined_MONSE_Records_5_30_23/FeatureServer,
+WNADACommunityData,WNADACommunityData,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADACommunityData/FeatureServer,
+EvictionsJanAug23,EvictionsJanAug23,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/EvictionsJanAug23/FeatureServer,
+WNADA Cash Sales,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA_Cash_Sales/FeatureServer,
+Baltimore City NILF VS24,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_City_NILF_VS24/FeatureServer,
+WNADA Sales Price,WNADA Sales Price,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/WNADA Sales Price/FeatureServer,
+Digital Equity Index 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Digital_Equity_Index_2023/FeatureServer,
+rehabtract2024,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/rehabtract2024/FeatureServer,
+Arts_Emplyoment_in_Select_CSAs__2013_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Arts_Emplyoment_in_Select_CSAs__2013_2023/FeatureServer,
+2023 tract digital equity index,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/2023_tract_digital_equity_index/FeatureServer,
+rehab 12_22,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/rehab_12_22/FeatureServer,
+Plans,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Plans/FeatureServer,
+Part 1 Crime Comparison 2022_2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Part_1_Crime_Comparison_2022_2023/FeatureServer,
+Untitled survey_form,survey123_524c0390378646c99e48194aff542013_form,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/survey123_524c0390378646c99e48194aff542013_form/FeatureServer,
+BCHD Vaccine Clinic Dates and Addresses Nov_ 2021_June 2025,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCHD_Vaccine_Clinic_Dates_and_Addresses_Nov__2021_June_2025/FeatureServer,
+Percent of Residential Properties Not Receiving Mail,NoStat_2018t2023_Tract,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/NoStat_2018t2023_Tract/FeatureServer,
+monse,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/monse/FeatureServer,
+Rehab Permits City QCT 2018 to 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Rehab_Permits_City_QCT_2018_to_2023/FeatureServer,
+Baltimore Resource Landscape Survey Responses,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Baltimore_Resource_Landscape_Survey_Responses/FeatureServer,
+BCHD Vaccine Clinic Dates and Addresses Nov 2021_June 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCHD_Vaccine_Clinic_Dates_and_Addresses_Nov_2021_June_2023/FeatureServer,
+BCHD Vaccine Clinic Dates and Addresses Nov_ 2021_March 2024,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/BCHD_Vaccine_Clinic_Dates_and_Addresses_Nov__2021_March_2024/FeatureServer,
+Vacancy  Data for Line Chart,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Vacancy_Data_for_Line_Chart/FeatureServer,
+Tobacco_Retailers_Council_2024,Tobacco_Retailers_Council_2024,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Tobacco_Retailers_Council_2024/FeatureServer,
+Rehab and QCT,Rehab and QCT,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Rehab and QCT/FeatureServer,
+CIP_FY23,CIP_FY23,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/CIP_FY23/FeatureServer,
+Homes without Internet 2018 to 2023,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Homes_without_Internet_2018_to_2023/FeatureServer,
+Nohhint_Tract,,https://services1.arcgis.com/mVFRs7NF4iFitgbY/arcgis/rest/services/Nohhint_Tract/FeatureServer,

@@ -30,11 +30,64 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .mtabs{display:flex;gap:4px;flex-wrap:wrap}
 .mtab{padding:5px 9px;font-size:11px;border-radius:999px;cursor:pointer;border:0.5px solid var(--br);background:var(--bg);color:var(--t2);transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1);white-space:nowrap}
 .mtab:hover{background:var(--bg2)}.mtab.active{background:var(--brand);color:var(--neutral-inverse);border-color:var(--brand)}
+.metric-info-btn{width:26px;height:26px;padding:0;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:600}
 .ltoggs{display:flex;gap:5px;align-items:center;flex-wrap:wrap}
 .ltog{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t2);cursor:pointer;padding:3px 6px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg2);transition:background-color .12s cubic-bezier(0.16,1,0.3,1),color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1)}
 .ltog.on{border-color:var(--brand2);color:var(--brand)}
 .ltog.share-launch{border-color:var(--brand2);color:var(--brand)}
 .ldot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.live311-src{font-size:9px;color:var(--t3);line-height:1.25;max-width:220px}
+.live311-panel{border-bottom:0.5px solid var(--br);gap:7px}
+.live311-row{display:flex;gap:6px;align-items:center}
+.live311-muted,.live311-caption{font-size:10px;color:var(--t3);line-height:1.35}
+.live311-follow,.live311-candidate{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--br)}
+.live311-link{border:0;background:transparent;color:var(--brand);font-size:11px;font-weight:500;cursor:pointer;padding:0}
+.live311-chip{display:inline-flex;padding:2px 6px;border-radius:999px;font-size:9px;font-weight:500;background:var(--bg2);color:var(--t2);border:0.5px solid var(--br)}
+.live311-chip.open{background:var(--warn-lt);color:var(--warn)}
+.live311-chip.closed{background:var(--success-lt);color:var(--success)}
+.live311-chip.caveat{background:var(--bg3);color:var(--t3)}
+.live311-change{font-size:10px;color:var(--warn);line-height:1.35}
+.live311-dot{width:12px;height:12px;border-radius:50%;border:2px solid;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.live311-pop{font-size:11px;line-height:1.4;min-width:210px}
+.live311-pop-title{font-weight:600;font-size:12px}.live311-pop-sr{font-family:var(--font-mono);font-size:10px;color:var(--t3);margin-bottom:4px}
+.live311-pop dl{display:grid;grid-template-columns:54px 1fr;gap:2px 6px;margin:6px 0}.live311-pop dt{color:var(--t3)}.live311-pop dd{color:var(--tx)}
+.live311-actions{display:flex;gap:6px;margin-top:8px}.live311-actions button{flex:1;padding:5px 8px;border-radius:5px;border:0.5px solid var(--br);background:var(--bg2);cursor:pointer;font-size:10px}
+.live311-modal{position:fixed;inset:0;z-index:2200;display:none;align-items:center;justify-content:center;background:rgba(15,23,42,.52);padding:10px}
+.live311-modal.open{display:flex}
+.live311-box{width:380px;max-width:94vw;max-height:86vh;overflow:auto;background:#fff;color:#0f172a;border:1px solid #cbd5e1;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 44px rgba(15,23,42,.28)}
+.live311-box .sbtitle,.live311-box .rfl{color:#0f172a}
+.live311-box .sbsub,.live311-box .live311-muted{color:#475569}
+.live311-box .rfs,.live311-box .rft{background:#fff;color:#0f172a;border-color:#cbd5e1}
+.live311-box .sb-btn:not(.primary),.live311-box .ss-btn{background:#f8fafc;color:#0f172a;border-color:#cbd5e1}
+.live311-pin-guide{position:absolute;top:24px;left:24px;z-index:1300;display:none;width:min(360px,calc(100% - 48px));padding:14px;border:1px solid #1d4ed8;border-radius:8px;background:#fff;color:#0f172a;box-shadow:0 14px 34px rgba(15,23,42,.28);flex-direction:column;gap:9px}
+.live311-pin-guide.open{display:flex}
+.live311-pin-guide-head{font-size:13px;font-weight:600;color:#0f172a}
+.live311-pin-guide-copy{font-size:11px;line-height:1.4;color:#475569}
+.live311-pin-guide-steps{font-size:11px;line-height:1.45;color:#0f172a;padding:7px 8px;border-radius:6px;background:#eff6ff;border:1px solid #bfdbfe}
+.live311-pin-guide .sb-btn:not(.primary){background:#f8fafc;color:#0f172a;border-color:#cbd5e1}
+.live311-pin-guide .sb-btn[disabled]{opacity:.45;cursor:not-allowed}
+.live311-address-wrap{position:relative;flex:1;min-width:0}
+.live311-address-wrap .rfs{width:100%}
+.live311-suggestions{position:absolute;z-index:5;top:calc(100% + 4px);left:0;right:0;display:flex;flex-direction:column;background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 12px 28px rgba(15,23,42,.18);overflow:hidden}
+.live311-suggestions:empty{display:none}
+.live311-suggestions button{border:0;background:#fff;color:#0f172a;text-align:left;padding:8px 10px;font-size:11px;line-height:1.25;cursor:pointer}
+.live311-suggestions button:hover,.live311-suggestions button:focus{background:#eff6ff;outline:0}
+#map-wrap.live311-pinning{outline:2px solid var(--brand);outline-offset:-2px}
+#map-wrap.live311-pinning #balt-map{cursor:crosshair}
+#map-wrap.live311-pinning #leg{display:none}
+#map-wrap.live311-pinning .leaflet-map-pane>.leaflet-pane:not(.leaflet-tile-pane):not(.leaflet-live311-report-pane){display:none!important}
+#map-wrap.live311-pinning .leaflet-live311-report-pane{display:block!important;z-index:760!important}
+.live311-pin-summary{font-size:10px;color:#475569;line-height:1.35;padding:7px 8px;border:1px solid #cbd5e1;border-radius:6px;background:#f8fafc}
+.live311-pin-summary.set{color:var(--success);border-color:color-mix(in oklab,var(--success) 35%,var(--br));background:var(--success-lt)}
+.live311-report-pin{width:18px;height:18px;border-radius:50% 50% 50% 0;background:var(--accent);border:2px solid var(--bg);box-shadow:0 2px 8px rgba(0,0,0,.3);transform:rotate(-45deg)}
+.live311-report-pin::after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:var(--bg);left:4px;top:4px}
+.metric-info-body{display:flex;flex-direction:column;gap:8px}
+.metric-info-row{display:grid;grid-template-columns:72px 1fr;gap:8px;font-size:11px;line-height:1.45}
+.metric-info-key{color:var(--t3);font-size:10px}.metric-info-value{color:var(--tx)}
+.metric-info-chips{display:flex;gap:5px;flex-wrap:wrap}
+#live311-packet{white-space:pre-wrap;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;padding:8px 10px;font-size:11px;color:#0f172a;line-height:1.45}
+.live311-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+@media (max-width:720px){.live311-box{width:calc(100vw - 20px);max-height:92vh}.live311-grid{grid-template-columns:1fr}.live311-src{max-width:100%}}
 #time-bar{flex-shrink:0;border-bottom:0.5px solid var(--br);padding:9px 16px;display:flex;align-items:center;gap:12px;background:linear-gradient(180deg,var(--bg2),color-mix(in oklab,var(--bg2) 65%,var(--brand-lt)))}
 .time-meta{display:flex;flex-direction:column;gap:2px;min-width:122px;flex-shrink:0}
 .time-kicker{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)}
@@ -53,6 +106,15 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 #leg{position:absolute;bottom:24px;left:24px;background:color-mix(in oklab,var(--bg) 92%,var(--brand-lt));border:0.5px solid var(--br);border-radius:10px;padding:9px 10px;font-size:10px;z-index:999;min-width:132px}
 #leg-title{font-weight:500;font-size:10px;margin-bottom:3px;color:var(--t2)}
 .lr{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ls{width:10px;height:6px;border-radius:2px;flex-shrink:0}
+.holc-leg{margin-top:7px;padding-top:6px;border-top:0.5px solid var(--br);display:none;flex-direction:column;gap:3px}
+.holc-title{font-size:10px;font-weight:500;color:var(--t2)}
+.holc-src{font-size:9px;color:var(--t3);line-height:1.3}
+.holc-copy{font-size:9px;color:var(--t2);line-height:1.35;max-width:260px}
+.holc-controls{display:flex;flex-direction:column;gap:4px;margin-top:3px}
+.holc-mode,.holc-grade{display:flex;align-items:center;gap:5px;border:0.5px solid var(--br);border-radius:6px;background:var(--bg);color:var(--t2);font-size:9px;padding:4px 6px;text-align:left;cursor:pointer}
+.holc-mode.on,.holc-grade.on{background:var(--brand-lt);border-color:color-mix(in oklab,var(--brand) 25%,var(--br));color:var(--tx)}
+.holc-grade .ls{width:12px;height:8px}
+.holc-more{font-size:9px;color:var(--brand);text-decoration:none}
 #side{width:372px;flex-shrink:0;border-left:0.5px solid var(--br);overflow:hidden;display:flex;flex-direction:column;background:var(--bg)}
 #compare-bar{display:flex;align-items:stretch;border-bottom:0.5px solid var(--br);flex-shrink:0;min-height:64px;padding:8px;background:var(--bg2);gap:8px}
 .pin-slot{flex:1;display:flex;align-items:center;padding:10px 10px 8px;gap:6px;position:relative;transition:background-color .12s cubic-bezier(0.16,1,0.3,1),border-color .12s cubic-bezier(0.16,1,0.3,1);background:var(--bg);border:0.5px solid var(--br);border-radius:12px}
@@ -113,6 +175,46 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .accuracy-chip.proxy{background:var(--warn-lt);color:var(--warn);border-color:color-mix(in oklab,var(--warn) 24%,var(--bg))}
 .accuracy-chip.scaffold{background:var(--accent-lt);color:var(--danger);border-color:color-mix(in oklab,var(--accent) 28%,var(--bg))}
 .accuracy-copy{font-size:9px;color:var(--t2);line-height:1.45}
+.city-overview{display:flex;flex-direction:column;gap:11px;width:100%;text-align:left}
+.city-hero{display:flex;flex-direction:column;gap:7px;padding-bottom:8px;border-bottom:0.5px solid var(--br)}
+.city-eyebrow{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.city-title{font-size:16px;font-weight:600;color:var(--tx)}
+.city-copy{font-size:11px;color:var(--t2);line-height:1.45}
+.city-profile{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.city-profile-item{border:0.5px solid var(--br);border-radius:7px;background:var(--bg2);padding:7px 8px;min-width:0}
+.city-profile-label{font-size:9px;color:var(--t3);line-height:1.3}
+.city-profile-value{font-size:12px;font-weight:600;color:var(--tx);line-height:1.3}
+.city-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.city-card{border:0.5px solid var(--br);border-radius:7px;background:var(--bg2);padding:8px 9px;display:flex;flex-direction:column;gap:3px;min-width:0;text-align:left;color:inherit}
+button.city-card{cursor:pointer}
+button.city-card:hover{background:var(--bg3)}
+.city-card-label{font-size:9px;color:var(--t3);line-height:1.35}
+.city-card-value{font-size:17px;font-weight:600;color:var(--tx)}
+.city-card-note{font-size:9px;color:var(--t2);line-height:1.35}
+.city-section-title{font-size:10px;font-weight:500;color:var(--t2);padding-bottom:3px;border-bottom:0.5px solid var(--br)}
+.city-group{border:0.5px solid var(--br);border-radius:7px;background:var(--bg2);padding:8px;display:flex;flex-direction:column;gap:6px}
+.city-group-top{display:flex;align-items:center;justify-content:space-between;gap:7px}
+.city-group-title{font-size:10px;font-weight:600;color:var(--tx)}
+.city-group-count{font-size:9px;color:var(--t3);white-space:nowrap}
+.city-chip-row{display:flex;flex-wrap:wrap;gap:4px}
+.city-chip{border:0.5px solid var(--br);border-radius:999px;background:var(--bg);color:var(--t2);font-size:9px;padding:3px 7px;cursor:pointer}
+.city-chip:hover{background:var(--bg3);color:var(--tx)}
+.city-rank{display:flex;justify-content:space-between;gap:7px;padding:5px 0;border-bottom:0.5px solid var(--br);font-size:10px;align-items:center}
+.city-rank-name{color:var(--t2);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.city-rank-value{font-weight:500;color:var(--tx);white-space:nowrap}
+.city-actions{display:flex;gap:6px;flex-wrap:wrap}
+.city-next-grid{display:grid;grid-template-columns:1fr;gap:6px}
+.city-next-card{border:0.5px solid var(--br);border-radius:7px;background:var(--bg);padding:7px 8px;display:flex;flex-direction:column;gap:5px}
+.city-next-head{display:flex;align-items:flex-start;justify-content:space-between;gap:7px}
+.city-next-title{font-size:10px;font-weight:600;color:var(--tx);line-height:1.3}
+.city-next-status{display:inline-flex;align-items:center;white-space:nowrap;border-radius:999px;padding:2px 6px;font-size:8px;font-weight:600;border:0.5px solid var(--br);color:var(--t2);background:var(--bg2)}
+.city-next-status.ready{background:var(--success-lt);color:var(--success);border-color:color-mix(in oklab,var(--success) 28%,var(--bg))}
+.city-next-status.live{background:var(--warn-lt);color:var(--warn);border-color:color-mix(in oklab,var(--warn) 24%,var(--bg))}
+.city-next-status.gated{background:var(--brand-lt);color:var(--brand);border-color:color-mix(in oklab,var(--brand2) 24%,var(--bg))}
+.city-next-status.pending{background:var(--bg3);color:var(--t3)}
+.city-next-detail{font-size:9px;color:var(--t2);line-height:1.4}
+.city-next-action{align-self:flex-start;padding:3px 8px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg2);color:var(--t2);font-size:9px;cursor:pointer}
+.city-next-action:hover{background:var(--bg3);color:var(--tx)}
 .gap-grid{display:grid;grid-template-columns:1fr;gap:6px}
 .gap-card{display:flex;flex-direction:column;gap:7px;padding:10px 11px;border-radius:10px;background:var(--bg2);border:0.5px solid var(--br)}
 .gap-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
@@ -260,6 +362,29 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .desk-answer{display:flex;flex-direction:column;gap:7px;padding:10px 11px;border-radius:9px;background:var(--bg2);border:0.5px solid var(--br)}
 .desk-answer-title{font-size:11px;font-weight:500}
 .desk-answer-copy{font-size:10px;color:var(--t2);line-height:1.5}
+.chat-shell{position:fixed;right:12px;bottom:12px;width:min(380px,calc(100vw - 24px));z-index:1680;display:none}
+.chat-shell.open{display:flex}
+.chat-panel{width:100%;border-radius:14px;border:0.5px solid var(--br);background:var(--bg);display:flex;flex-direction:column;gap:9px;padding:14px;max-height:min(72vh,560px);box-shadow:0 10px 30px rgba(15,23,42,.12)}
+.chat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.chat-title{font-size:13px;font-weight:500}
+.chat-log{display:flex;flex-direction:column;gap:7px;overflow:auto;min-height:120px;padding-right:2px}
+.chat-msg{display:flex;flex-direction:column;gap:5px;padding:9px 10px;border-radius:10px;border:0.5px solid var(--br);background:var(--bg2)}
+.chat-msg.user{background:var(--brand-lt);border-color:color-mix(in oklab,var(--brand) 20%,var(--bg))}
+.chat-msg.assistant{background:var(--bg);border-color:var(--br)}
+.chat-role{font-size:9px;font-weight:500;color:var(--t3);text-transform:uppercase;letter-spacing:.04em}
+.chat-copy{font-size:10px;color:var(--t2);line-height:1.55;white-space:pre-wrap}
+.chat-cites{display:flex;gap:5px;flex-wrap:wrap}
+.chat-cite{display:inline-flex;padding:3px 7px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg2);font-size:9px;color:var(--t2)}
+.chat-starters{display:flex;gap:6px;flex-wrap:wrap}
+.chat-chip{padding:4px 9px;border-radius:999px;border:0.5px solid var(--br);background:var(--bg2);color:var(--t2);font-size:9px;cursor:pointer}
+.chat-form{display:flex;flex-direction:column;gap:6px}
+.chat-input{width:100%;padding:7px 9px;border-radius:8px;border:0.5px solid var(--br);background:var(--bg2);color:var(--tx);font-size:11px;resize:vertical;min-height:58px}
+.chat-actions{display:flex;gap:6px;align-items:center}
+.chat-btn{padding:5px 10px;border-radius:999px;border:0.5px solid var(--br);background:var(--brand);color:var(--neutral-inverse);font-size:9px;cursor:pointer}
+.chat-btn.secondary{background:var(--bg2);color:var(--t2);border-color:var(--br)}
+.chat-btn:disabled,.chat-chip:disabled{opacity:.58;cursor:not-allowed}
+.chat-disclaimer{font-size:9px;color:var(--t3);line-height:1.4}
+@media (max-width:720px){.chat-shell{left:10px;right:10px;bottom:10px;width:auto}.chat-panel{max-height:78vh}}
 .desk-list{display:flex;flex-direction:column;gap:6px}
 .desk-item{display:flex;flex-direction:column;gap:3px;padding:8px 9px;border-radius:8px;background:var(--bg);border:0.5px solid var(--br)}
 .desk-item-title{font-size:10px;font-weight:500}
@@ -330,7 +455,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   .desk-shell{left:8px;right:8px;bottom:8px}
 }
 @media (prefers-reduced-motion: reduce){
-  .skip-link,.mtab,.ltog,#play-btn,.pt,.sb-btn,.chip,.ss-btn,.map-picker,.conf-fill,.rfb,.toast,.level-btn,.context-btn,.pilot-vote,.desk-chip{transition:none!important}
+  .skip-link,.mtab,.ltog,#play-btn,.pt,.sb-btn,.chip,.ss-btn,.map-picker,.conf-fill,.rfb,.toast,.level-btn,.context-btn,.pilot-vote,.desk-chip,.chat-chip,.chat-btn{transition:none!important}
   .spin{animation:none}
 }
 </style>
@@ -356,14 +481,29 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <div class="shell-label">Metric</div>
       <div class="mtabs" id="mtabs">
       <button type="button" class="mtab active" data-m="hi" onclick="setM(this)">Health index</button>
-      <button type="button" class="mtab" data-m="le" onclick="setM(this)">Life exp.</button>
+      <button type="button" class="mtab" data-m="le" onclick="setM(this)">Life expectancy</button>
       <button type="button" class="mtab" data-m="as" onclick="setM(this)">Asthma</button>
-      <button type="button" class="mtab" data-m="la" onclick="setM(this)">Lead</button>
-      <button type="button" class="mtab" data-m="va" onclick="setM(this)">Vacant</button>
+      <button type="button" class="mtab" data-m="la" onclick="setM(this)">Lead exposure</button>
+      <button type="button" class="mtab" data-m="va" onclick="setM(this)">Vacant housing</button>
       <button type="button" class="mtab" data-m="pv" onclick="setM(this)">Poverty</button>
-      <button type="button" class="mtab" data-m="un" onclick="setM(this)">Unemploy.</button>
-      <button type="button" class="mtab" data-m="hs" onclick="setM(this)">HS grad</button>
-      <button type="button" class="mtab" data-m="hz" onclick="setM(this)">311 Hazards</button>
+      <button type="button" class="mtab" data-m="un" onclick="setM(this)">Unemployment</button>
+      <button type="button" class="mtab" data-m="hs" onclick="setM(this)">High school graduation</button>
+      <button type="button" class="mtab" data-m="fd" onclick="setM(this)">Food access</button>
+      <button type="button" class="mtab" data-m="gs" onclick="setM(this)">Green space</button>
+      <button type="button" class="mtab" data-m="cr" onclick="setM(this)">Crime reports</button>
+      <button type="button" class="mtab" data-m="sm" onclick="setM(this)">Smoking</button>
+      <button type="button" class="mtab" data-m="ob" onclick="setM(this)">Obesity</button>
+      <button type="button" class="mtab" data-m="db" onclick="setM(this)">Diabetes</button>
+      <button type="button" class="mtab" data-m="mh" onclick="setM(this)">Poor mental health</button>
+      <button type="button" class="mtab" data-m="pa" onclick="setM(this)">Physical inactivity</button>
+      <button type="button" class="mtab" data-m="bb" onclick="setM(this)">Broadband access</button>
+      <button type="button" class="mtab" data-m="rb" onclick="setM(this)">High rent burden</button>
+      <button type="button" class="mtab" data-m="ui" onclick="setM(this)">No health insurance</button>
+      <button type="button" class="mtab" data-m="gi" onclick="setM(this)">Income inequality</button>
+      <button type="button" class="mtab" data-m="ap" onclick="setM(this)">Air pollution</button>
+      <button type="button" class="mtab" data-m="ha" onclick="setM(this)">Housing cost burden</button>
+      <button type="button" class="mtab" data-m="hz" onclick="setM(this)">Reported 311 hazards</button>
+      <button type="button" class="mtab metric-info-btn" onclick="openMetricInfo()" aria-haspopup="dialog" aria-label="About this metric" title="About this metric">ⓘ</button>
     </div>
     </div>
     <div class="control-shell">
@@ -375,9 +515,19 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <button type="button" class="ltog on" id="lt-r" onclick="togL('r')" aria-pressed="true" aria-label="Toggle community reports layer">
         <span class="ldot" style="background:var(--accent)"></span><span>Reports</span>
       </button>
-      <button type="button" class="ltog" id="lt-3" onclick="togL('3')" aria-pressed="false" aria-label="Toggle 311 request layer">
+      <button type="button" class="ltog" id="lt-3" onclick="togL('3')" aria-pressed="false" aria-label="Toggle live 311 request layer">
         <span class="ldot" style="background:var(--warn)"></span><span>311</span>
       </button>
+      <button type="button" class="ltog" id="lt-holc" onclick="togL('holc')" aria-pressed="false" aria-label="Toggle 1937 HOLC redlining map layer">
+        <span class="ldot" style="background:#d73027"></span><span>Redlining Map</span>
+      </button>
+      <button type="button" class="ltog" id="lt-spend" onclick="toggleSpendingMode()" aria-pressed="false" aria-label="Toggle capital spending map layer">
+        <span class="ldot" style="background:var(--success)"></span><span>Capital spending</span>
+      </button>
+      <button type="button" class="ltog" id="lt-311-report" onclick="Live311.openReport()" aria-label="Create a 311 report packet">
+        <span class="ldot" style="background:var(--success)"></span><span>Report 311</span>
+      </button>
+      <div class="live311-src">Official 311 data: Open Baltimore (ArcGIS). Not an official city app.</div>
       <button type="button" class="ltog" id="lt-gap" onclick="toggleGapMode()" aria-pressed="false" aria-label="Toggle gap severity map mode">
         <span class="ldot" style="background:var(--danger)"></span><span>Gap mode</span>
       </button>
@@ -386,6 +536,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       </button>
       <button type="button" class="ltog share-launch" id="lt-share" onclick="openShare()" aria-haspopup="dialog" aria-label="Open share options">
         <span class="ldot" style="background:var(--brand2)"></span><span>Share</span>
+      </button>
+      <button type="button" class="ltog" id="lt-csv" onclick="downloadCurrentCsv()" aria-label="Download current metric table as CSV">
+        <span class="ldot" style="background:var(--success)"></span><span>CSV</span>
+      </button>
+      <button type="button" class="ltog" id="lt-chat" onclick="toggleChat()" aria-pressed="false" aria-controls="chat-shell" aria-label="Open Ask the data panel">
+        <span class="ldot" style="background:var(--brand2)"></span><span>Ask data</span>
       </button>
       <button type="button" class="ltog desk-launch" id="lt-desk" onclick="toggleDesk()" aria-pressed="false" aria-label="Toggle analysis desk">
         <span class="ldot" style="background:var(--brand)"></span><span>Desk</span>
@@ -410,7 +566,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <div id="map-wrap">
     <div id="ml"><div class="spin"></div><span>Loading boundaries…</span></div>
     <div id="balt-map"></div>
-    <div id="leg"><div id="leg-title">Health index</div><div id="leg-body"></div><div id="leg-meta" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px"></div><div id="leg-source" style="margin-top:3px;font-size:9px;color:var(--t3)">BNIA / BCHD</div></div>
+    <div id="leg"><div id="leg-title">Health index</div><div id="leg-body"></div><div id="leg-meta" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px"></div><div id="leg-source" style="margin-top:3px;font-size:9px;color:var(--t3)">BNIA / BCHD</div><div id="holc-leg" class="holc-leg"></div></div>
   </div>
   <div id="side">
     <div id="compare-bar">
@@ -445,37 +601,9 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <button type="button" class="ss-btn" onclick="closeStrip()" aria-label="Hide inline share bar">✕</button>
     </div>
     <div id="side-body">
-      <div id="no-pin" class="empty-state">
-        <div class="empty-eyebrow">Presentation path</div>
-        <div class="empty-title">Start with one neighborhood, then pin a second for the clearest story.</div>
-        <div class="empty-copy">Use the map to open a neighborhood profile, then pin a second area to compare trends, determinants, gap signals, and resident reports side by side.</div>
-        <div class="empty-step-grid">
-          <div class="empty-step">
-            <span class="empty-step-num">1</span>
-            <div class="empty-step-copy">
-              <div class="empty-step-title">Choose a metric</div>
-              <div class="empty-step-text">Lead, vacancy, life expectancy, or 311 hazards usually tell the story fastest.</div>
-            </div>
-          </div>
-          <div class="empty-step">
-            <span class="empty-step-num">2</span>
-            <div class="empty-step-copy">
-              <div class="empty-step-title">Click one neighborhood</div>
-              <div class="empty-step-text">Show the single-place profile first, then pin a second neighborhood for the strongest comparison.</div>
-            </div>
-          </div>
-          <div class="empty-step">
-            <span class="empty-step-num">3</span>
-            <div class="empty-step-copy">
-              <div class="empty-step-title">Use Gap or Pilot mode</div>
-              <div class="empty-step-text">Gap mode surfaces mismatches between official burden and resident signal. Pilot mode narrows the demo to Carrollton Ridge.</div>
-            </div>
-          </div>
-        </div>
-        <div class="empty-tip">
-          <span class="empty-chip">Best demo flow: metric → map click → compare → gap</span>
-          <span class="empty-chip">Fast alternate: ?pilot=carrollton</span>
-        </div>
+      <div id="live311-panel" class="pane live311-panel"></div>
+      <div id="no-pin" class="pane">
+        <div id="city-overview" class="city-overview"></div>
         <div id="no-pin-admin" class="pane" style="display:none;width:100%;text-align:left;padding:12px 0 0"></div>
       </div>
       <div id="one-pin" style="display:none;flex-direction:column">
@@ -484,6 +612,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button type="button" class="pt" onclick="swTab(this,'tr1')">Trends</button>
           <button type="button" class="pt" onclick="swTab(this,'dt1')">Determinants</button>
           <button type="button" class="pt" onclick="swTab(this,'gap1')">Gap</button>
+          <button type="button" class="pt" onclick="swTab(this,'hz1')">311 hazards</button>
+          <button type="button" class="pt" onclick="swTab(this,'sp1')">Capital</button>
           <button type="button" class="pt" onclick="swTab(this,'rp1')">Reports</button>
           <button type="button" class="pt" onclick="swTab(this,'vl1')">Validate</button>
           <button type="button" class="pt" onclick="swTab(this,'sb1')">Submit</button>
@@ -493,6 +623,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div class="pane" id="t-tr1" style="display:none"></div>
         <div class="pane" id="t-dt1" style="display:none"></div>
         <div class="pane" id="t-gap1" style="display:none"></div>
+        <div class="pane" id="t-hz1" style="display:none"></div>
+        <div class="pane" id="t-sp1" style="display:none"></div>
         <div class="pane" id="t-rp1" style="display:none"></div>
         <div class="pane" id="t-vl1" style="display:none"></div>
         <div class="pane" id="t-sb1" style="display:none"></div>
@@ -504,6 +636,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
           <button type="button" class="pt" onclick="swTab(this,'tra')">Trajectory</button>
           <button type="button" class="pt" onclick="swTab(this,'det')">Determinants</button>
           <button type="button" class="pt" onclick="swTab(this,'gap2')">Gap</button>
+          <button type="button" class="pt" onclick="swTab(this,'hz2')">311 hazards</button>
+          <button type="button" class="pt" onclick="swTab(this,'sp2')">Capital</button>
           <button type="button" class="pt" onclick="swTab(this,'rp2')">Reports</button>
           <button type="button" class="pt" onclick="swTab(this,'vl2')">Validate</button>
           <button type="button" class="pt" onclick="swTab(this,'sb2')">Submit</button>
@@ -513,6 +647,8 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
         <div class="pane" id="t-tra" style="display:none"></div>
         <div class="pane" id="t-det" style="display:none"></div>
         <div class="pane" id="t-gap2" style="display:none"></div>
+        <div class="pane" id="t-hz2" style="display:none"></div>
+        <div class="pane" id="t-sp2" style="display:none"></div>
         <div class="pane" id="t-rp2" style="display:none"></div>
         <div class="pane" id="t-vl2" style="display:none"></div>
         <div class="pane" id="t-sb2" style="display:none"></div>
@@ -521,6 +657,17 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     </div>
   </div>
 </main>
+
+<div id="metric-info-modal" class="live311-modal" role="dialog" aria-modal="true" aria-labelledby="metric-info-title" aria-hidden="true">
+  <div class="live311-box">
+    <div class="sbtitle" id="metric-info-title">About this metric</div>
+    <div id="metric-info-chips" class="metric-info-chips"></div>
+    <div id="metric-info-body" class="metric-info-body"></div>
+    <div class="sb-row">
+      <button type="button" class="sb-btn primary" onclick="closeMetricInfo()">Close</button>
+    </div>
+  </div>
+</div>
 
 <div id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-dialog-title" aria-hidden="true">
   <div id="share-box">
@@ -559,6 +706,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   </div>
 </div>
 
+<div class="chat-shell" id="chat-shell" aria-hidden="true">
+  <div class="chat-panel" id="chat-panel"></div>
+</div>
+
 <div class="desk-shell" id="desk-shell" aria-hidden="true">
   <button type="button" class="desk-toggle" id="desk-toggle" onclick="toggleDesk()" aria-expanded="false" aria-controls="desk-panel">Analysis desk</button>
   <div class="desk-panel" id="desk-panel"></div>
@@ -568,11 +719,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="live311.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script src="supabase/config.js"></script>
 <script>
 const YEARS=[2016,2017,2018,2019,2020,2021,2022,2023];
+const CHAT_WORKER_URL=window.BALTI2_CHAT_WORKER_URL||'https://balti2-chat-assistant.romulloataides.workers.dev';
+const CHAT_STARTERS=['Which neighborhood has the lowest broadband access?','Where is poverty highest in 2023?','Compare poverty and broadband access for Sandtown and Roland Park.','Which metric changed most since 2016?'];
 let BASE={},BENCHMARKS={city:{},state:{},federal:{}},DATA_META={};
 // ── Supabase client ──────────────────────────────────────────────────────────
 let db=null;
@@ -668,9 +822,9 @@ function getVoterFp(){
   if(!fp){fp=Math.random().toString(36).slice(2)+Date.now().toString(36);localStorage.setItem('blt_fp',fp);}
   return fp;
 }
-const LEGACY_RATES={hi:.4,le:.08,as:-.6,la:-.5,va:-.2,pv:-.3,un:-.25,hs:.15,fd:.3,gs:.1,hw:-.2,cr:-.5,in:.8,tp:.2,dp:.4,rt:.25,ws:.3,hz:.45};
-const BENCHMARK_METRICS=new Set(['hi','le','as','la','va','pv','un','hs','fd','gs','cr']);
-const INVERSE_BENCHMARK_METRICS=new Set(['as','la','va','pv','un','cr']);
+const LEGACY_RATES={hi:.4,le:.08,as:-.6,la:-.5,va:-.2,pv:-.3,un:-.25,hs:.15,fd:0,gs:.1,hw:-.2,cr:-.5,in:.8,tp:.2,dp:.4,rt:.25,ws:.3,hz:.45,sm:-.2,ob:.15,db:.05,mh:.1,pa:-.15,bb:1.2,rb:.1,ui:-.2,gi:0,ap:0,ha:0};
+const BENCHMARK_METRICS=new Set(['hi','le','as','la','va','pv','un','hs','fd','gs','cr','sm','ob','db','mh','pa','bb','rb','ui','gi','ap','ha']);
+const INVERSE_BENCHMARK_METRICS=new Set(['as','la','va','pv','un','fd','cr','sm','ob','db','mh','pa','rb','ui','gi','ap','ha']);
 const round1=v=>v===null||v===undefined||Number.isNaN(Number(v))?null:Math.round(Number(v)*10)/10;
 function legacySeries(value,metric){
   if(Array.isArray(value)) return value.map(v=>round1(v));
@@ -715,28 +869,30 @@ function normalizeDataset(raw){return raw?.neighborhoods&&raw?.benchmarks?raw:no
 function metaListIncludes(field,key){const raw=DATA_META?.[field];if(Array.isArray(raw))return raw.includes(key);if(typeof raw==='string')return raw===key;if(raw&&typeof raw==='object')return Object.keys(raw).includes(key)||Object.values(raw).includes(key);return false;}
 function hasProxyMetric(key){return metaListIncludes('proxy_metrics',key);}
 function hasDerivedMetric(key){return metaListIncludes('derived_metrics',key);}
+function hasImportedMetric(key){const raw=DATA_META?.imported_metrics;return !Array.isArray(raw)||!raw.length||raw.includes(key);}
 function hasBenchmarkProxyMetric(key){return metaListIncludes('benchmark_proxy_metrics',key);}
 function hasRealBenchmarkMetric(level,key){if(level==='city')return true;return metaListIncludes(`${level}_benchmark_metrics`,key)||metaListIncludes('real_benchmark_metrics',key);}
-function asthmaMetricMeta(){return hasProxyMetric('as')?{tab:'Asthma proxy',label:'Adult asthma %',compact:'Asthma proxy',min:4,max:20,unit:'%'}:{tab:'Asthma',label:'Asthma ED /1k',compact:'Asthma ED',min:14,max:97,unit:''};}
-function sourceLine(){const parts=['BNIA Vital Signs'];if(hasProxyMetric('as'))parts.push('CDC PLACES asthma proxy');if(DATA_META?.source_files?.poverty)parts.push('ACS 5-yr');return parts.join(' · ');}
+function asthmaMetricMeta(){return hasProxyMetric('as')?{tab:'Asthma prevalence',label:'Adult asthma prevalence',compact:'Asthma prevalence',min:4,max:20,unit:'%'}:{tab:'Asthma emergency visits',label:'Asthma emergency visits',compact:'Asthma visits',min:14,max:97,unit:' per 1k'};}
+function sourceLine(){const parts=['BNIA Vital Signs'];if(DATA_META?.source_files?.cdc_places)parts.push('CDC PLACES');if(DATA_META?.source_files?.local_health)parts.push('Local staged health sources');if(DATA_META?.source_files?.poverty)parts.push('ACS 5-yr');return parts.join(' · ');}
 function healthIndexSourceLine(){return hasDerivedMetric('hi')?`Health index 2016–${YEARS[curYI]} · derived from official components`:`Health index 2016–${YEARS[curYI]} · BNIA`;}
 function seriesProvenance(metric){
-  if(hasDerivedMetric(metric))return{tone:'derived',label:'Derived series',detail:`${MCFG[metric]?.label||metric} is derived from available official component metrics.`};
-  if(hasProxyMetric(metric))return{tone:'proxy',label:'Official proxy',detail:`${MCFG[metric]?.label||metric} is shown using an official proxy series instead of the original neighborhood indicator.`};
-  return{tone:'official',label:'Official series',detail:`${MCFG[metric]?.label||metric} is being shown from the official neighborhood data path currently wired into the dashboard.`};
+  if(hasDerivedMetric(metric))return{tone:'derived',label:'Derived',detail:`${MCFG[metric]?.label||metric} is derived from available official component metrics.`};
+  if(hasProxyMetric(metric))return{tone:'proxy',label:'Proxy',detail:`${MCFG[metric]?.label||metric} is shown using an official proxy series instead of the original neighborhood indicator.`};
+  if(!hasImportedMetric(metric))return{tone:'scaffold',label:'Staged',detail:`${MCFG[metric]?.label||metric} is carried from the existing dashboard bundle while a matched source import is pending.`};
+  return{tone:'official',label:'Official',detail:`${MCFG[metric]?.label||metric} is being shown from the official neighborhood data path currently wired into the dashboard.`};
 }
 function benchmarkProvenance(metric){
   if(benchMode==='neighborhood')return null;
-  if(benchMode==='city')return{tone:'derived',label:'City aggregate',detail:'City benchmarks are aggregated from the Baltimore CSA dataset shown on the map.'};
+  if(benchMode==='city')return{tone:'derived',label:'City average',detail:'City benchmarks are aggregated from the Baltimore CSA dataset shown on the map.'};
   if(hasBenchmarkProxyMetric(metric)&&benchMode==='federal')return{tone:'proxy',label:'Benchmark proxy',detail:`Federal ${MCFG[metric]?.label||metric} uses a clearly labeled proxy benchmark rather than a matched annual surveillance series.`};
   if(hasRealBenchmarkMetric(benchMode,metric))return{tone:'official',label:`${LEVEL_META[benchMode].label} benchmark`,detail:`The ${LEVEL_META[benchMode].label.toLowerCase()} benchmark for ${MCFG[metric]?.label||metric} comes from an official external series.`};
-  return{tone:'scaffold',label:'Scaffolded benchmark',detail:`The ${LEVEL_META[benchMode].label.toLowerCase()} benchmark for ${MCFG[metric]?.label||metric} still falls back to the provisional scaffold for at least part of the series.`};
+  return{tone:'scaffold',label:'Staged benchmark',detail:`The ${LEVEL_META[benchMode].label.toLowerCase()} benchmark for ${MCFG[metric]?.label||metric} still falls back to the provisional scaffold for at least part of the series.`};
 }
 function accuracyChip(label,tone){return `<span class="accuracy-chip ${tone}">${label}</span>`;}
 function metricAccuracyInline(metric){
   const chips=[];
-  if(hasDerivedMetric(metric))chips.push(accuracyChip('Derived','derived'));
-  else if(hasProxyMetric(metric))chips.push(accuracyChip('Proxy','proxy'));
+  const source=seriesProvenance(metric);
+  chips.push(accuracyChip(source.label,source.tone));
   if(benchMode==='federal'&&hasBenchmarkProxyMetric(metric))chips.push(accuracyChip('Federal benchmark proxy','proxy'));
   return chips.length?`<span style="display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;margin-left:4px">${chips.join('')}</span>`:'';
 }
@@ -752,6 +908,31 @@ function legendAccuracyLine(metric){
   if(benchmarkPart)chips.push(benchmarkPart);
   return chips.map(part=>accuracyChip(part.label,part.tone)).join('');
 }
+function metricInfoChips(metric){const source=seriesProvenance(metric);return accuracyChip(source.label,source.tone);}
+function metricInfoRow(key,value){return `<div class="metric-info-row"><div class="metric-info-key">${key}</div><div class="metric-info-value">${escapeHtml(value)}</div></div>`;}
+function openMetricInfo(){
+  const info=METRIC_INFO[curM];if(!info)return;
+  const label=MCFG[curM]?.label||curM;
+  const unit=MCFG[curM]?.unit||'',coverage=metricValues(curM,curYI).length,cityValue=cityMetricValue(curM,curYI),source=seriesProvenance(curM),benchmark=benchmarkProvenance(curM);
+  document.getElementById('metric-info-title').textContent=`About ${label}`;
+  const chips=metricInfoChips(curM);
+  const chipBox=document.getElementById('metric-info-chips');
+  chipBox.innerHTML=chips;
+  chipBox.style.display=chips?'flex':'none';
+  document.getElementById('metric-info-body').innerHTML=[
+    metricInfoRow('Metric',label),
+    metricInfoRow('Source',info.source),
+    metricInfoRow('Vintage',info.vintage),
+    metricInfoRow('Method',info.method),
+    metricInfoRow('Disclosure',info.disclosure),
+    metricInfoRow('Reliability',[source.detail,benchmark?.detail].filter(Boolean).join(' ')),
+    metricInfoRow('Coverage',`${coverage} neighborhood areas in ${YEARS[curYI]}${cityValue===null?'':`; city average ${cityValue}${unit}`}. Use the CSV button for the current table.`)
+  ].join('');
+  const modal=document.getElementById('metric-info-modal');
+  modal.setAttribute('aria-hidden','false');
+  modal.classList.add('open');
+}
+function closeMetricInfo(evt){if(evt&&evt.currentTarget&&evt.target!==evt.currentTarget)return;const modal=document.getElementById('metric-info-modal');modal.setAttribute('aria-hidden','true');modal.classList.remove('open');}
 function metricConcernScore(metric,value){
   const config=MCFG[metric];
   if(!config||value===null||value===undefined||Number.isNaN(Number(value)))return null;
@@ -898,7 +1079,36 @@ function allY(nsa,k){return YEARS.map((_,i)=>yv(nsa,k,i));}
 function bench(level,k,yi){const record=BENCHMARKS?.[level]?.[String(YEARS[yi])]||BENCHMARKS?.[level]?.[YEARS[yi]]||null;if(!record||record[k]===undefined||record[k]===null)return null;return round1(record[k]);}
 function benchRecord(level,yi){return BENCHMARKS?.[level]?.[String(YEARS[yi])]||BENCHMARKS?.[level]?.[YEARS[yi]]||{};}
 function allBench(level,k){return YEARS.map((_,i)=>bench(level,k,i));}
-let MCFG={hi:{label:'Health index',min:25,max:87,inv:false,unit:''},le:{label:'Life exp.',min:59,max:82,inv:false,unit:' yrs'},as:{label:'Asthma ED /1k',min:14,max:97,inv:true,unit:''},la:{label:'Lead exp.',min:7,max:72,inv:true,unit:'%'},va:{label:'Vacant',min:1,max:28,inv:true,unit:'%'},pv:{label:'Poverty',min:3,max:52,inv:true,unit:'%'},un:{label:'Unemploy.',min:2,max:25,inv:true,unit:'%'},hs:{label:'HS grad',min:58,max:99,inv:false,unit:'%'},hz:{label:'311 Hazards',min:0,max:250,inv:true,unit:' calls'}};
+let MCFG={hi:{label:'Health index',min:25,max:87,inv:false,unit:''},le:{label:'Life expectancy',min:59,max:82,inv:false,unit:' years'},as:{label:'Asthma emergency visits',min:14,max:97,inv:true,unit:' per 1k'},la:{label:'Lead exposure',min:7,max:72,inv:true,unit:'%'},va:{label:'Vacant housing',min:1,max:28,inv:true,unit:'%'},pv:{label:'Poverty',min:3,max:52,inv:true,unit:'%'},un:{label:'Unemployment',min:2,max:25,inv:true,unit:'%'},hs:{label:'High school graduation',min:58,max:99,inv:false,unit:'%'},fd:{label:'Food access',min:0,max:100,inv:true,unit:'%'},gs:{label:'Green space',min:0,max:60,inv:false,unit:'%'},cr:{label:'Crime reports',min:0,max:100,inv:true,unit:''},sm:{label:'Smoking',min:5,max:45,inv:true,unit:'%'},ob:{label:'Obesity',min:15,max:55,inv:true,unit:'%'},db:{label:'Diabetes',min:5,max:25,inv:true,unit:'%'},mh:{label:'Poor mental health',min:8,max:30,inv:true,unit:'%'},pa:{label:'Physical inactivity',min:10,max:45,inv:true,unit:'%'},bb:{label:'Broadband access',min:55,max:100,inv:false,unit:'%'},rb:{label:'High rent burden',min:20,max:75,inv:true,unit:'%'},ui:{label:'No health insurance',min:1,max:18,inv:true,unit:'%'},gi:{label:'Income inequality',min:.25,max:.65,inv:true,unit:''},ap:{label:'Air pollution',min:6,max:9,inv:true,unit:' micrograms/m3'},ha:{label:'Housing cost burden',min:15,max:70,inv:true,unit:'%'},hz:{label:'Reported 311 hazards',min:0,max:250,inv:true,unit:' calls'},rt:{label:'Rat service requests',min:0,max:100,inv:true,unit:' calls'},dp:{label:'Illegal dumping requests',min:0,max:100,inv:true,unit:' calls'},ws:{label:'Water and sewer requests',min:0,max:100,inv:true,unit:' calls'}};
+const METRIC_INFO={
+  hi:{source:'Derived composite from le/as/la/pv/un/hs',vintage:'2016-2023',method:'Computed in the pipeline from component metrics after yearly citywide min-max normalization.',disclosure:'Derived dashboard index, not an official BNIA indicator.'},
+  le:{source:'BNIA Vital Signs ArcGIS Lifexp service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
+  as:{source:'CDC PLACES adult asthma prevalence',vintage:'2018-2023 backfilled',method:'Census tract estimates aggregated to CSA.',disclosure:'Proxy for asthma ED rate; not an emergency-department visit rate.'},
+  la:{source:'BNIA Vital Signs ArcGIS Ebll service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
+  va:{source:'BNIA Vital Signs ArcGIS Vacant service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
+  pv:{source:'BNIA Vital Signs ArcGIS Hhpov service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
+  un:{source:'BNIA Vital Signs ArcGIS Unempr service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
+  hs:{source:'BNIA Vital Signs ArcGIS Lesshs service',vintage:'2016-2023',method:'Neighborhood service values loaded at CSA level.',disclosure:'Official BNIA neighborhood series.'},
+  fd:{source:'USDA Food Access Research Atlas staged tract extract',vintage:'2019 static repeated across 2016-2023',method:'Low-income/low-access tract population share aggregated to CSA.',disclosure:'Static access proxy, not an annual food insecurity survey.'},
+  gs:{source:'Existing BALTI2 dashboard bundle',vintage:'2016-2023 staged series',method:'CSA-level values carried from the existing dashboard bundle while a matched source import is pending.',disclosure:'Staged neighborhood access context; compare relative values across CSAs.'},
+  cr:{source:'Existing BALTI2 dashboard bundle',vintage:'2016-2023 staged series',method:'CSA-level crime index carried from the existing dashboard bundle while a matched source import is pending.',disclosure:'Relative staged burden measure, not incident-level crime reporting.'},
+  sm:{source:'CDC PLACES tract CSMOKING',vintage:'2018-2023',method:'Tract centroids assigned to CSA.',disclosure:'Tract-level modeled prevalence shown at CSA level.'},
+  ob:{source:'CDC PLACES tract OBESITY',vintage:'2018-2023',method:'Tract centroids assigned to CSA.',disclosure:'Tract-level modeled prevalence shown at CSA level.'},
+  db:{source:'CDC PLACES tract DIABETES',vintage:'2018-2023',method:'Tract centroids assigned to CSA.',disclosure:'Tract-level modeled prevalence shown at CSA level.'},
+  mh:{source:'CDC PLACES tract MHLTH',vintage:'2018-2023',method:'Tract centroids assigned to CSA.',disclosure:'Tract-level modeled prevalence shown at CSA level.'},
+  pa:{source:'CDC PLACES tract LPA',vintage:'2018-2023',method:'Tract centroids assigned to CSA.',disclosure:'Tract-level modeled prevalence shown at CSA level.'},
+  bb:{source:'ACS 5-year tract table B28002',vintage:'2017-2023',method:'Population-weighted tract data to CSA.',disclosure:'Broadband starts in 2017 in the staged series.'},
+  rb:{source:'ACS 5-year tract table B25070',vintage:'2016-2023',method:'Population-weighted tract data to CSA.',disclosure:'ACS tract estimate aggregated to neighborhood.'},
+  ui:{source:'ACS 5-year tract table B27001',vintage:'2016-2023',method:'Population-weighted tract data to CSA.',disclosure:'ACS tract estimate aggregated to neighborhood.'},
+  gi:{source:'ACS 5-year tract table B19083',vintage:'2016-2023',method:'Population-weighted tract data to CSA.',disclosure:'ACS tract estimate aggregated to neighborhood.'},
+  ap:{source:'EPA EJScreen 2024 PM2.5 archived copy',vintage:'2024 static',method:'Baltimore EJScreen extract assigned to CSA.',disclosure:'Static across years; EPA removed EJScreen in 2025.'},
+  ha:{source:'HUD CHAS 2016-2020 Table 9 cost burden >30%',vintage:'2016-2020 static',method:'Cached Baltimore CHAS extract assigned to CSA.',disclosure:'Static across years.'},
+  hz:{source:'Open Baltimore 311 service requests',vintage:'2016-2023',method:'Service requests aggregated by CSA and year.',disclosure:'311 hazards proxy reflects reported service activity, not clinical risk.'},
+  rt:{source:'Open Baltimore 311 service requests',vintage:'2016-2023',method:'Rat/rodent service requests aggregated by CSA and year.',disclosure:'Service-request activity field; zero values can mean no cached subtype records in this bundle.'},
+  dp:{source:'Open Baltimore 311 service requests',vintage:'2016-2023',method:'Trash/dumping service requests aggregated by CSA and year.',disclosure:'Service-request activity field; zero values can mean no cached subtype records in this bundle.'},
+  ws:{source:'Open Baltimore 311 service requests',vintage:'2016-2023',method:'Water/sewer service requests aggregated by CSA and year.',disclosure:'Service-request activity field; zero values can mean no cached subtype records in this bundle.'}
+};
+const HOLC_GRADE_INFO={A:{label:'Best',color:'#2ca25f'},B:{label:'Still Desirable',color:'#3182bd'},C:{label:'Declining',color:'#fee08b'},D:{label:'Hazardous',color:'#d73027'}};
 function applyMetricMetadata(){const asthma=asthmaMetricMeta();MCFG={...MCFG,as:{...MCFG.as,label:asthma.label,min:asthma.min,max:asthma.max,unit:asthma.unit}};const btn=document.querySelector('.mtab[data-m="as"]');if(btn)btn.textContent=asthma.tab;}
 const cssVar=name=>getComputedStyle(document.getElementById('bd')).getPropertyValue(name).trim();
 const TOKENS={brand:cssVar('--brand'),brand2:cssVar('--brand2'),brandLt:cssVar('--brand-lt'),accent:cssVar('--accent'),accentLt:cssVar('--accent-lt'),success:cssVar('--success'),successLt:cssVar('--success-lt'),warn:cssVar('--warn'),warnLt:cssVar('--warn-lt'),danger:cssVar('--danger'),neutralInverse:cssVar('--neutral-inverse'),bg:cssVar('--bg'),bg2:cssVar('--bg2'),bg3:cssVar('--bg3'),br:cssVar('--br'),t2:cssVar('--t2'),t3:cssVar('--t3'),mapStroke:cssVar('--map-stroke'),metricLow:cssVar('--metric-low'),metricMidLow:cssVar('--metric-midlow'),metricMid:cssVar('--metric-mid'),metricMidHigh:cssVar('--metric-midhigh'),metricHigh:cssVar('--metric-high')};
@@ -949,7 +1159,7 @@ const FALLBACK_REPORTS=[
 ];
 const THREE11=[{lat:39.310,lng:-76.665,cnt:180},{lat:39.248,lng:-76.622,cnt:140},{lat:39.285,lng:-76.620,cnt:88},{lat:39.302,lng:-76.590,cnt:64},{lat:39.278,lng:-76.643,cnt:58}];
 let REPORTS=[],VALIDATION_CASES=[];
-let map,geo,rMks=[],cMks=[],curM='hi',curYI=7,pinA=null,pinB=null,activeSlot='a',ls={c:true,r:true,'3':false},benchMode='city',gapMode=false,blindSpotsOnly=false;
+let map,geo,rMks=[],cMks=[],curM='hi',curYI=7,pinA=null,pinB=null,activeSlot='a',ls={c:true,r:true,'3':false,holc:false},benchMode='city',gapMode=false,blindSpotsOnly=false,spendingMode=false,spendingRows=null,spendingPromise=null;
 let playing=false,playT=null,trajChart=null;
 let reportSyncChannel=null,annotationSyncChannel=null,pilotVoteSyncChannel=null,activeReportPinForm=null;
 const draftReportLocations={};
@@ -958,7 +1168,8 @@ const OPEN_ANNOTATION_PANELS=new Set();
 const LOCAL_ANNOTATION_KEY='blt_annotations_local';
 let adminMode=false;
 let adminSession=null,adminAuthorized=false,adminUserEmail='',adminRole='',adminAuthMessage='';
-let pilotMode=null,deskOpen=false;
+let pilotMode=null,deskOpen=false,chatOpen=false,chatBusy=false;
+let chatMessages=[];
 const PILOT_META={
   carrollton:{
     label:'Carrollton Ridge pilot',
@@ -1153,7 +1364,7 @@ function loadFromURL(){
     pilotMode=pilot&&PILOT_META[pilot]?pilot:null;
     if(a){const k=decodeNSA(a);if(k)pinA=k;}
     if(b){const k=decodeNSA(b);if(k)pinB=k;}
-    if(m&&MCFG[m])curM=m;
+    if(m&&Array.from(document.querySelectorAll('.mtab[data-m]')).some(btn=>btn.dataset.m===m))curM=m;
     if(y){const yi=YEARS.indexOf(parseInt(y,10));if(yi>=0)curYI=yi;}
     if(lvl&&LEVEL_META[lvl])benchMode=lvl;
     gapMode=p.get('gap')==='1';
@@ -1196,29 +1407,301 @@ View mode: ${gapMode?`Gap view${blindSpotsOnly?' · blind spots only':''}`:MCFG[
 
 Data: BNIA Vital Signs · BCHD · ACS 5-yr`;window.open(`mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`);}
 function copyEmbed(doCopy){const url=buildURL();const code=`<iframe src="${url}&embed=1" width="100%" height="600" frameborder="0" style="border-radius:8px;border:1px solid ${TOKENS.br}" title="Baltimore Health Dashboard"></iframe>`;if(doCopy){navigator.clipboard.writeText(code).then(()=>{toast('Embed code copied ✓');}).catch(()=>toast('Code: '+code));return;}const box=document.getElementById('embed-box');box.style.display=box.style.display==='none'?'flex':'none';box.style.flexDirection='column';document.getElementById('embed-code').textContent=code;}
+function csvEscape(value){const text=value===null||value===undefined?'':String(value);return /[",\n\r]/.test(text)?`"${text.replace(/"/g,'""')}"`:text;}
+function currentCsvRows(){
+  const metric=curM,cfg=MCFG[metric]||{},year=YEARS[curYI],source=seriesProvenance(metric);
+  const city=cityMetricValue(metric,curYI),state=bench('state',metric,curYI),federal=bench('federal',metric,curYI);
+  return metricValues(metric,curYI).sort((a,b)=>a.nsa.localeCompare(b.nsa)).map(row=>({
+    year,
+    metric,
+    metric_label:cfg.label||metric,
+    neighborhood:row.nsa,
+    value:row.value,
+    unit:cfg.unit||'',
+    city_value:city??'',
+    maryland_value:state??'',
+    national_value:federal??'',
+    source_quality:source.label
+  }));
+}
+function downloadCurrentCsv(){
+  const rows=currentCsvRows();
+  if(!rows.length){toast('No rows available for this metric/year.');return;}
+  const headers=Object.keys(rows[0]);
+  const csv=[headers.join(','),...rows.map(row=>headers.map(header=>csvEscape(row[header])).join(','))].join('\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const link=document.createElement('a');
+  link.href=url;
+  link.download=`baltimore-${curM}-${YEARS[curYI]}.csv`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('CSV downloaded.');
+}
 function geoName(props){return props?.Community||props?.CSA2010||props?.name||props?.Name||props?.NAME||'';}
 function gc(val,m){const c=MCFG[m],t=Math.max(0,Math.min(1,(val-c.min)/(c.max-c.min)));const n=c.inv?1-t:t;const p=c.inv?PAL_B:PAL_G;return p[Math.floor(n*4.99)];}
-function getStyle(f){const n=geoName(f.properties);const k=findK(n);if(gapMode&&k){const snapshot=gapSnapshot(k,curM,curYI);const severity=gapSeverityMeta(snapshot);const hidden=blindSpotsOnly&&(snapshot.delta===null||snapshot.delta<15);return{fillColor:snapshot.available?severity.fill:'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(hidden?0.12:0.82):0};}const v=k?yv(k,curM,curYI):null;return{fillColor:v!==null?gc(v,curM):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?0.76:0};}
+function getStyle(f){const n=geoName(f.properties);const k=findK(n);if(spendingMode&&k){const amount=spendingTotalForNSA(k);return{fillColor:amount?spendingColor(amount):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(amount?0.82:0.18):0};}if(gapMode&&k){const snapshot=gapSnapshot(k,curM,curYI);const severity=gapSeverityMeta(snapshot);const hidden=blindSpotsOnly&&(snapshot.delta===null||snapshot.delta<15);return{fillColor:snapshot.available?severity.fill:'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?(hidden?0.12:0.82):0};}const v=k?yv(k,curM,curYI):null;return{fillColor:v!==null?gc(v,curM):'var(--br)',weight:1,opacity:1,color:'var(--map-stroke)',fillOpacity:ls.c?0.76:0};}
 function findK(name){if(BASE[name])return name;for(const k of Object.keys(BASE)){if(k.toLowerCase()===name.toLowerCase())return k;const a=name.toLowerCase().split('/')[0].trim(),b=k.toLowerCase().split('/')[0].trim();if(a===b||a.includes(b)||b.includes(a))return k;}return null;}
-function buildLeg(){const m=MCFG[curM];if(gapMode){document.getElementById('leg-title').textContent=`Gap severity · ${m.label}`;document.getElementById('leg-body').innerHTML=`<div class="lr"><div class="ls" style="background:${TOKENS.success}"></div><span>0–14 pts · aligned</span></div><div class="lr"><div class="ls" style="background:${TOKENS.warn}"></div><span>15–29 pts · diverging</span></div><div class="lr"><div class="ls" style="background:${TOKENS.danger}"></div><span>30+ pts · contradicting</span></div>`;document.getElementById('leg-meta').innerHTML=gapLegendLine(curM);document.getElementById('leg-source').textContent=gapSourceLine();return;}document.getElementById('leg-title').textContent=m.label;const p=m.inv?PAL_B:PAL_G,r=m.max-m.min;let h='';for(let i=4;i>=0;i--){const lo=+(m.min+(i/5)*r).toFixed(1),hi=+(m.min+((i+1)/5)*r).toFixed(1);h+=`<div class="lr"><div class="ls" style="background:${p[i]}"></div><span>${lo}–${hi}${m.unit}</span></div>`;}document.getElementById('leg-body').innerHTML=h;document.getElementById('leg-meta').innerHTML=legendAccuracyLine(curM);document.getElementById('leg-source').textContent=sourceLine();}
-function setM(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');curM=btn.dataset.m;if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
+function neighborhoodConcernRank(metric,nsa,yi=curYI){
+  if(!nsa)return null;
+  const cfg=MCFG[metric]||{};
+  const rows=metricValues(metric,yi).sort((a,b)=>cfg.inv?b.value-a.value:a.value-b.value);
+  const index=rows.findIndex(row=>row.nsa===nsa);
+  return index>=0?{rank:index+1,total:rows.length}:null;
+}
+function mapTooltipHtml(key,name){
+  if(spendingMode&&key)return spendingTooltipHtml(key,name);
+  if(gapMode&&key)return gapTooltipHtml(key,name);
+  const cfg=MCFG[curM]||{},label=key||name||'Neighborhood',unit=cfg.unit||'';
+  const value=key?yv(key,curM,curYI):null,city=cityMetricValue(curM,curYI),rank=neighborhoodConcernRank(curM,key,curYI),source=seriesProvenance(curM);
+  const valueText=value===null||value===undefined?'N/A':`${value}${unit}`;
+  const cityLine=city===null||city===undefined?'':`<br>City average: ${escapeHtml(`${city}${unit}`)}`;
+  const rankLine=rank?`<br>Concern rank: ${rank.rank} of ${rank.total}`:'';
+  return `<strong>${escapeHtml(label)}</strong><br>${escapeHtml(cfg.label||curM)}: <strong>${escapeHtml(valueText)}</strong>${cityLine}${rankLine}<br>${accuracyChip(source.label,source.tone)}`;
+}
+const HOLC_GRADES=['A','B','C','D'];
+const HOLC_MORE_URL='https://www.cityhealthdashboard.com/MD/Baltimore/metric-detail?metricId=64&dataPeriod=2023&focus=grade&grade=A&grade=B&grade=C&grade=D#';
+let holcData=null,holcDataPromise=null,holcLayer=null,holcGrades=new Set(HOLC_GRADES);
+function ensureHolcData(){
+  if(holcData)return Promise.resolve(holcData);
+  if(!holcDataPromise){
+    holcDataPromise=fetch('holc_baltimore_1937.geojson',{cache:'no-store'}).then(resp=>{
+      if(!resp.ok)throw new Error(`HOLC layer failed (${resp.status})`);
+      return resp.json();
+    }).then(data=>{holcData=data;return data;});
+  }
+  return holcDataPromise;
+}
+function requestHolcRefresh(){
+  if(holcData||holcDataPromise)return;
+  ensureHolcData().then(()=>refreshSide()).catch(err=>console.error(err));
+}
+function pointInRing(point,ring){
+  let inside=false;
+  for(let i=0,j=ring.length-1;i<ring.length;j=i++){
+    const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1];
+    const intersect=((yi>point[1])!==(yj>point[1]))&&(point[0]<(xj-xi)*(point[1]-yi)/(yj-yi)+xi);
+    if(intersect)inside=!inside;
+  }
+  return inside;
+}
+function pointInPolygon(point,polygon){
+  if(!polygon?.length||!pointInRing(point,polygon[0]))return false;
+  return !polygon.slice(1).some(ring=>pointInRing(point,ring));
+}
+function pointInHolcGeometry(point,geometry){
+  if(!geometry)return false;
+  if(geometry.type==='Polygon')return pointInPolygon(point,geometry.coordinates);
+  if(geometry.type==='MultiPolygon')return geometry.coordinates.some(poly=>pointInPolygon(point,poly));
+  return false;
+}
+function holcGradeForNSA(nsa){
+  if(!holcData)return null;
+  const loc=reportLocation({nsa});
+  if(!loc)return null;
+  const point=[loc[1],loc[0]];
+  const feature=(holcData.features||[]).find(f=>HOLC_GRADES.includes(f.properties?.grade)&&pointInHolcGeometry(point,f.geometry));
+  return feature?.properties?.grade||null;
+}
+function holcTooltip(props){
+  const grade=props?.grade,info=HOLC_GRADE_INFO[grade]||{};
+  const place=props?.label||props?.name||'Baltimore area';
+  const detail=grade==='D'?"Grade D, the red category, marked areas judged most risky for mortgage lending.":`Grade ${escapeHtml(grade)} was labeled '${escapeHtml(info.label||grade)}' on the 1937 HOLC map.`;
+  return `<strong>HOLC grade ${escapeHtml(grade)}</strong> &mdash; ${escapeHtml(place)}<br><span>${detail}</span>`;
+}
+function holcAllGradesSelected(){return HOLC_GRADES.every(g=>holcGrades.has(g));}
+function refreshHolcLayer(){if(holcLayer&&holcData){holcLayer.clearLayers();holcLayer.addData(holcData);}}
+function setHolcAllGrades(){holcGrades=new Set(HOLC_GRADES);refreshHolcLayer();updateHolcLegend();}
+function toggleHolcGrade(grade){
+  if(!HOLC_GRADES.includes(grade))return;
+  if(holcGrades.has(grade))holcGrades.delete(grade);
+  else holcGrades.add(grade);
+  refreshHolcLayer();
+  updateHolcLegend();
+}
+function holcLegendHtml(){
+  const gradeLabel={A:'highest grade',B:'second grade',C:'third grade',D:'lowest grade'};
+  return `<div class="holc-title">Redlining Map</div><div class="holc-copy">The 1930s HOLC residential security maps graded Baltimore areas for mortgage risk. Race, immigration, income, and housing conditions shaped those grades; Black and immigrant neighborhoods were often placed in the red Grade D category.</div><a class="holc-more" href="${HOLC_MORE_URL}" target="_blank" rel="noopener">More about this feature</a><div class="holc-title">Show grades</div><div class="holc-controls"><button type="button" class="holc-mode ${holcAllGradesSelected()?'on':''}" onclick="setHolcAllGrades()" aria-pressed="${holcAllGradesSelected()?'true':'false'}">All grades (recommended start)</button>${HOLC_GRADES.map(g=>`<button type="button" class="holc-grade ${holcGrades.has(g)?'on':''}" onclick="toggleHolcGrade('${g}')" aria-pressed="${holcGrades.has(g)?'true':'false'}"><span class="ls" style="background:${HOLC_GRADE_INFO[g].color}"></span><span>Grade ${g} (${gradeLabel[g]})</span></button>`).join('')}</div><div class="holc-src">Source: Mapping Inequality, University of Richmond.</div>`;
+}
+function updateHolcLegend(){const el=document.getElementById('holc-leg');if(!el)return;el.innerHTML=ls.holc?holcLegendHtml():'';el.style.display=ls.holc?'flex':'none';}
+async function ensureHolcLayer(){
+  if(holcLayer)return holcLayer;
+  await ensureHolcData();
+  holcLayer=L.geoJSON(holcData,{pane:'holcPane',filter:f=>HOLC_GRADES.includes(f.properties?.grade)&&holcGrades.has(f.properties.grade),style:f=>{const fill=HOLC_GRADE_INFO[f.properties.grade]?.color||f.properties.fill||'#888';return{fillColor:fill,color:fill,weight:1,opacity:.9,fillOpacity:.35};},onEachFeature:(feature,layer)=>{layer.bindTooltip(holcTooltip(feature.properties),{sticky:true,direction:'top',opacity:.95});}});
+  return holcLayer;
+}
+async function setHolcEnabled(on){
+  if(!map)return;
+  if(!on){if(holcLayer&&map.hasLayer(holcLayer))map.removeLayer(holcLayer);updateHolcLegend();return;}
+  try{const layer=await ensureHolcLayer();if(ls.holc&&!map.hasLayer(layer))layer.addTo(map);}
+  catch(err){console.error(err);ls.holc=false;const btn=document.getElementById('lt-holc');if(btn){btn.classList.remove('on');btn.setAttribute('aria-pressed','false');}toast('Redlining layer failed to load.');}
+  updateHolcLegend();
+}
+function buildLeg(){const m=MCFG[curM];if(spendingMode){const summary=spendingCitySummary(),max=spendingMaxTotal();document.getElementById('leg-title').textContent='Capital spending';let h='';for(let i=4;i>=0;i--){const lo=max*(i/5),hi=max*((i+1)/5);h+=`<div class="lr"><div class="ls" style="background:${PAL_G[i]}"></div><span>${formatSpendingAmount(lo)}–${formatSpendingAmount(hi)}</span></div>`;}document.getElementById('leg-body').innerHTML=h||'<div class="lr"><span>Loading capital spending seed...</span></div>';document.getElementById('leg-meta').innerHTML=`${accuracyChip('CIP seed','proxy')}${summary.ready?accuracyChip(`${summary.count} records`,'derived'):accuracyChip('Loading','pending')}`;document.getElementById('leg-source').textContent=spendingSourceNote();return;}if(gapMode){document.getElementById('leg-title').textContent=`Gap severity · ${m.label}`;document.getElementById('leg-body').innerHTML=`<div class="lr"><div class="ls" style="background:${TOKENS.success}"></div><span>0–14 pts · aligned</span></div><div class="lr"><div class="ls" style="background:${TOKENS.warn}"></div><span>15–29 pts · diverging</span></div><div class="lr"><div class="ls" style="background:${TOKENS.danger}"></div><span>30+ pts · contradicting</span></div>`;document.getElementById('leg-meta').innerHTML=gapLegendLine(curM);document.getElementById('leg-source').textContent=gapSourceLine();return;}document.getElementById('leg-title').textContent=m.label;const p=m.inv?PAL_B:PAL_G,r=m.max-m.min;let h='';for(let i=4;i>=0;i--){const lo=+(m.min+(i/5)*r).toFixed(1),hi=+(m.min+((i+1)/5)*r).toFixed(1);h+=`<div class="lr"><div class="ls" style="background:${p[i]}"></div><span>${lo}–${hi}${m.unit}</span></div>`;}document.getElementById('leg-body').innerHTML=h;document.getElementById('leg-meta').innerHTML=legendAccuracyLine(curM);document.getElementById('leg-source').textContent=sourceLine();}
+function setM(btn){document.querySelectorAll('.mtab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');curM=btn.dataset.m;if(spendingMode){spendingMode=false;updateSpendingToggleUI();}if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();if(document.getElementById('metric-info-modal')?.classList.contains('open'))openMetricInfo();}
 function onSlide(v){curYI=parseInt(v);document.getElementById('cur-yr').textContent=YEARS[curYI];if(geo)geo.setStyle(getStyle);refreshSide();updateShareStrip();}
 function togglePlay(){const playBtn=document.getElementById('play-btn');if(REDUCED_MOTION.matches){curYI=(curYI+1)%8;document.getElementById('yr-slider').value=curYI;onSlide(curYI);toast('Reduced-motion mode is on, advanced one year.');return;}playing=!playing;playBtn.textContent=playing?'■':'▶';playBtn.setAttribute('aria-label',playing?'Pause timeline':'Play timeline');if(playing){playT=setInterval(()=>{curYI=(curYI+1)%8;document.getElementById('yr-slider').value=curYI;onSlide(curYI);if(curYI===7){clearInterval(playT);playing=false;playBtn.textContent='▶';playBtn.setAttribute('aria-label','Play timeline');}},800);}else clearInterval(playT);}
-function togL(l){ls[l]=!ls[l];const toggle=document.getElementById('lt-'+l);toggle.classList.toggle('on',ls[l]);toggle.setAttribute('aria-pressed',String(ls[l]));if(l==='c'&&geo)geo.setStyle(getStyle);if(l==='r')rMks.forEach(m=>ls.r?m.addTo(map):map.removeLayer(m));if(l==='3')cMks.forEach(m=>ls['3']?m.addTo(map):map.removeLayer(m));}
+function togL(l){ls[l]=!ls[l];const toggle=document.getElementById('lt-'+l);toggle.classList.toggle('on',ls[l]);toggle.setAttribute('aria-pressed',String(ls[l]));if(l==='holc'){setHolcEnabled(ls.holc);return;}if(l==='c'&&geo)geo.setStyle(getStyle);if(l==='r')rMks.forEach(m=>ls.r?m.addTo(map):map.removeLayer(m));if(l==='3'){if(window.Live311)Live311.setEnabled(ls['3']);else cMks.forEach(m=>ls['3']?m.addTo(map):map.removeLayer(m));}}
+function showLayer(l){if(l==='spend'){toggleSpendingMode(true);return;}if(!ls[l])togL(l);if(l==='3'&&window.Live311)Live311.refresh();}
 function updateGapToggleUI(){const gapBtn=document.getElementById('lt-gap');const blindBtn=document.getElementById('lt-blind');if(gapBtn){gapBtn.classList.toggle('on',gapMode);gapBtn.setAttribute('aria-pressed',String(gapMode));}if(blindBtn){blindBtn.classList.toggle('on',blindSpotsOnly);blindBtn.setAttribute('aria-pressed',String(blindSpotsOnly));}}
-function toggleGapMode(){gapMode=!gapMode;if(!gapMode)blindSpotsOnly=false;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
-function toggleBlindSpots(){blindSpotsOnly=!blindSpotsOnly;if(blindSpotsOnly)gapMode=true;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
-function onNSAClick(e){const name=geoName(e.target.feature.properties);const k=findK(name);if(!k)return;if(activeReportPinForm){captureReportLocation(activeReportPinForm,e.latlng,k);return;}const pilotTarget=resolvePilotNeighborhood();if(pilotTarget){if(k!==pilotTarget){toast('Pilot mode is locked to Carrollton Ridge / Franklin Square for this demo.');return;}pinA=pilotTarget;pinB=null;activeSlot='a';updatePinBar();updatePinStyles();refreshSide();updateShareStrip();return;}if(activeSlot==='a'||!pinA){pinA=k;activeSlot='b';}else if(activeSlot==='b'||!pinB){if(k===pinA){toast('Pin a different neighborhood for B');return;}pinB=k;activeSlot='a';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
+function toggleGapMode(){gapMode=!gapMode;if(gapMode){spendingMode=false;updateSpendingToggleUI();}if(!gapMode)blindSpotsOnly=false;updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
+function toggleBlindSpots(){blindSpotsOnly=!blindSpotsOnly;if(blindSpotsOnly){gapMode=true;spendingMode=false;updateSpendingToggleUI();}updateGapToggleUI();if(geo)geo.setStyle(getStyle);buildLeg();refreshSide();updateShareStrip();}
+function live311Pinning(){return !!(window.Live311&&typeof Live311.isReportPinning==='function'&&Live311.isReportPinning());}
+function onNSAClick(e){const name=geoName(e.target.feature.properties);const k=findK(name);if(!k)return;if(live311Pinning())return;if(activeReportPinForm){captureReportLocation(activeReportPinForm,e.latlng,k);return;}const pilotTarget=resolvePilotNeighborhood();if(pilotTarget){if(k!==pilotTarget){toast('Pilot mode is locked to Carrollton Ridge / Franklin Square for this demo.');return;}pinA=pilotTarget;pinB=null;activeSlot='a';updatePinBar();updatePinStyles();refreshSide();updateShareStrip();return;}if(activeSlot==='a'||!pinA){pinA=k;activeSlot='b';}else if(activeSlot==='b'||!pinB){if(k===pinA){toast('Pin a different neighborhood for B');return;}pinB=k;activeSlot='a';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
 function updatePinBar(){const pilotTarget=resolvePilotNeighborhood();(['a','b']).forEach((s)=>{const p=s==='a'?pinA:pinB;const btn=document.getElementById('slot-btn-'+s);const clear=document.getElementById('clear-'+s);if(p){document.getElementById('empty-'+s).style.display='none';document.getElementById('dot-'+s).style.display='block';document.getElementById('info-'+s).style.display='flex';document.getElementById('name-'+s).textContent=pilotTarget&&s==='a'?(currentPilotConfig()?.scopeLabel||p.split('/')[0]):p.split('/')[0];document.getElementById('score-'+s).textContent=yv(p,'hi',curYI);clear.style.display=pilotTarget?'none':'inline-flex';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active. Current neighborhood ${p.split('/')[0]}`);}else{document.getElementById('empty-'+s).style.display='block';document.getElementById('dot-'+s).style.display='none';document.getElementById('info-'+s).style.display='none';clear.style.display='none';btn.setAttribute('aria-label',`Set neighborhood pin ${s.toUpperCase()} as active`);}btn.setAttribute('aria-pressed',String(activeSlot===s));});}
-function updatePinStyles(){if(!geo)return;geo.eachLayer(l=>{const name=geoName(l.feature?.properties);const k=findK(name);if(k===pinA)l.setStyle({weight:3,color:COL_A,fillOpacity:.9});else if(k===pinB)l.setStyle({weight:3,color:COL_B,fillOpacity:.9});else geo.resetStyle(l);});}
+function updatePinStyles(){if(!geo)return;if(live311Pinning()){geo.setStyle({weight:0,opacity:0,fillOpacity:0});return;}geo.eachLayer(l=>{const name=geoName(l.feature?.properties);const k=findK(name);if(k===pinA)l.setStyle({weight:3,color:COL_A,fillOpacity:.9});else if(k===pinB)l.setStyle({weight:3,color:COL_B,fillOpacity:.9});else geo.resetStyle(l);});}
+window.addEventListener('live311:pinning',e=>{if(!geo)return;if(e.detail?.on)geo.setStyle({weight:0,opacity:0,fillOpacity:0});else updatePinStyles();});
 function unpin(s){if(s==='a'){pinA=null;activeSlot='a';}else{pinB=null;activeSlot='b';}updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}
 function clearPin(evt,s){if(evt)evt.stopPropagation();unpin(s);}
 function focusSlot(s){if(resolvePilotNeighborhood()&&s==='b')return;activeSlot=s;updatePinBar();}
-function refreshSide(){if(pilotMode)enforcePilotSelection();updateModeUI();updatePinBar();if(!pinA&&!pinB){document.getElementById('no-pin').style.display='flex';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='none';if(adminMode)renderAdminPanel([], 'no-pin-admin');if(adminMode&&deskOpen)renderDeskPanel();return;}if(pinA&&!pinB){document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='flex';document.getElementById('two-pin').style.display='none';renderOne();}else{document.getElementById('no-pin').style.display='none';document.getElementById('one-pin').style.display='none';document.getElementById('two-pin').style.display='flex';renderTwo();}if(adminMode&&deskOpen)renderDeskPanel();}
-function swTab(btn,tab){const group=btn.closest('.pt-row');group.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const allPanes=['t-ov1','t-tr1','t-dt1','t-gap1','t-rp1','t-vl1','t-sb1','t-ad1','t-cmp','t-tra','t-det','t-gap2','t-rp2','t-vl2','t-sb2','t-ad2'];allPanes.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});const el=document.getElementById('t-'+tab);if(el){el.style.display='flex';el.style.flexDirection='column';}if(tab==='tra')drawTrajChart();}
+function refreshSide(){
+  if(pilotMode)enforcePilotSelection();
+  updateModeUI();
+  updatePinBar();
+  if(!pinA&&!pinB){
+    document.getElementById('no-pin').style.display='flex';
+    document.getElementById('one-pin').style.display='none';
+    document.getElementById('two-pin').style.display='none';
+    renderCityOverview();
+    const noPinAdmin=document.getElementById('no-pin-admin');
+    if(adminMode)renderAdminPanel([], 'no-pin-admin');
+    else if(noPinAdmin)noPinAdmin.style.display='none';
+    if(adminMode&&deskOpen)renderDeskPanel();
+    return;
+  }
+  if(pinA&&!pinB){
+    document.getElementById('no-pin').style.display='none';
+    document.getElementById('one-pin').style.display='flex';
+    document.getElementById('two-pin').style.display='none';
+    renderOne();
+  }else{
+    document.getElementById('no-pin').style.display='none';
+    document.getElementById('one-pin').style.display='none';
+    document.getElementById('two-pin').style.display='flex';
+    renderTwo();
+  }
+  if(adminMode&&deskOpen)renderDeskPanel();
+}
+function swTab(btn,tab){const group=btn.closest('.pt-row');group.querySelectorAll('.pt').forEach(b=>b.classList.remove('active'));btn.classList.add('active');const allPanes=['t-ov1','t-tr1','t-dt1','t-gap1','t-hz1','t-sp1','t-rp1','t-vl1','t-sb1','t-ad1','t-cmp','t-tra','t-det','t-gap2','t-hz2','t-sp2','t-rp2','t-vl2','t-sb2','t-ad2'];allPanes.forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});const el=document.getElementById('t-'+tab);if(el){el.style.display='flex';el.style.flexDirection='column';}if(tab==='tra')drawTrajChart();}
 function normalizeNeighborhood(name){return String(name||'').toLowerCase().replace(/\([^)]*\)/g,' ').replace(/[^a-z0-9]+/g,' ').trim();}
 function matchNeighborhoodKey(name){if(!name)return null;const direct=findK(name);if(direct)return direct;const target=normalizeNeighborhood(name);for(const k of Object.keys(BASE)){const norm=normalizeNeighborhood(k);if(norm===target||norm.includes(target)||target.includes(norm))return k;}return null;}
 function shortNeighborhood(name){const key=matchNeighborhoodKey(name)||name||'Baltimore neighborhood';return key.split('/')[0];}
+const SPENDING_SEED_URL='supabase/seeds/spending_events_sample.sql';
+const SPENDING_SOURCE_LABEL='Baltimore CIP Equity layers, fiscal years 2014 to 2020';
+function splitSqlFields(tuple){
+  const fields=[];let cur='',quote=false;
+  for(let i=0;i<tuple.length;i++){
+    const ch=tuple[i],next=tuple[i+1];
+    if(quote){
+      if(ch==="'"&&next==="'"){cur+="'";i+=1;}
+      else if(ch==="'")quote=false;
+      else cur+=ch;
+      continue;
+    }
+    if(ch==="'"){quote=true;continue;}
+    if(ch===','){fields.push(cur.trim());cur='';continue;}
+    cur+=ch;
+  }
+  fields.push(cur.trim());
+  return fields.map(value=>value.toUpperCase()==='NULL'?null:value);
+}
+function parseSpendingSeed(sql){
+  const start=String(sql||'').indexOf('VALUES');
+  if(start<0)return[];
+  const rows=[];let depth=0,quote=false,tupleStart=-1;
+  for(let i=start;i<sql.length;i++){
+    const ch=sql[i],next=sql[i+1];
+    if(quote){
+      if(ch==="'"&&next==="'"){i+=1;}
+      else if(ch==="'")quote=false;
+      continue;
+    }
+    if(ch==="'"){quote=true;continue;}
+    if(ch==='('){if(depth===0)tupleStart=i+1;depth+=1;continue;}
+    if(ch===')'&&depth>0){
+      depth-=1;
+      if(depth===0&&tupleStart>=0){
+        const fields=splitSqlFields(sql.slice(tupleStart,i));
+        if(fields.length>=9){
+          rows.push({nsa:fields[0],category:fields[1]||'Uncategorized',program:fields[2]||'Capital project',amount:Number(fields[3])||0,status:fields[6]||'unknown',details:fields[8]||''});
+        }
+      }
+    }
+  }
+  return rows.filter(row=>row.nsa&&row.amount>0);
+}
+function ensureSpendingData(){
+  if(spendingRows)return Promise.resolve(spendingRows);
+  if(!spendingPromise){
+    spendingPromise=fetch(SPENDING_SEED_URL,{cache:'no-store'})
+      .then(resp=>{if(!resp.ok)throw new Error(`Capital spending seed failed (${resp.status})`);return resp.text();})
+      .then(sql=>{spendingRows=parseSpendingSeed(sql);return spendingRows;})
+      .catch(err=>{console.error(err);spendingRows=[];toast('Capital spending seed could not be loaded.');return spendingRows;});
+  }
+  return spendingPromise;
+}
+function requestSpendingRefresh(){
+  if(spendingRows||spendingPromise)return;
+  ensureSpendingData().then(()=>{if(spendingMode&&geo)geo.setStyle(getStyle);buildLeg();refreshSide();});
+}
+function spendingKey(name){return matchNeighborhoodKey(name)||name;}
+function spendingRowsForNSA(nsa){
+  if(!spendingRows)return[];
+  const key=spendingKey(nsa);
+  return spendingRows.filter(row=>spendingKey(row.nsa)===key);
+}
+function sumAmounts(rows){return round1((rows||[]).reduce((total,row)=>total+(Number(row.amount)||0),0));}
+function categorySummary(rows,limit=4){
+  const totals=new Map();
+  (rows||[]).forEach(row=>totals.set(row.category,(totals.get(row.category)||0)+(Number(row.amount)||0)));
+  return Array.from(totals,([category,total])=>({category,total:round1(total)})).sort((a,b)=>b.total-a.total).slice(0,limit);
+}
+function spendingSummaryForNSA(nsa){
+  const rows=spendingRowsForNSA(nsa);
+  return{rows,total:sumAmounts(rows),count:rows.length,categories:categorySummary(rows,4),projects:[...rows].sort((a,b)=>b.amount-a.amount).slice(0,5)};
+}
+function spendingCitySummary(){
+  if(!spendingRows)return{ready:false,total:0,count:0,areas:0,topNeighborhoods:[],topCategories:[]};
+  const byArea=new Map();
+  spendingRows.forEach(row=>{const key=spendingKey(row.nsa);byArea.set(key,(byArea.get(key)||0)+(Number(row.amount)||0));});
+  const topNeighborhoods=Array.from(byArea,([nsa,total])=>({nsa,total:round1(total)})).sort((a,b)=>b.total-a.total).slice(0,5);
+  return{ready:true,total:sumAmounts(spendingRows),count:spendingRows.length,areas:byArea.size,topNeighborhoods,topCategories:categorySummary(spendingRows,5)};
+}
+function spendingTotalForNSA(nsa){return spendingRows?spendingSummaryForNSA(nsa).total:0;}
+function spendingMaxTotal(){return Math.max(0,...(spendingCitySummary().topNeighborhoods||[]).map(row=>row.total));}
+function formatSpendingAmount(amountThousands){
+  const dollars=(Number(amountThousands)||0)*1000;
+  if(dollars>=1e9)return `$${(dollars/1e9).toFixed(2)}B`;
+  if(dollars>=1e6)return `$${(dollars/1e6).toFixed(1)}M`;
+  return `$${Math.round(dollars).toLocaleString()}`;
+}
+function spendingColor(amount){
+  const max=spendingMaxTotal();
+  if(!max||!amount)return TOKENS.br;
+  const idx=Math.max(0,Math.min(4,Math.floor((amount/max)*4.99)));
+  return PAL_G[idx];
+}
+function spendingSourceNote(){return `${SPENDING_SOURCE_LABEL}. Source amount fields are treated as thousands of dollars.`;}
+function spendingTooltipHtml(key,name){
+  if(!spendingRows)return `<strong>${escapeHtml(key||name)}</strong><br>Capital spending: loading`;
+  const summary=spendingSummaryForNSA(key);
+  return `<strong>${escapeHtml(key||name)}</strong><br>Capital spending: <strong>${formatSpendingAmount(summary.total)}</strong><br>${summary.count} allocated project records<br>${accuracyChip('CIP seed','proxy')}`;
+}
+function updateSpendingToggleUI(){
+  const btn=document.getElementById('lt-spend');
+  if(btn){btn.classList.toggle('on',spendingMode);btn.setAttribute('aria-pressed',String(spendingMode));}
+}
+function toggleSpendingMode(force){
+  spendingMode=typeof force==='boolean'?force:!spendingMode;
+  if(spendingMode){gapMode=false;blindSpotsOnly=false;updateGapToggleUI();requestSpendingRefresh();}
+  updateSpendingToggleUI();
+  if(geo)geo.setStyle(getStyle);
+  buildLeg();
+  refreshSide();
+  updateShareStrip();
+}
 function statusMeta(status){return status==='verified'?{label:'Verified',klass:'sv'}:status==='review'?{label:'In review',klass:'sr'}:{label:'Open',klass:'so'};}
 function sessionVoteKey(reportId,type){return `blt_vote_${reportId}_${type}`;}
 function hasSessionVote(reportId,type){return sessionStorage.getItem(sessionVoteKey(reportId,type))==='1';}
@@ -1444,6 +1927,130 @@ function benchComparison(metric,yi){if(benchMode==='neighborhood')return null;re
 function benchLabel(){return LEVEL_META[benchMode]?.benchmarkLabel||null;}
 function pctForMetric(value,metric,maxOverride){const max=maxOverride??MCFG[metric]?.max??100;if(value===null||value===undefined||Number.isNaN(Number(value)))return 0;return Math.min(100,Math.max(0,Math.round((Math.abs(value)/max)*100)));}
 function makeLevelSwitcher(scope,label='Benchmark context'){const scopeId=String(scope||'global').replace(/[^a-z0-9_-]/gi,'-');const noteId=`level-note-${scopeId}`;return`<div class="level-block" data-level-scope="${scopeId}"><div class="level-top"><div class="level-label">${label}</div><div class="level-switch" role="group" aria-label="${label}" aria-describedby="${noteId}">${Object.entries(LEVEL_META).map(([mode,meta])=>`<button type="button" class="level-btn ${benchMode===mode?'active':''}" onclick="setBenchMode('${mode}')" aria-pressed="${benchMode===mode?'true':'false'}">${meta.label}</button>`).join('')}</div></div><div class="level-note" id="${noteId}">${LEVEL_META[benchMode].note}</div></div>`;}
+function metricValues(metric,yi=curYI){return Object.keys(BASE).map(nsa=>({nsa,value:yv(nsa,metric,yi)})).filter(row=>Number.isFinite(row.value));}
+function cityMetricValue(metric,yi=curYI){const y=String(YEARS[yi]),city=BENCHMARKS.city?.[y]?.[metric];if(Number.isFinite(Number(city)))return round1(city);const vals=metricValues(metric,yi).map(row=>row.value);return vals.length?mean(vals):null;}
+function metricSpread(metric,yi=curYI){const vals=metricValues(metric,yi);if(!vals.length)return null;const sorted=[...vals].sort((a,b)=>a.value-b.value);return{low:sorted[0],high:sorted[sorted.length-1],count:sorted.length};}
+function metricConcernRows(metric,yi=curYI,limit=5){const vals=metricValues(metric,yi),cfg=MCFG[metric]||{};return vals.sort((a,b)=>cfg.inv?b.value-a.value:a.value-b.value).slice(0,limit);}
+function metricDisplay(metric,value){if(value===null||value===undefined)return'--';return`${value}${MCFG[metric]?.unit||''}`;}
+const PROFILE_METRICS=['hi','le','pv','un','bb','va','gs','hz'];
+const HAZARD_METRICS=['hz','rt','dp','ws'];
+function neighborhoodTopConcerns(nsa,yi=curYI,limit=4){
+  return selectableMetricKeys().filter(metric=>!['rt','dp','ws'].includes(metric)).map(metric=>({metric,value:yv(nsa,metric,yi),score:metricConcernScore(metric,yv(nsa,metric,yi))})).filter(row=>row.score!==null).sort((a,b)=>b.score-a.score).slice(0,limit);
+}
+function bestComparisonNeighborhood(nsa,yi=curYI){
+  let best=null;
+  Object.keys(BASE).filter(other=>other!==nsa).forEach(other=>{
+    let total=0,count=0;
+    PROFILE_METRICS.forEach(metric=>{
+      const a=yv(nsa,metric,yi),b=yv(other,metric,yi),cfg=MCFG[metric];
+      if(a===null||b===null||!cfg)return;
+      total+=Math.abs((a-b)/(cfg.max-cfg.min||1));
+      count+=1;
+    });
+    if(count&&(!best||total/count<best.distance))best={nsa:other,distance:total/count};
+  });
+  return best?.nsa||null;
+}
+function holcGradeBadge(grade){return grade?`${accuracyChip(`HOLC ${grade}`,'proxy')} ${HOLC_GRADE_INFO[grade]?.label||''}`:'Not matched by CSA center';}
+function renderNeighborhoodProfile(nsa){
+  requestHolcRefresh();
+  requestSpendingRefresh();
+  const grade=holcGradeForNSA(nsa),match=bestComparisonNeighborhood(nsa),concerns=neighborhoodTopConcerns(nsa);
+  const spending=spendingRows?spendingSummaryForNSA(nsa):null;
+  const profile=[['Health',metricDisplay('hi',yv(nsa,'hi',curYI))],['Housing',metricDisplay('va',yv(nsa,'va',curYI))],['Internet',metricDisplay('bb',yv(nsa,'bb',curYI))],['Environment',metricDisplay('gs',yv(nsa,'gs',curYI))],['311 hazards',metricDisplay('hz',yv(nsa,'hz',curYI))],['Capital spending',spending?formatSpendingAmount(spending.total):'Loading'],['Redlining',grade?`Grade ${grade}`:'Not matched']];
+  return `<div class="shd">Neighborhood profile</div><div class="city-profile">${profile.map(([label,value])=>`<div class="city-profile-item"><div class="city-profile-label">${escapeHtml(label)}</div><div class="city-profile-value">${escapeHtml(value)}</div></div>`).join('')}</div><div class="gap-card"><div class="gap-title">Top concerns</div>${concerns.map(row=>`<button type="button" class="city-rank" onclick="setMetricKey('${row.metric}')"><span class="city-rank-name">${escapeHtml(MCFG[row.metric]?.label||row.metric)}</span><span class="city-rank-value">${metricDisplay(row.metric,row.value)}</span></button>`).join('')}</div><div class="gap-card"><div class="gap-title">Context</div><div class="gap-mini-copy">Redlining match: ${holcGradeBadge(grade)}. ${match?`Closest current metric profile: ${escapeHtml(shortNeighborhood(match))}.`:''}</div></div>`;
+}
+function redliningStats(metric=curM,yi=curYI){
+  if(!holcData)return null;
+  const buckets=Object.fromEntries(HOLC_GRADES.map(grade=>[grade,{grade,count:0,total:0,values:[]}]));
+  Object.keys(BASE).forEach(nsa=>{
+    const grade=holcGradeForNSA(nsa),value=yv(nsa,metric,yi);
+    if(!grade||value===null)return;
+    buckets[grade].count+=1;
+    buckets[grade].total+=value;
+    buckets[grade].values.push({nsa,value});
+  });
+  return HOLC_GRADES.map(grade=>({...buckets[grade],avg:buckets[grade].count?round1(buckets[grade].total/buckets[grade].count):null}));
+}
+function redliningAnalysisHtml(metric=curM,yi=curYI){
+  requestHolcRefresh();
+  const stats=redliningStats(metric,yi),cfg=MCFG[metric]||{};
+  if(!stats)return `<div class="city-group"><div class="city-group-top"><div class="city-group-title">Redlining and current outcomes</div><div class="city-group-count">loading</div></div><div class="city-next-card"><div class="city-next-detail">Loading the 1937 HOLC layer for current-outcome comparison.</div></div></div>`;
+  return `<div class="city-group"><div class="city-group-top"><div class="city-group-title">Redlining and current outcomes</div><div class="city-group-count">${escapeHtml(cfg.label||metric)} · ${YEARS[yi]}</div></div><div class="city-next-grid">${stats.map(row=>`<div class="city-next-card"><div class="city-next-head"><div class="city-next-title">Grade ${row.grade} · ${escapeHtml(HOLC_GRADE_INFO[row.grade]?.label||'')}</div><span class="city-next-status ready">${row.count} CSAs</span></div><div class="city-next-detail">${row.avg===null?'No matched CSA centers.':`Average ${escapeHtml(cfg.label||metric).toLowerCase()}: ${row.avg}${cfg.unit||''}`}</div></div>`).join('')}</div><div class="src-n">CSA centers are matched to HOLC polygons for orientation; historic HOLC areas do not perfectly equal current neighborhood boundaries.</div></div>`;
+}
+function capitalSpendingOverviewHtml(){
+  requestSpendingRefresh();
+  if(!spendingRows)return `<div class="city-group"><div class="city-group-top"><div class="city-group-title">Capital spending overview</div><div class="city-group-count">loading</div></div><div class="city-next-card"><div class="city-next-detail">Loading Baltimore CIP neighborhood allocations.</div></div></div>`;
+  const summary=spendingCitySummary();
+  return `<div class="city-group"><div class="city-group-top"><div class="city-group-title">Capital spending overview</div><div class="city-group-count">${formatSpendingAmount(summary.total)} · ${summary.count} records</div></div><div class="city-next-grid"><div class="city-next-card"><div class="city-next-head"><div class="city-next-title">Top neighborhoods</div><span class="city-next-status ready">${summary.areas} CSAs</span></div><div class="city-next-detail">${summary.topNeighborhoods.map(row=>`${escapeHtml(shortNeighborhood(row.nsa))}: ${formatSpendingAmount(row.total)}`).join('<br>')}</div></div><div class="city-next-card"><div class="city-next-head"><div class="city-next-title">Top categories</div><span class="city-next-status ready">CIP</span></div><div class="city-next-detail">${summary.topCategories.map(row=>`${escapeHtml(row.category)}: ${formatSpendingAmount(row.total)}`).join('<br>')}</div></div></div><div class="city-actions"><button type="button" class="sb-btn" onclick="toggleSpendingMode(true)">Show spending layer</button></div><div class="src-n">${spendingSourceNote()}</div></div>`;
+}
+function spendingLoadingHtml(){return `<div class="gap-card"><div class="gap-title">Capital spending</div><div class="gap-mini-copy">Loading Baltimore CIP allocations from the generated local seed.</div></div>`;}
+function spendingProjectCard(row,color=COL_A){return `<div class="gap-card"><div class="gap-head"><div><div class="gap-title">${escapeHtml(row.program)}</div><div class="gap-meta">${escapeHtml(row.category)} · ${escapeHtml(row.status)}</div></div><div class="city-card-value" style="font-size:16px;color:${color}">${formatSpendingAmount(row.amount)}</div></div><div class="gap-mini-copy">${escapeHtml(truncateText(row.details||spendingSourceNote(),120))}</div></div>`;}
+function renderSpendingOne(nsa,tid){
+  const target=document.getElementById(tid);if(!target)return;
+  requestSpendingRefresh();
+  if(!spendingRows){target.innerHTML=spendingLoadingHtml();return;}
+  const summary=spendingSummaryForNSA(nsa),topCategory=summary.categories[0];
+  target.innerHTML=`<div class="shd">Capital spending allocations</div><div class="city-profile"><div class="city-profile-item"><div class="city-profile-label">Total</div><div class="city-profile-value">${formatSpendingAmount(summary.total)}</div></div><div class="city-profile-item"><div class="city-profile-label">Records</div><div class="city-profile-value">${summary.count}</div></div><div class="city-profile-item"><div class="city-profile-label">Top category</div><div class="city-profile-value">${escapeHtml(topCategory?.category||'None')}</div></div><div class="city-profile-item"><div class="city-profile-label">Source</div><div class="city-profile-value">CIP</div></div></div>${summary.categories.length?`<div class="gap-card"><div class="gap-title">Category mix</div>${summary.categories.map(row=>`<div class="city-rank"><span class="city-rank-name">${escapeHtml(row.category)}</span><span class="city-rank-value">${formatSpendingAmount(row.total)}</span></div>`).join('')}</div>`:`<div class="gap-card"><div class="gap-mini-copy">No capital spending records matched this neighborhood in the seed.</div></div>`}<div class="shd">Largest projects</div><div class="gap-grid">${summary.projects.map(row=>spendingProjectCard(row,COL_A)).join('')||'<div class="gap-card"><div class="gap-mini-copy">No project records available.</div></div>'}</div><button type="button" class="sb-btn" onclick="toggleSpendingMode(true)">Show spending layer</button><div class="src-n">${spendingSourceNote()}</div>`;
+}
+function renderSpendingTwo(p1,p2,tid){
+  const target=document.getElementById(tid);if(!target)return;
+  requestSpendingRefresh();
+  if(!spendingRows){target.innerHTML=spendingLoadingHtml();return;}
+  const a=spendingSummaryForNSA(p1),b=spendingSummaryForNSA(p2),gap=Math.abs(a.total-b.total);
+  const card=(nsa,summary,color)=>`<div class="gap-card"><div class="gap-head"><div><div class="gap-title">${escapeHtml(shortNeighborhood(nsa))}</div><div class="gap-meta">${summary.count} project records</div></div><div class="city-card-value" style="font-size:17px;color:${color}">${formatSpendingAmount(summary.total)}</div></div>${summary.categories.slice(0,3).map(row=>`<div class="city-rank"><span class="city-rank-name">${escapeHtml(row.category)}</span><span class="city-rank-value">${formatSpendingAmount(row.total)}</span></div>`).join('')||'<div class="gap-mini-copy">No matched projects.</div>'}</div>`;
+  target.innerHTML=`<div class="shd">Capital spending comparison</div><div class="gap-card"><div class="gap-title">Allocation gap</div><div class="gap-summary"><span>${escapeHtml(shortNeighborhood(p1))} vs ${escapeHtml(shortNeighborhood(p2))}</span><strong>${formatSpendingAmount(gap)}</strong></div><div class="gap-mini-copy">Compare cautiously: CIP allocations vary by infrastructure footprint and project location, not only neighborhood need.</div></div><div class="gap-pair">${card(p1,a,COL_A)}${card(p2,b,COL_B)}</div><button type="button" class="sb-btn" onclick="toggleSpendingMode(true)">Show spending layer</button><div class="src-n">${spendingSourceNote()}</div>`;
+}
+function hazardCards(nsa,color=COL_A){
+  return HAZARD_METRICS.map(metric=>{
+    const snap=latestNeighborhoodMetric(nsa,metric,curYI),city=cityMetricValue(metric,curYI),rank=neighborhoodConcernRank(metric,nsa,curYI);
+    const points=YEARS.map((year,i)=>({year,value:yv(nsa,metric,i)})).filter(point=>Number.isFinite(point.value));
+    const first=points[0],delta=first&&snap.value!==null?round1(snap.value-first.value):null;
+    const trend=delta===null?'':`Since ${first.year}: ${delta>=0?'+':''}${delta} calls. `;
+    return `<div class="gap-card"><div class="gap-head"><div><div class="gap-title">${escapeHtml(MCFG[metric]?.label||metric)}</div><div class="gap-meta">${snap.year||YEARS[curYI]}${snap.stale?' · latest available':''}</div></div>${metricAccuracyInline(metric)}</div><div class="city-card-value" style="color:${color}">${metricDisplay(metric,snap.value)}</div><div class="gap-mini-copy">${trend}${city===null?'':`City average ${metricDisplay(metric,city)}. `}${rank?`Concern rank ${rank.rank} of ${rank.total}.`:''}</div></div>`;
+  }).join('');
+}
+function renderHazardsOne(nsa,tid){
+  const reports=recentReportsForFamilies(nsa,['sanitation','environmental','infrastructure','vacant'],180);
+  document.getElementById(tid).innerHTML=`${metricAccuracyBox('hz','311 hazards metric')}<div class="shd">311 hazards drilldown</div><div class="gap-grid">${hazardCards(nsa,COL_A)}</div><div class="gap-card"><div class="gap-title">Recent local reports</div><div class="gap-mini-copy">${reports.length} matched resident reports in the last 180 days.</div><button type="button" class="sb-btn" onclick="showLayer('3')">Show 311 layer</button><button type="button" class="sb-btn" onclick="Live311.openReport()">Report 311</button></div><div class="src-n">Rat, dumping, and water/sewer signals are shown here as 311 hazard sub-signals, not as top-level health metrics.</div>`;
+}
+function renderHazardsTwo(p1,p2,tid){
+  document.getElementById(tid).innerHTML=`${metricAccuracyBox('hz','311 hazards metric')}<div class="shd">311 hazards drilldown</div><div class="gap-pair"><div>${hazardCards(p1,COL_A)}</div><div>${hazardCards(p2,COL_B)}</div></div><div class="src-n">Sub-signals stay inside the 311 hazards view: rat service requests, illegal dumping requests, and water/sewer requests.</div>`;
+}
+function setMetricKey(metric){const btn=document.querySelector(`.mtab[data-m="${metric}"]`);if(btn)setM(btn);}
+function selectableMetricKeys(){return Array.from(document.querySelectorAll('.mtab[data-m]')).map(btn=>btn.dataset.m);}
+const CITY_PROFILE=[
+  ['Population','577,193'],
+  ['Region','South Atlantic'],
+  ['City type','Big Cities'],
+  ['Local geography','55 neighborhood areas']
+];
+const CITY_GROUPS=[
+  {label:'Health outcomes',metrics:['hi','le','as','sm','ob','db','mh','pa']},
+  {label:'Social and economic factors',metrics:['pv','un','hs','fd','bb','rb','ui','gi']},
+  {label:'Physical environment and housing',metrics:['la','va','gs','cr','ap','ha','hz']}
+];
+const CITY_NEXT_DATA=[
+  {label:'Capital spending equity layers',status:'Layer ready',tone:'ready',detail:'Baltimore capital improvement spending from fiscal years 2014 to 2020 has 1,247 neighborhood allocations across all 55 neighborhood areas. Source amount fields are reported in thousands of dollars, about $2.39B total.',action:{label:'Show spending layer',layer:'spend'}},
+  {label:'Redlining vs current outcomes',status:'Analysis ready',tone:'ready',detail:'HOLC layer has 59 graded Baltimore polygons. The overview now summarizes the current metric by matched HOLC grade.',action:{label:'Show Redlining Map',layer:'holc'}},
+  {label:'311 hazards drilldown',status:'Live layer wired',tone:'live',detail:'Reported hazards now open into rat, dumping, water/sewer, and recent local report detail without exposing those sub-signals as metric tabs.',action:{label:'Show 311 layer',layer:'3'}},
+  {label:'Demographic overview by tract',status:'Needs tract cache',tone:'pending',detail:'ACS pulls exist for map metrics; the overview module should add age, race/ethnicity, disability, and household structure as a separate tract cache.'}
+];
+function cityMetricCard(metric,label=MCFG[metric]?.label||metric){
+  const value=cityMetricValue(metric),unit=MCFG[metric]?.unit||'',spread=metricSpread(metric),meta=seriesProvenance(metric);
+  const spreadText=spread?`${shortNeighborhood(spread.low.nsa)} ${spread.low.value}${unit} to ${shortNeighborhood(spread.high.nsa)} ${spread.high.value}${unit}`:'Neighborhood coverage pending';
+  return`<button type="button" class="city-card" onclick="setMetricKey('${metric}')" aria-label="Map ${escapeHtml(label)}"><div class="city-card-label">${escapeHtml(label)} ${accuracyChip(meta.label,meta.tone)}</div><div class="city-card-value">${value===null?'--':`${value}${unit}`}</div><div class="city-card-note">${escapeHtml(spreadText)}</div></button>`;
+}
+function cityProfileHtml(){return `<div class="city-profile">${CITY_PROFILE.map(([label,value])=>`<div class="city-profile-item"><div class="city-profile-label">${escapeHtml(label)}</div><div class="city-profile-value">${escapeHtml(value)}</div></div>`).join('')}</div>`;}
+function cityGroupHtml(group,selectableMetrics){const metrics=group.metrics.filter(metric=>selectableMetrics.includes(metric));return `<div class="city-group"><div class="city-group-top"><div class="city-group-title">${escapeHtml(group.label)}</div><div class="city-group-count">${metrics.length} metrics</div></div><div class="city-chip-row">${metrics.map(metric=>`<button type="button" class="city-chip" onclick="setMetricKey('${metric}')">${escapeHtml(MCFG[metric]?.label||metric)}</button>`).join('')}</div></div>`;}
+function cityNextDataHtml(){return `<div class="city-group"><div class="city-group-top"><div class="city-group-title">Next-step modules</div><div class="city-group-count">wired + queued</div></div><div class="city-next-grid">${CITY_NEXT_DATA.map(item=>`<div class="city-next-card"><div class="city-next-head"><div class="city-next-title">${escapeHtml(item.label)}</div><span class="city-next-status ${escapeHtml(item.tone)}">${escapeHtml(item.status)}</span></div><div class="city-next-detail">${escapeHtml(item.detail)}</div>${item.action?`<button type="button" class="city-next-action" onclick="showLayer('${item.action.layer}')">${escapeHtml(item.action.label)}</button>`:''}</div>`).join('')}</div></div>`;}
+function renderCityOverview(){
+  const el=document.getElementById('city-overview');if(!el)return;
+  const yi=curYI,metric=curM,cfg=MCFG[metric]||{},unit=cfg.unit||'',cityVal=cityMetricValue(metric,yi),spread=metricSpread(metric,yi),rankRows=metricConcernRows(metric,yi),rankLabel=cfg.inv?'Highest local burden':'Lowest local values';
+  const selectableMetrics=selectableMetricKeys(),mappedMetrics=selectableMetrics.length,currentYearMetrics=selectableMetrics.filter(k=>metricValues(k,yi).length).length;
+  const source=DATA_META?.source_files?sourceLine():'Loaded dashboard data';
+  el.innerHTML=`<div class="city-hero"><div class="city-eyebrow">City overview for</div><div class="city-title">Baltimore, MD</div><div class="city-copy">${YEARS[yi]} snapshot · ${mappedMetrics} mapped metric tabs · ${currentYearMetrics} current-year neighborhood series · ${source}</div></div>${cityProfileHtml()}${makeLevelSwitcher('city','Benchmark context')}<div class="city-section-title">Metrics overview</div><div class="city-grid">${cityMetricCard('hi','Health index')}${cityMetricCard('le','Life expectancy')}${cityMetricCard('un','Unemployment')}${cityMetricCard('bb','Broadband access')}${cityMetricCard('fd','Food access')}${cityMetricCard('gs','Green space')}</div>${CITY_GROUPS.map(group=>cityGroupHtml(group,selectableMetrics)).join('')}${cityNextDataHtml()}${capitalSpendingOverviewHtml()}${redliningAnalysisHtml(metric,yi)}<div class="city-section-title">${escapeHtml(MCFG[metric]?.label||metric)} · ${rankLabel}</div><div>${rankRows.map(row=>`<button type="button" class="city-rank" onclick="pinA=${quoteJsArg(row.nsa)};pinB=null;activeSlot='b';updatePinBar();updatePinStyles();refreshSide();updateShareStrip();" aria-label="Open ${escapeHtml(shortNeighborhood(row.nsa))}"><span class="city-rank-name">${escapeHtml(shortNeighborhood(row.nsa))}</span><span class="city-rank-value">${row.value}${unit}</span></button>`).join('')}</div><div class="city-section-title">Current metric</div><div class="city-card"><div class="city-card-label">${escapeHtml(MCFG[metric]?.label||metric)} · city value</div><div class="city-card-value">${cityVal===null?'--':`${cityVal}${unit}`}</div><div class="city-card-note">${spread?`${spread.count} neighborhood areas, range ${spread.low.value}${unit} to ${spread.high.value}${unit}`:'Neighborhood values unavailable for this year.'}</div></div><div class="city-actions"><button type="button" class="sb-btn" onclick="toggleGapMode()">Gap view</button><button type="button" class="sb-btn" onclick="openShare()">Share</button><button type="button" class="sb-btn" onclick="downloadCurrentCsv()">Download CSV</button><button type="button" class="sb-btn" onclick="toggleChat(true)">Ask data</button></div><div class="src-n">City profile mirrors CHDB-style overview fields. Neighborhood metrics use BALTI2 neighborhood data.</div>`;
+}
 function renderContextMetricCard(nsa,metric,value,contextText,color=COL_A){
   const displayValue=value===null||value===undefined?'N/A':`${value}${MCFG[metric]?.unit||''}`;
   return `<div style="background:var(--bg2);border-radius:5px;padding:6px 8px"><div style="font-size:13px;font-weight:500;color:${color}">${escapeHtml(displayValue)}</div><div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap"><div style="font-size:9px;color:var(--t2)">${escapeHtml(MCFG[metric]?.label||metric)}</div>${metricAccuracyInline(metric)}</div><div class="metric-note">${escapeHtml(contextText)}</div>${renderAnnotationPanel(nsa,annotationContext('metric',metric),MCFG[metric]?.label||metric)}</div>`;
@@ -1577,6 +2184,51 @@ function deskScopeNeighborhoods(){
   if(pinA&&pinB)return[pinA,pinB];
   if(pinA)return[pinA];
   return Object.keys(BASE);
+}
+function chatContext(){return{pinned:[pinA,pinB].filter(Boolean),metric:curM,metricLabel:MCFG[curM]?.label||curM,year:YEARS[curYI],benchmarkLevel:benchMode};}
+function toggleChat(force){chatOpen=typeof force==='boolean'?force:!chatOpen;renderChatPanel();}
+function chatCitationHtml(citations){
+  if(!Array.isArray(citations)||!citations.length)return'';
+  return `<div class="chat-cites">${citations.map(c=>`<span class="chat-cite">${escapeHtml([c.metric_label||c.metric,c.csa,(c.years||[]).join('-'),c.source].filter(Boolean).join(' · '))}</span>`).join('')}</div>`;
+}
+function chatMessageHtml(message){
+  const role=message.role==='user'?'user':'assistant';
+  const label=role==='user'?'You':'Assistant';
+  return `<div class="chat-msg ${role}"><div class="chat-role">${label}</div><div class="chat-copy">${escapeHtml(message.content||'')}</div>${chatCitationHtml(message.citations)}</div>`;
+}
+function renderChatPanel(){
+  const shell=document.getElementById('chat-shell'),panel=document.getElementById('chat-panel'),toggle=document.getElementById('lt-chat');
+  if(!shell||!panel)return;
+  shell.classList.toggle('open',chatOpen);
+  shell.setAttribute('aria-hidden',String(!chatOpen));
+  if(toggle){toggle.classList.toggle('on',chatOpen);toggle.setAttribute('aria-pressed',String(chatOpen));}
+  const starters=!chatMessages.length?`<div class="chat-starters">${CHAT_STARTERS.map(q=>`<button type="button" class="chat-chip" onclick="askChat(${quoteJsArg(q)})"${chatBusy?' disabled':''}>${escapeHtml(q)}</button>`).join('')}</div>`:'';
+  const log=chatMessages.length?chatMessages.map(chatMessageHtml).join(''):`<div class="desk-empty">Ask about dashboard metrics, rankings, comparisons, or trends.</div>`;
+  panel.innerHTML=`<div class="chat-top"><div class="chat-title">Ask the data</div><button type="button" class="chat-btn secondary" onclick="toggleChat(false)">Close</button></div><div class="chat-log" id="chat-log">${log}</div>${starters}<form class="chat-form" onsubmit="askChat();return false;"><div class="chat-disclaimer">AI-generated answers, grounded only in this dashboard's data (2016-2023). May be incomplete. Not official city guidance. Free-tier provider may use API traffic for product improvement.</div><textarea class="chat-input" id="chat-input" maxlength="500" placeholder="Ask a question about the dashboard data."${chatBusy?' disabled':''}></textarea><div class="chat-actions"><button type="submit" class="chat-btn"${chatBusy?' disabled':''}>${chatBusy?'Asking...':'Send'}</button><button type="button" class="chat-btn secondary" onclick="clearChat()"${chatBusy||!chatMessages.length?' disabled':''}>Clear</button></div></form>`;
+  const logEl=document.getElementById('chat-log');if(logEl)logEl.scrollTop=logEl.scrollHeight;
+}
+function clearChat(){chatMessages=[];renderChatPanel();}
+function pushChat(role,content,citations=[]){chatMessages.push({role,content,citations});chatMessages=chatMessages.slice(-10);renderChatPanel();}
+async function askChat(forcedQuestion=''){
+  const input=document.getElementById('chat-input');
+  const question=(forcedQuestion||input?.value||'').trim();
+  if(!question){if(input)input.focus();return;}
+  if(question.length>500){toast('Keep questions under 500 characters.');return;}
+  pushChat('user',question);
+  if(input)input.value='';
+  if(!CHAT_WORKER_URL){pushChat('assistant','Chat endpoint is not configured yet. Deploy the Worker and set window.BALTI2_CHAT_WORKER_URL.');return;}
+  chatBusy=true;renderChatPanel();
+  const history=chatMessages.slice(-9,-1).map(m=>({role:m.role,content:m.content}));
+  try{
+    const resp=await fetch(CHAT_WORKER_URL,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({question,history,context:chatContext()})});
+    const data=await resp.json().catch(()=>({}));
+    if(!resp.ok)throw new Error(data.error||'Chat request failed.');
+    pushChat('assistant',data.answer||'No answer returned.',data.citations||[]);
+  }catch(error){
+    pushChat('assistant',error.message||'The data assistant could not answer right now.');
+  }finally{
+    chatBusy=false;renderChatPanel();
+  }
 }
 function deskScopeLabel(){
   const scope=deskScopeNeighborhoods();
@@ -1825,12 +2477,14 @@ function renderOne(){
   const badgeFg=comparisonDelta===null?(hiV>=65?TOKENS.success:hiV<45?TOKENS.danger:TOKENS.warn):comparisonDelta>1?TOKENS.success:comparisonDelta<-1?TOKENS.danger:TOKENS.warn;
   const badgeLabel=comparisonDelta===null?(hiV>=65?'Above avg':hiV<45?'Below avg':'Near avg'):comparisonDelta>1?`Above ${compText.toLowerCase()}`:comparisonDelta<-1?`Below ${compText.toLowerCase()}`:`Near ${compText.toLowerCase()}`;
   const deltaColor=delta===null?TOKENS.t2:delta>=0?TOKENS.success:TOKENS.danger;
-  document.getElementById('t-ov1').innerHTML=`${currentPilotConfig()?renderPilotOverview(p):''}${makeLevelSwitcher('ov1')}${metricAccuracyBox(curM,'Current map metric')}<div style="font-size:13px;font-weight:500">${shortNeighborhood(p)}</div><div style="font-size:9px;color:var(--t3)">${p} · ${YEARS[yi]}</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:26px;font-weight:500;color:${COL_A}">${hiV}</div><div style="font-size:10px;color:var(--t2)">health index<br><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${badgeBg};color:${badgeFg}">${badgeLabel}</span>${delta!==null?`<span style="color:${deltaColor};margin-left:4px">${delta>=0?'▲':'▼'}${Math.abs(delta)}</span>`:''}</div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t2)"><span style="color:${COL_A}">${shortNeighborhood(p)}: ${hiV}</span><span>${compHi!==null?`${compText}: ${compHi}`:'Local view only'}</span></div><div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;position:relative;margin-bottom:2px"><div style="height:100%;width:${pctForMetric(hiV,'hi')}%;background:${COL_A};border-radius:2px"></div>${compHi!==null?`<div style="position:absolute;top:0;left:${pctForMetric(compHi,'hi')}%;width:2px;height:100%;background:var(--t3)"></div>`:''}</div>${renderAnnotationPanel(p,annotationContext('metric','hi'),'Health index')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${['le','as','la','va','pv','hs'].map(k=>{const local=yv(p,k,yi),comp=benchComparison(k,yi);return renderContextMetricCard(p,k,local,comp!==null?`${compText}: ${comp}${MCFG[k].unit}`:'Local neighborhood value');}).join('')}</div><div style="margin-top:4px;background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this view</strong><br><span id="one-url" style="font-family:var(--font-mono);word-break:break-all">${buildURL()}</span><br><button type="button" onclick="copyURL()" aria-label="Copy shareable link for ${shortNeighborhood(p)}" style="margin-top:5px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for ${shortNeighborhood(p)}" style="margin-top:5px;margin-left:4px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">More options</button></div><div class="src-n">${sourceLine()}</div>`;
-  const keys=[{k:'hi',l:'Health idx'},{k:'le',l:'Life exp.'},{k:'as',l:'Asthma'},{k:'la',l:'Lead'},{k:'pv',l:'Poverty'},{k:'un',l:'Unemploy.'}];
+  document.getElementById('t-ov1').innerHTML=`${currentPilotConfig()?renderPilotOverview(p):''}${makeLevelSwitcher('ov1')}${metricAccuracyBox(curM,'Current map metric')}${renderNeighborhoodProfile(p)}<div style="font-size:13px;font-weight:500">${shortNeighborhood(p)}</div><div style="font-size:9px;color:var(--t3)">${p} · ${YEARS[yi]}</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:26px;font-weight:500;color:${COL_A}">${hiV}</div><div style="font-size:10px;color:var(--t2)">health index<br><span style="font-size:9px;padding:2px 5px;border-radius:3px;background:${badgeBg};color:${badgeFg}">${badgeLabel}</span>${delta!==null?`<span style="color:${deltaColor};margin-left:4px">${delta>=0?'▲':'▼'}${Math.abs(delta)}</span>`:''}</div></div><div style="display:flex;justify-content:space-between;font-size:9px;color:var(--t2)"><span style="color:${COL_A}">${shortNeighborhood(p)}: ${hiV}</span><span>${compHi!==null?`${compText}: ${compHi}`:'Local view only'}</span></div><div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;position:relative;margin-bottom:2px"><div style="height:100%;width:${pctForMetric(hiV,'hi')}%;background:${COL_A};border-radius:2px"></div>${compHi!==null?`<div style="position:absolute;top:0;left:${pctForMetric(compHi,'hi')}%;width:2px;height:100%;background:var(--t3)"></div>`:''}</div>${renderAnnotationPanel(p,annotationContext('metric','hi'),'Health index')}<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">${['le','as','la','va','pv','hs'].map(k=>{const local=yv(p,k,yi),comp=benchComparison(k,yi);return renderContextMetricCard(p,k,local,comp!==null?`${compText}: ${comp}${MCFG[k].unit}`:'Local neighborhood value');}).join('')}</div><div style="margin-top:4px;background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this view</strong><br><span id="one-url" style="font-family:var(--font-mono);word-break:break-all">${buildURL()}</span><br><button type="button" onclick="copyURL()" aria-label="Copy shareable link for ${shortNeighborhood(p)}" style="margin-top:5px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for ${shortNeighborhood(p)}" style="margin-top:5px;margin-left:4px;padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">More options</button></div><div class="src-n">${sourceLine()}</div>`;
+  const keys=[{k:'hi',l:'Health index'},{k:'le',l:'Life expectancy'},{k:'as',l:'Asthma'},{k:'la',l:'Lead exposure'},{k:'pv',l:'Poverty'},{k:'un',l:'Unemployment'}];
   document.getElementById('t-tr1').innerHTML=`<div class="src-n" style="margin-bottom:4px">2016–${YEARS[yi]}</div>`+keys.map((kv,i)=>{const vals=allY(p,kv.k),cur=vals[yi],chg=Math.round((cur-vals[0])*10)/10;const improving=MCFG[kv.k].inv?chg<0:chg>0;const tone=improving?TOKENS.success:TOKENS.danger;const sign=chg>=0?'+':'';return`<div style="display:flex;align-items:center;gap:5px;padding:4px 0;border-bottom:0.5px solid var(--br)"><div style="flex:1;font-size:10px;color:var(--t2)">${kv.l}</div><canvas id="spk1-${i}" width="60" height="18" style="flex-shrink:0"></canvas><div style="min-width:26px;font-size:11px;font-weight:500">${cur}${MCFG[kv.k].unit}</div><div style="font-size:9px;min-width:24px;text-align:right;color:${tone}">${sign}${chg}</div></div>`;}).join('');
   requestAnimationFrame(()=>keys.forEach((kv,i)=>drawSpk('spk1-'+i,allY(p,kv.k),yi,COL_A)));
-  document.getElementById('t-dt1').innerHTML=`${makeLevelSwitcher('dt1','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}`+[['hi','Health idx',100,false,''],['le','Life exp',85,false,' yrs'],['as',asthmaMetricMeta().compact,100,true,MCFG.as.unit],['la','Lead exp',75,true,'%'],['pv','Poverty',55,true,'%'],['un','Unemploy.',25,true,'%'],['va','Vacant',28,true,'%'],['hz','Total Hazards',250,true,' calls'],['rt','Rat Erad.',100,true,' calls'],['dp','Illegal Dump',100,true,' calls'],['ws','Water/Sewer',100,true,' calls']].map(([k,l,mx,inv,u])=>{const v=yv(p,k,yi)||0,cv=benchComparison(k,yi),pct=pctForMetric(v,k,mx),cpct=cv!==null?pctForMetric(cv,k,mx):null,better=cv===null?null:(inv?v<cv:v>cv),col=better===null?TOKENS.brand:better?TOKENS.success:TOKENS.danger;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div class="vs-track-wrap"><div class="vs-track"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div>${cpct!==null?`<div class="vs-benchmark" style="left:${cpct}%"></div>`:''}</div></div><div style="width:32px;text-align:right;font-size:10px;font-weight:500">${v}${u}</div><div style="font-size:9px;color:${cv===null?TOKENS.t3:col};width:74px;text-align:right">${cv!==null?`${compText}: ${cv}${u}`:'Local'}</div></div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()}</div>`;
+  document.getElementById('t-dt1').innerHTML=`${makeLevelSwitcher('dt1','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}`+[['hi','Health index',100,false,''],['le','Life expectancy',85,false,' years'],['as',asthmaMetricMeta().compact,100,true,MCFG.as.unit],['la','Lead exposure',75,true,'%'],['pv','Poverty',55,true,'%'],['un','Unemployment',25,true,'%'],['va','Vacant housing',28,true,'%'],['hz','Reported 311 hazards',250,true,' calls']].map(([k,l,mx,inv,u])=>{const v=yv(p,k,yi)||0,cv=benchComparison(k,yi),pct=pctForMetric(v,k,mx),cpct=cv!==null?pctForMetric(cv,k,mx):null,better=cv===null?null:(inv?v<cv:v>cv),col=better===null?TOKENS.brand:better?TOKENS.success:TOKENS.danger;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div class="vs-track-wrap"><div class="vs-track"><div style="height:100%;width:${pct}%;background:${col};border-radius:2px"></div>${cpct!==null?`<div class="vs-benchmark" style="left:${cpct}%"></div>`:''}</div></div><div style="width:32px;text-align:right;font-size:10px;font-weight:500">${v}${u}</div><div style="font-size:9px;color:${cv===null?TOKENS.t3:col};width:74px;text-align:right">${cv!==null?`${compText}: ${cv}${u}`:'Local'}</div></div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()}</div>`;
   renderGapPanelOne(p,'t-gap1');
+  renderHazardsOne(p,'t-hz1');
+  renderSpendingOne(p,'t-sp1');
   renderReportsFor(p,'t-rp1');
   document.getElementById('t-vl1').innerHTML=makeValidationPanel([p],'vl1');
   document.getElementById('t-sb1').innerHTML=`${renderPilotSubmitIntro()}${makeSubmitForm('sb1',p)}`;
@@ -1838,11 +2492,13 @@ function renderOne(){
 }
 function renderTwo(){
   const p1=pinA,p2=pinB,yi=curYI,v1=yv(p1,'hi',yi),v2=yv(p2,'hi',yi),gap=Math.abs(v1-v2),compHi=benchComparison('hi',yi),compText=benchLabel();
-  const mkeys=[{k:'hi',l:'Health index',u:''},{k:'le',l:'Life exp.',u:' yrs'},{k:'as',l:asthmaMetricMeta().compact,u:MCFG.as.unit},{k:'la',l:'Lead',u:'%'},{k:'pv',l:'Poverty',u:'%'},{k:'un',l:'Unemploy.',u:'%'},{k:'hs',l:'HS grad',u:'%'},{k:'va',l:'Vacant',u:'%'}];
+  const mkeys=[{k:'hi',l:'Health index',u:''},{k:'le',l:'Life expectancy',u:' years'},{k:'as',l:asthmaMetricMeta().compact,u:MCFG.as.unit},{k:'la',l:'Lead exposure',u:'%'},{k:'pv',l:'Poverty',u:'%'},{k:'un',l:'Unemployment',u:'%'},{k:'hs',l:'High school graduation',u:'%'},{k:'va',l:'Vacant housing',u:'%'}];
   document.getElementById('t-cmp').innerHTML=`${makeLevelSwitcher('cmp')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:5px;margin-bottom:4px"><div style="flex:1;background:${TOKENS.accentLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p1)}</div><div style="font-size:20px;font-weight:500;color:${COL_A}">${v1}</div></div><div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 3px"><div style="font-size:9px;color:var(--t3)">gap</div><div style="font-size:14px;font-weight:500">${gap}</div></div><div style="flex:1;background:${TOKENS.brandLt};border-radius:6px;padding:8px;text-align:center"><div style="font-size:9px;color:var(--t2);margin-bottom:1px">${shortNeighborhood(p2)}</div><div style="font-size:20px;font-weight:500;color:${COL_B}">${v2}</div></div></div><div class="bench-chip"><span class="bench-dot"></span>${compHi!==null?`${compText}: ${compHi}`:'Local-only comparison'}</div>${mkeys.map(({k,l,u})=>{const a=yv(p1,k,yi),b=yv(p2,k,yi),comp=benchComparison(k,yi),mx=MCFG[k]?.max||100,w1=Math.min(92,pctForMetric(a,k,mx)),w2=Math.min(92,pctForMetric(b,k,mx)),wc=comp!==null?Math.min(92,pctForMetric(comp,k,mx)):null;return`<div class="vs-row"><div class="vs-lbl">${l}${metricAccuracyInline(k)}</div><div style="flex:1;display:flex;flex-direction:column;gap:2px"><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A};font-weight:500">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B};font-weight:500">${b}${u}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3};font-weight:500">${compText}: ${comp}${u}</span></div>`:''}</div></div></div>`;}).join('')}<div style="background:var(--bg2);border-radius:6px;padding:7px 9px;font-size:9px;color:var(--t2)"><strong style="color:var(--tx)">Share this comparison</strong><br><span style="font-family:var(--font-mono);word-break:break-all;font-size:9px">${buildURL()}</span><br><div style="display:flex;gap:4px;margin-top:5px;flex-wrap:wrap"><button type="button" onclick="copyURL()" aria-label="Copy shareable comparison link for ${shortNeighborhood(p1)} and ${shortNeighborhood(p2)}" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--brand);color:${TOKENS.neutralInverse};cursor:pointer">Copy link</button><button type="button" onclick="openShare()" aria-label="Open more share options for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Share options</button><button type="button" onclick="shareEmail()" aria-label="Share this neighborhood comparison by email" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Email</button><button type="button" onclick="copyEmbed()" aria-label="Show embed code for this neighborhood comparison" style="padding:3px 8px;font-size:10px;border-radius:4px;border:0.5px solid var(--br);background:var(--bg);color:var(--tx);cursor:pointer">Embed</button></div></div><div class="src-n">${sourceLine()} · ${YEARS[yi]}</div>`;
   document.getElementById('t-tra').innerHTML=`${makeLevelSwitcher('tra')}${metricAccuracyBox('hi','Trajectory metric')}<div class="cmp-legend"><div class="cll"><div class="clsq" style="background:${COL_A}"></div>${shortNeighborhood(p1)}</div><div class="cll"><div class="clsq" style="background:${COL_B}"></div>${shortNeighborhood(p2)}</div>${compHi!==null?`<div class="cll"><div class="clsq" style="background:${TOKENS.t3}"></div>${compText}</div>`:''}</div><div style="position:relative;width:100%;height:140px"><canvas id="traj-chart"></canvas></div><div class="src-n">${healthIndexSourceLine()}</div>`;
-  document.getElementById('t-det').innerHTML=`${makeLevelSwitcher('det','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:8px;font-size:9px;margin-bottom:5px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_A};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p1)}</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_B};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p2)}</span>${compHi!==null?`<span class="bench-chip" style="margin-left:auto"><span class="bench-dot"></span>${compText}</span>`:''}</div>`+[['le','Life exp',85,' yrs'],['as',asthmaMetricMeta().compact,100,MCFG.as.unit],['la','Lead',75,'%'],['pv','Poverty',55,'%'],['un','Unemploy.',25,'%'],['va','Vacant',28,'%'],['hz','Total Hazards',250,' calls'],['rt','Rat Erad.',100,' calls'],['dp','Illegal Dump',100,' calls'],['ws','Water/Sewer',100,' calls']].map(([k,l,mx,u])=>{const a=yv(p1,k,yi)||0,b=yv(p2,k,yi)||0,comp=benchComparison(k,yi),w1=pctForMetric(a,k,mx),w2=pctForMetric(b,k,mx),wc=comp!==null?pctForMetric(comp,k,mx):null,g=Math.abs(Math.round((a-b)*10)/10);return`<div style="padding:3px 0;border-bottom:0.5px solid var(--br)"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:9px;color:var(--t2)">${l}${metricAccuracyInline(k)}</span><span style="font-size:9px;color:var(--t3)">gap:${g}${u}</span></div><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A}">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B}">${b}${u}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px;margin-top:2px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3}">${compText}: ${comp}${u}</span></div>`:''}</div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()} · EJScreen</div>`;
+  document.getElementById('t-det').innerHTML=`${makeLevelSwitcher('det','Determinant context')}${metricAccuracyBox(curM,'Current map metric')}<div style="display:flex;gap:8px;font-size:9px;margin-bottom:5px"><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_A};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p1)}</span><span style="display:flex;align-items:center;gap:3px"><span style="width:8px;height:3px;background:${COL_B};display:inline-block;border-radius:1px"></span>${shortNeighborhood(p2)}</span>${compHi!==null?`<span class="bench-chip" style="margin-left:auto"><span class="bench-dot"></span>${compText}</span>`:''}</div>`+[['le','Life expectancy',85,' years'],['as',asthmaMetricMeta().compact,100,MCFG.as.unit],['la','Lead exposure',75,'%'],['pv','Poverty',55,'%'],['un','Unemployment',25,'%'],['va','Vacant housing',28,'%'],['hz','Reported 311 hazards',250,' calls']].map(([k,l,mx,u])=>{const a=yv(p1,k,yi)||0,b=yv(p2,k,yi)||0,comp=benchComparison(k,yi),w1=pctForMetric(a,k,mx),w2=pctForMetric(b,k,mx),wc=comp!==null?pctForMetric(comp,k,mx):null,g=Math.abs(Math.round((a-b)*10)/10);return`<div style="padding:3px 0;border-bottom:0.5px solid var(--br)"><div style="display:flex;justify-content:space-between;margin-bottom:1px"><span style="font-size:9px;color:var(--t2)">${l}${metricAccuracyInline(k)}</span><span style="font-size:9px;color:var(--t3)">gap:${g}${u}</span></div><div style="display:flex;align-items:center;gap:3px;margin-bottom:1px"><div style="height:4px;width:${w1}%;background:${COL_A};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_A}">${a}${u}</span></div><div style="display:flex;align-items:center;gap:3px"><div style="height:4px;width:${w2}%;background:${COL_B};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${COL_B}">${b}${u}</span></div>${comp!==null?`<div style="display:flex;align-items:center;gap:3px;margin-top:2px"><div style="height:2px;width:${wc}%;background:${TOKENS.t3};border-radius:2px;min-width:2px"></div><span style="font-size:9px;color:${TOKENS.t3}">${compText}: ${comp}${u}</span></div>`:''}</div>`;}).join('')+`<div class="src-n" style="margin-top:4px">${sourceLine()} · EJScreen</div>`;
   renderGapPanelTwo(p1,p2,'t-gap2');
+  renderHazardsTwo(p1,p2,'t-hz2');
+  renderSpendingTwo(p1,p2,'t-sp2');
   renderReportsFor2(p1,p2,'t-rp2');
   document.getElementById('t-vl2').innerHTML=makeValidationPanel([p1,p2],'vl2');
   document.getElementById('t-sb2').innerHTML=makeSubmitForm('sb2',p1,p2);
@@ -1879,10 +2535,11 @@ async function subR(formId){const form=document.getElementById(`${formId}-form`)
 function newReport(formId){const form=document.getElementById(`${formId}-form`);const success=document.getElementById(`${formId}-success`);if(form)form.reset();if(form)form.style.display='flex';if(success)success.style.display='none';const picker=document.getElementById(`${formId}-location`);const label=document.getElementById(`${formId}-pin-label`);delete draftReportLocations[formId];if(activeReportPinForm===formId)activeReportPinForm=null;if(picker)picker.setAttribute('aria-pressed','false');if(label)label.textContent='Click to pin approximate location';const desc=form?.querySelector('#rf-desc');if(desc)desc.focus();}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2800);}
 function rebuildReportMarkers(){if(!map)return;rMks.forEach(marker=>{if(map.hasLayer(marker))map.removeLayer(marker);});rMks=[];REPORTS.forEach(report=>{const location=reportLocation(report);if(!location)return;const ic=L.divIcon({className:'',html:`<div style="width:10px;height:10px;border-radius:50%;background:${report.color};border:2px solid ${TOKENS.bg};cursor:pointer"></div>`,iconSize:[10,10],iconAnchor:[5,5]});const mk=L.marker(location,{icon:ic});mk.bindPopup(`<div style="font-size:11px;font-family:sans-serif;min-width:130px"><strong>${escapeHtml(report.title)}</strong><br><span style="color:${TOKENS.t3};font-size:10px">${escapeHtml(report.nsa)}</span><br><span style="color:${TOKENS.t3};font-size:10px">${escapeHtml(report.trackingId)}</span></div>`,{closeButton:false});rMks.push(mk);if(ls.r)mk.addTo(map);});}
-function initMks(){rebuildReportMarkers();THREE11.forEach(c=>{const r=Math.max(8,Math.min(22,c.cnt/7));const ic=L.divIcon({className:'',html:`<div style="width:${r*2}px;height:${r*2}px;border-radius:50%;background:${TOKENS.warnLt};border:1.5px solid ${TOKENS.warn};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:500;color:${TOKENS.warn}">${c.cnt}</div>`,iconSize:[r*2,r*2],iconAnchor:[r,r]});cMks.push(L.marker([c.lat,c.lng],{icon:ic}));});}
+function initMks(){rebuildReportMarkers();}
+document.getElementById('metric-info-modal').addEventListener('click',closeMetricInfo);
 document.getElementById('share-modal').addEventListener('click',closeModal);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal();if(deskOpen)toggleDesk(false);}});
-async function initMap(){document.getElementById('ylabels').innerHTML=YEARS.map(y=>`<span>${y}</span>`).join('');map=L.map('balt-map',{zoomControl:true,attributionControl:false}).setView([39.29,-76.62],11);map.on('click',e=>{if(activeReportPinForm)captureReportLocation(activeReportPinForm,e.latlng);});L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);try{const [baseResp, geoResp] = await Promise.all([fetch('data.json',{cache:'no-store'}),fetch('csa_boundaries.geojson',{cache:'no-store'})]);if(!baseResp.ok) throw new Error(`Failed to load data.json (${baseResp.status})`);if(!geoResp.ok) throw new Error(`Failed to load csa_boundaries.geojson (${geoResp.status})`);const normalizedData=normalizeDataset(await baseResp.json());DATA_META=normalizedData.meta||{};BASE=normalizedData.neighborhoods||{};BENCHMARKS=normalizedData.benchmarks||{city:{},state:{},federal:{}};applyMetricMetadata();const geoData = await geoResp.json();geo=L.geoJSON(geoData,{style:getStyle,onEachFeature:(feature,layer)=>{const name=geoName(feature.properties);const key=findK(name);layer.on({click:onNSAClick,mouseover:()=>{const label=key||name||'Neighborhood';const tooltip=gapMode&&key?gapTooltipHtml(key,name):`${label}<br>${MCFG[curM].label}: ${key?yv(key,curM,curYI):'N/A'}${key&&yv(key,curM,curYI)!==null?MCFG[curM].unit:''}`;layer.bindTooltip(tooltip,{sticky:true,direction:'top',opacity:0.95}).openTooltip();if(key!==pinA&&key!==pinB) layer.setStyle({weight:2,color:TOKENS.neutralInverse,fillOpacity:gapMode?0.92:0.9});},mouseout:()=>{if(key===pinA||key===pinB) updatePinStyles();else geo.resetStyle(layer);}});}}).addTo(map);updateGapToggleUI();buildLeg();if(db){const loaded=await syncReportsFromSupabase();if(!loaded)resetFallbackReports();await syncAnnotationsFromSupabase();await syncPilotVotesFromSupabase();subscribeToReports();subscribeToAnnotations();subscribeToPilotVotes();}initMks();if(ls['3']) cMks.forEach(m=>m.addTo(map));map.fitBounds(geo.getBounds(),{padding:[12,12]});document.getElementById('ml').style.display='none';loadFromURL();updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}catch(err){console.error(err);document.getElementById('ml').innerHTML='<div style="max-width:280px;text-align:center;line-height:1.5"><strong>Dashboard data failed to load.</strong><br>Make sure <code>data.json</code> and <code>csa_boundaries.geojson</code> are published in the repo root.</div>';}}
+async function initMap(){document.getElementById('ylabels').innerHTML=YEARS.map(y=>`<span>${y}</span>`).join('');map=L.map('balt-map',{zoomControl:true,attributionControl:false}).setView([39.29,-76.62],11);map.createPane('holcPane');map.getPane('holcPane').style.zIndex=425;map.on('click',e=>{if(activeReportPinForm)captureReportLocation(activeReportPinForm,e.latlng);});L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);try{const [baseResp, geoResp] = await Promise.all([fetch('data.json',{cache:'no-store'}),fetch('csa_boundaries.geojson',{cache:'no-store'})]);if(!baseResp.ok) throw new Error(`Failed to load data.json (${baseResp.status})`);if(!geoResp.ok) throw new Error(`Failed to load csa_boundaries.geojson (${geoResp.status})`);const normalizedData=normalizeDataset(await baseResp.json());DATA_META=normalizedData.meta||{};BASE=normalizedData.neighborhoods||{};BENCHMARKS=normalizedData.benchmarks||{city:{},state:{},federal:{}};applyMetricMetadata();const geoData = await geoResp.json();geo=L.geoJSON(geoData,{style:getStyle,onEachFeature:(feature,layer)=>{const name=geoName(feature.properties);const key=findK(name);layer.on({click:onNSAClick,mouseover:()=>{if(live311Pinning())return;const tooltip=mapTooltipHtml(key,name);layer.bindTooltip(tooltip,{sticky:true,direction:'top',opacity:0.95}).openTooltip();if(key!==pinA&&key!==pinB) layer.setStyle({weight:2,color:TOKENS.neutralInverse,fillOpacity:gapMode?0.92:0.9});},mouseout:()=>{if(live311Pinning())return;if(key===pinA||key===pinB) updatePinStyles();else geo.resetStyle(layer);}});}}).addTo(map);updateGapToggleUI();buildLeg();if(db){const loaded=await syncReportsFromSupabase();if(!loaded)resetFallbackReports();await syncAnnotationsFromSupabase();await syncPilotVotesFromSupabase();subscribeToReports();subscribeToAnnotations();subscribeToPilotVotes();}initMks();if(window.Live311){Live311.init({map,L});if(ls['3'])Live311.setEnabled(true);}map.fitBounds(geo.getBounds(),{padding:[12,12]});if(!map.getSize().x){const mro=new ResizeObserver(()=>{if(map.getSize().x||document.getElementById('balt-map').offsetWidth){map.invalidateSize();if(map.getZoom()>14)map.fitBounds(geo.getBounds(),{padding:[12,12]});mro.disconnect();}});mro.observe(document.getElementById('balt-map'));};document.getElementById('ml').style.display='none';loadFromURL();updatePinBar();updatePinStyles();refreshSide();updateShareStrip();}catch(err){console.error(err);document.getElementById('ml').innerHTML='<div style="max-width:280px;text-align:center;line-height:1.5"><strong>Dashboard data failed to load.</strong><br>Make sure <code>data.json</code> and <code>csa_boundaries.geojson</code> are published in the repo root.</div>';}}
 (async function startDashboard(){await initSupabase();await initMap();})();
 </script>
 </body>

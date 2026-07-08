@@ -1,0 +1,12 @@
+name = "balti2-chat-assistant"
+main = "index.js"
+compatibility_date = "2026-07-06"
+
+[vars]
+GEMINI_MODEL = "gemini-2.5-flash"
+CHAT_REQUEST_DAILY_CAP = "1200"
+ALLOWED_ORIGINS = "http://localhost:8765,http://127.0.0.1:8765,http://[::1]:8765,http://localhost:8787,http://127.0.0.1:8787,https://romulloataides.github.io"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "1358b098f30e48bdb34ec239ee07b06d"

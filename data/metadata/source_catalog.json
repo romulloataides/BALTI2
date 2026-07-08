@@ -33,10 +33,10 @@
     "organization": "NYU School of Medicine / City Health Dashboard",
     "url": "https://www.cityhealthdashboard.com",
     "api_url": "https://www.cityhealthdashboard.com/api/data",
-    "api_key_required": false,
+    "api_key_required": true,
     "download_formats": ["JSON (API)"],
     "geographic_levels": ["City (Baltimore)", "Census tract (selected metrics only)"],
-    "years_available": "2014–2022 (varies by metric)",
+    "years_available": "Varies by metric; consult the CHDB metrics endpoint and data dictionary",
     "update_frequency": "Periodic (approximately annual)",
     "data_type": "Mix of survey (BRFSS) and administrative",
     "priority": 1,
@@ -50,7 +50,7 @@
       "hs_graduation_rate"
     ],
     "limitations": "Census-tract data available only for some metrics. Year coverage is inconsistent across indicators; some fields may be 2–3 years behind. Does not use CSA geography — not suitable as a primary neighborhood source.",
-    "notes": "Best used to populate city/state/national benchmark values in BENCHMARKS.city, BENCHMARKS.state, BENCHMARKS.federal. Baltimore City is available as a named 'place' in the API. No authentication required for public data reads."
+    "notes": "Best used to populate city/state/national benchmark values in BENCHMARKS.city, BENCHMARKS.state, BENCHMARKS.federal. Baltimore City is available as a named 'place' in the API. Public API reads require a CHDB token; set CHDB_API_KEY before running scripts/fetch_chdb_metric_42.R."
   },
   {
     "id": "cdc_places",
